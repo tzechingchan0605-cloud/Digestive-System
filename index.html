@@ -27,37 +27,38 @@
       </section>
 
       <nav class="steps" aria-label="探究進度">
-        <button class="step active" data-phase="1"><b>01</b><span>情境導向</span></button>
-        <i></i><button class="step" data-phase="2" disabled><b>02</b><span>提出假設</span></button>
+        <button class="step active" data-phase="1"><b>01</b><span>了解情境</span></button>
+        <i></i><button class="step" data-phase="2" disabled><b>02</b><span>設計探究</span></button>
         <i></i><button class="step" data-phase="3" disabled><b>03</b><span>進行探究</span></button>
         <i></i><button class="step" data-phase="4" disabled><b>04</b><span>分析與結論</span></button>
       </nav>
 
       <section class="phase active" id="phase-1">
-        <div class="phase-heading"><span>階段一</span><div><h2>情境導向</h2><p>先細心觀察，暫時不要急於替現象命名。</p></div></div>
+        <div class="phase-heading"><span>階段一</span><div><h2>了解情境</h2><p>閱讀研究任務，認識將會使用的材料。</p></div></div>
         <div class="orientation-grid">
           <article class="scene-card">
-            <div class="scene-head"><span>觀察站</span><span class="live"><i></i> 現象模擬中</span></div>
+            <div class="scene-head"><span>研究情境</span><span class="live"><i></i> 準備探究</span></div>
             <div class="digestive-scene">
               <div class="body-line"></div><div class="organ liver">肝</div><div class="organ intestine">腸</div>
               <div class="vial x">X</div><div class="vial y">Y</div>
               <div class="scene-note">從消化道收集到兩種神秘液體</div>
             </div>
-            <div class="control-tube"><div class="oil"></div><div class="water"></div><span>油 + 水（對照組）</span></div>
+            <div class="control-tube"><div class="oil"></div><div class="water"></div><span>油和水原本不相混合，形成兩層。</span></div>
           </article>
-          <article class="prompt-card"><span class="prompt-number">觀察問題</span><h3>油脂在水中呈現甚麼狀態？</h3><p>觀察試管：黃色油層浮在水面，兩層清楚分開。</p><div class="choice-row" id="observationChoices"><button data-answer="separated">油與水分層</button><button data-answer="cloudy">形成混濁液</button><button data-answer="clear">變成清澈液</button></div><p class="hint" id="observationFeedback">選擇你觀察到的現象。</p>
+          <article class="prompt-card"><span class="prompt-number">研究任務</span><h3>兩種神秘消化液，如何處理油脂？</h3><p>研究員從消化道收集到消化液 X 和 Y。你需要自行設計公平測試，找出它們單獨及共同作用時，試管中油脂外觀的變化。</p><div class="scenario-points"><span>① 先提出可測試的假設</span><span>② 設計裝置和辨認變量</span><span>③ 收集證據後才作推論</span></div>
           </article>
         </div>
-        <button class="primary next" data-next="2">開始提出假設 <span>→</span></button>
+        <button class="primary next" data-next="2">開始設計探究 <span>→</span></button>
       </section>
 
       <section class="phase" id="phase-2">
-        <div class="phase-heading"><span>階段二</span><div><h2>提出假設與擬訂變量</h2><p>以一個可改變的因素，設計一個可測試的預測。</p></div></div>
+        <div class="phase-heading"><span>階段二</span><div><h2>設計探究</h2><p>完成假設、實驗裝置及公平測試設計，才可開始實驗。</p></div></div>
         <div class="concept-grid">
-          <article class="builder-card"><p class="card-kicker">假設建立器</p><h3>完成你的預測</h3><p class="sentence">若在油和水中加入 <select id="hypothesisLiquid"><option value="X">消化液 X</option><option value="Y">消化液 Y</option><option value="XY" selected>消化液 X + Y</option></select>，油脂的外觀將會變成 <select id="hypothesisOutcome"><option value="cloudy">混濁乳狀液</option><option value="clear" selected>清澈溶液</option><option value="separated">無明顯變化</option></select>。</p><label class="reason-label">我的理由（可選）<textarea id="reason" maxlength="120" placeholder="例如：兩種液體可能有不同作用……"></textarea></label></article>
-          <article class="variables-card"><p class="card-kicker">公平測試設計</p><h3>辨認本實驗的變量</h3><div class="variable"><span class="tag iv">獨立變量</span><div><strong>消化液組合</strong><small>你主動改變的因素</small></div></div><div class="variable"><span class="tag dv">因變量</span><div><strong>混合物外觀</strong><small>你觀察和記錄的結果</small></div></div><div class="cv-box"><span class="tag cv">控制變量</span><p>油和水總體積（各 2 mL）、反應溫度（37°C）、反應時間（5 分鐘）</p></div></article>
+          <article class="builder-card"><p class="card-kicker">假設建立器</p><h3>完成你的預測</h3><p class="sentence">若在油和水中加入 <select id="hypothesisLiquid"><option value="X">消化液 X</option><option value="Y">消化液 Y</option><option value="XY" selected>消化液 X + Y</option></select>，試管中溶液的外觀將會 <select id="hypothesisOutcome"><option value="cloudy">變得混濁</option><option value="clear" selected>變得清澈</option><option value="separated">無明顯變化</option></select>。</p><label class="reason-label">我的理由（必答；沒有固定答案）<textarea id="reason" required maxlength="160" placeholder="請寫下你作出這項預測的理由……"></textarea></label></article>
+          <article class="equipment-card"><p class="card-kicker">實驗裝置設計</p><h3>拖曳材料到白色工作區</h3><p>安排你認為進行比較實驗所需的裝置，再儲存設計。</p><div class="setup-layout"><div class="materials" id="materials"><button draggable="true" data-item="試管">▯<small>試管</small></button><button draggable="true" data-item="滴管">╲<small>滴管</small></button><button draggable="true" data-item="油和水">◒<small>油和水</small></button><button draggable="true" data-item="X 和 Y">✦<small>X 和 Y</small></button><button draggable="true" data-item="37°C 水浴">♨<small>37°C 水浴</small></button></div><div class="drop-zone" id="dropZone"><span>把材料拖到這裡</span></div></div><button class="secondary" id="saveSetup" type="button">儲存我的裝置設計</button><p class="hint" id="setupFeedback"></p></article>
+          <article class="variables-card"><p class="card-kicker">公平測試設計</p><h3>將每項因素分類</h3><p class="variable-hints"><b>獨立變量</b>：主動改變的因素　<b>因變量</b>：量度或觀察的結果　<b>控制變量</b>：保持不變的因素</p><div class="variable-quiz" id="variableQuiz"></div><p class="hint" id="variableFeedback"></p></article>
         </div>
-        <div class="action-row"><button class="secondary" data-back="1">← 返回觀察</button><button class="primary next" data-next="3" id="saveHypothesis">儲存假設並開始實驗 <span>→</span></button></div>
+        <div class="action-row"><button class="secondary" data-back="1">← 返回情境</button><button class="primary next" data-next="3" id="saveHypothesis" disabled>完成三部分後開始實驗 <span>→</span></button></div>
       </section>
 
       <section class="phase" id="phase-3">
@@ -72,10 +73,11 @@
           <article class="result-card"><div class="card-top"><div><p class="card-kicker">即時觀察</p><h3 id="resultTitle">等待進行實驗</h3></div><span class="status" id="resultStatus">準備中</span></div>
             <div class="test-tube" id="testTube"><div class="tube-liquid"><div class="result-oil"></div><div class="bubbles"></div></div></div>
             <p class="result-description" id="resultDescription">選擇條件後按「開始實驗」，觀察油脂的變化。</p>
-            <button class="record-button" id="recordData" disabled>記錄這項數據 ＋</button>
+            <div class="observation-choice" id="observationChoice" aria-live="polite"><p>根據你看到的現象，選擇外觀：</p><div><button data-observation="separated" disabled>油水分層</button><button data-observation="thin-oil" disabled>油水分層（油層變薄）</button><button data-observation="cloudy" disabled>變得混濁</button><button data-observation="clear" disabled>變得清澈</button></div></div>
+            <button class="record-button" id="recordData" disabled>確認並記錄這項數據 ＋</button>
           </article>
         </div>
-        <article class="data-card"><div class="data-heading"><div><p class="card-kicker">你的實驗記錄</p><h3>觀察數據表</h3></div><span id="unlockMessage">完成 X、Y 與 X + Y 的未加熱測試以解鎖熱處理。</span></div><div class="table-wrap"><table><thead><tr><th>測試</th><th>消化液組合</th><th>熱處理</th><th>觀察到的外觀</th></tr></thead><tbody id="dataBody"><tr class="empty"><td colspan="4">尚未記錄數據</td></tr></tbody></table></div></article>
+        <article class="data-card"><div class="data-heading"><div><p class="card-kicker">你的實驗記錄</p><h3>觀察數據表</h3></div><span id="unlockMessage">先完成對照組、X、Y 與 X + Y 的未加熱測試，才可進行熱處理比較。</span></div><div class="table-wrap"><table><thead><tr><th>測試</th><th>消化液組合</th><th>熱處理</th><th>你記錄的外觀</th></tr></thead><tbody id="dataBody"><tr class="empty"><td colspan="4">尚未記錄數據</td></tr></tbody></table></div></article>
         <div class="action-row"><button class="secondary" data-back="2">← 修改假設</button><button class="primary next" data-next="4" id="analyseButton" disabled>分析我的數據 <span>→</span></button></div>
       </section>
 
@@ -100,7 +102,8 @@
         <p>輸入顯示名稱和班別，系統只會把這些資料儲存在這部裝置，用作標示你的學習紀錄。</p>
         <label>姓名或稱呼<input id="profileName" name="name" required maxlength="24" autocomplete="name" placeholder="例如：陳小明" /></label>
         <label>班別及學號<input id="profileClass" name="class" required maxlength="16" placeholder="例如：S4X1-05" /></label>
-        <p class="privacy-note">🔒 不需要輸入電郵或身分證明資料。</p>
+        <label>電郵地址<input id="profileEmail" name="email" type="email" required autocomplete="email" placeholder="例如：student@school.edu.hk" /></label>
+        <p class="privacy-note">🔒 此版本只把資料儲存在本裝置；公開 GitHub Pages 不會把資料傳送到老師帳戶。</p>
         <button class="primary" type="submit">進入實驗室 →</button>
       </form>
     </div>
