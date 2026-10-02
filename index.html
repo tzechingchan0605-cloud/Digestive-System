@@ -14,7 +14,7 @@
       <header class="topbar">
         <a class="brand" href="#top" aria-label="探究實驗室主頁"><span class="brand-mark">✦</span><span>探究實驗室</span></a>
         <div class="module-label"><span class="dot"></span> S4 生物 · 模組 1</div>
-        <div class="student-chip"><span class="avatar" id="avatar">同</span><span id="studentName">同學</span><button id="changeProfile" title="更新學習者資料">⚙</button><button id="resetLab" title="重新開始此模組">↻</button></div>
+        <div class="student-chip"><span class="avatar" id="avatar">同</span><span id="studentName">同學</span><button id="teacherButton" hidden>教師儀表板</button><button id="changeProfile" title="更新學習者資料">⚙</button><button id="resetLab" title="重新開始此模組">↻</button></div>
       </header>
 
       <section class="hero" id="top">
@@ -38,25 +38,29 @@
         <div class="orientation-grid">
           <article class="scene-card">
             <div class="scene-head"><span>研究情境</span><span class="live"><i></i> 準備探究</span></div>
-            <div class="digestive-scene">
-              <div class="body-line"></div><div class="organ liver">肝</div><div class="organ intestine">腸</div>
-              <div class="vial x">X</div><div class="vial y">Y</div>
-              <div class="scene-note">從消化道收集到兩種神秘液體</div>
-            </div>
-            <div class="control-tube"><div class="oil"></div><div class="water"></div><span>油和水原本不相混合，形成兩層。</span></div>
+            <svg class="biology-diagram" viewBox="0 0 760 390" role="img" aria-label="肝臟和小腸分別提供神秘消化液 X 和 Y，加入油水試管後結果未知">
+              <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3z" fill="#557b77"/></marker></defs>
+              <g><path d="M65 78c22-48 130-47 160 2 0 53-42 82-99 70-42-8-69-37-61-72z" fill="#c96f62"/><path class="label-line" d="M145 67V28H50"/><text x="25" y="24">肝臟</text></g>
+              <g><path d="M474 70c46-29 96 5 74 42 25 18 5 50-22 37 9 31-37 41-47 10-25 20-55-13-30-39-29-21-4-58 25-50z" fill="none" stroke="#d88e76" stroke-width="14" stroke-linecap="round"/><path class="label-line" d="M510 57V28H640"/><text x="648" y="24">小腸</text></g>
+              <path class="flow-arrow" d="M150 160v52"/><path class="flow-arrow" d="M510 166v46"/>
+              <g><rect x="76" y="220" width="155" height="62" rx="12" fill="#eadcf5" stroke="#9976b0" stroke-width="2"/><text x="153" y="246" text-anchor="middle">神秘消化液 X</text><text class="sub-label" x="153" y="267" text-anchor="middle">從肝臟分泌物取得</text></g>
+              <g><rect x="433" y="220" width="155" height="62" rx="12" fill="#fff0c9" stroke="#c59030" stroke-width="2"/><text x="510" y="246" text-anchor="middle">神秘消化液 Y</text><text class="sub-label" x="510" y="267" text-anchor="middle">從小腸消化液取得</text></g>
+              <path class="flow-arrow" d="M231 251h100v48"/><path class="flow-arrow" d="M433 251h-92v48"/>
+              <g><text x="335" y="294" text-anchor="middle">油 + 水試管</text><path d="M292 308h86v52c0 10-8 18-18 18h-50c-10 0-18-8-18-18z" fill="#ccecef" stroke="#689d9b" stroke-width="3"/><path d="M294 310h82v16h-82z" fill="#efc342"/></g><text class="question-label" x="394" y="350">？加入 X 和／或 Y 後會怎樣？</text>
+            </svg>
           </article>
-          <article class="prompt-card"><span class="prompt-number">研究任務</span><h3>兩種神秘消化液，如何處理油脂？</h3><p>研究員從消化道收集到消化液 X 和 Y。你需要自行設計公平測試，找出它們單獨及共同作用時，試管中油脂外觀的變化。</p><div class="scenario-points"><span>① 先提出可測試的假設</span><span>② 設計裝置和辨認變量</span><span>③ 收集證據後才作推論</span></div>
+          <article class="prompt-card"><span class="prompt-number">研究任務</span><h3>兩種神秘消化液，如何分解油脂使其可被人體吸收？</h3><p>研究員從消化道收集到消化液 X 和 Y。試透過此虛擬實驗平台設計公平測試，找出它們的功能吧！</p><div class="scenario-points"><span>① 先提出可測試的假設</span><span>② 設計裝置和辨認變量</span><span>③ 收集證據後才作推論</span></div>
           </article>
         </div>
         <button class="primary next" data-next="2">開始設計探究 <span>→</span></button>
       </section>
 
       <section class="phase" id="phase-2">
-        <div class="phase-heading"><span>階段二</span><div><h2>設計探究</h2><p>完成假設、實驗裝置及公平測試設計，才可開始實驗。</p></div></div>
+        <div class="phase-heading"><span>階段二</span><div><h2>設計探究</h2><p>完成假設、公平測試及實驗裝置設計，才可開始實驗；系統不會預先判定答案正誤。</p></div></div>
         <div class="concept-grid">
           <article class="builder-card"><p class="card-kicker">假設建立器</p><h3>完成你的預測</h3><p class="sentence">若在油和水中加入 <select id="hypothesisLiquid"><option value="X">消化液 X</option><option value="Y">消化液 Y</option><option value="XY" selected>消化液 X + Y</option></select>，試管中溶液的外觀將會 <select id="hypothesisOutcome"><option value="cloudy">變得混濁</option><option value="clear" selected>變得清澈</option><option value="separated">無明顯變化</option></select>。</p><label class="reason-label">我的理由（必答；沒有固定答案）<textarea id="reason" required maxlength="160" placeholder="請寫下你作出這項預測的理由……"></textarea></label></article>
-          <article class="equipment-card"><p class="card-kicker">實驗裝置設計</p><h3>拖曳材料到白色工作區</h3><p>安排你認為進行比較實驗所需的裝置，再儲存設計。</p><div class="setup-layout"><div class="materials" id="materials"><button draggable="true" data-item="試管">▯<small>試管</small></button><button draggable="true" data-item="滴管">╲<small>滴管</small></button><button draggable="true" data-item="油和水">◒<small>油和水</small></button><button draggable="true" data-item="X 和 Y">✦<small>X 和 Y</small></button><button draggable="true" data-item="37°C 水浴">♨<small>37°C 水浴</small></button></div><div class="drop-zone" id="dropZone"><span>把材料拖到這裡</span></div></div><button class="secondary" id="saveSetup" type="button">儲存我的裝置設計</button><p class="hint" id="setupFeedback"></p></article>
-          <article class="variables-card"><p class="card-kicker">公平測試設計</p><h3>將每項因素分類</h3><p class="variable-hints"><b>獨立變量</b>：主動改變的因素　<b>因變量</b>：量度或觀察的結果　<b>控制變量</b>：保持不變的因素</p><div class="variable-quiz" id="variableQuiz"></div><p class="hint" id="variableFeedback"></p></article>
+          <article class="variables-card"><p class="card-kicker">公平測試設計</p><div class="variable-quiz" id="variableQuiz"></div><p class="hint" id="variableFeedback"></p></article>
+          <article class="equipment-card"><p class="card-kicker">實驗裝置設計</p><h3>繪畫並標示你的實驗裝置</h3><p>試參考實驗變量，繪畫並標示你的實驗裝置。（提示：此實驗需要多少個裝置？實驗組和對照組分別是什麼？）</p><p class="control-hint"><b>對照組提示：</b>不加入消化液的裝置顯示油和水在相同條件下原本的外觀，讓實驗組有比較基準。</p><div class="equipment-bank"><div class="equipment oil-tube"><span></span><b>油水試管 ×4</b></div><div class="equipment reagent-x"><span>X</span><b>消化液 X ×1</b></div><div class="equipment reagent-y"><span>Y</span><b>消化液 Y ×1</b></div><div class="equipment dropper"><span>●</span><b>滴管 ×4</b></div><div class="equipment bath"><span>37°C</span><b>水浴 ×1</b></div></div><canvas id="setupCanvas" width="900" height="430" aria-label="實驗裝置繪圖區"></canvas><div class="drawing-tools"><button type="button" data-tool="pencil">✎ 鉛筆</button><button type="button" data-tool="eraser">⌫ 橡皮擦</button><button type="button" id="clearCanvas">清除</button><button type="button" id="saveSetup">儲存</button><label>上載相片<input id="setupPhoto" type="file" accept="image/*"/></label></div><p class="hint" id="setupFeedback"></p></article>
         </div>
         <div class="action-row"><button class="secondary" data-back="1">← 返回情境</button><button class="primary next" data-next="3" id="saveHypothesis" disabled>完成三部分後開始實驗 <span>→</span></button></div>
       </section>
@@ -91,23 +95,13 @@
             <button class="primary" id="revealConcept">檢視我的推論</button><p class="hint" id="conclusionFeedback"></p>
           </article></div>
         <article class="reveal-card" id="conceptReveal"><span class="reveal-icon">✦</span><div><p class="card-kicker">概念揭示</p><h3>你已解開神秘消化液的身分！</h3><p><strong>消化液 X 是膽汁。</strong>它由肝臟製造，不含酵素，將油脂乳化成細小油滴，增加表面積。<strong>消化液 Y 是脂肪酶。</strong>它是酵素；高溫會使其變性，並負責把脂肪進行化學消化。</p></div></article>
-        <div class="complete-bar"><span>✓</span><div><strong>模組完成</strong><p>你的探究歷程已儲存在本機學習紀錄中。</p></div><button class="secondary" id="downloadRecord">下載學習紀錄</button></div>
+        <div class="complete-bar"><span>✓</span><div><strong>模組完成</strong><p>你的 01–04 階段答案、嘗試及用時已儲存。</p></div><button class="secondary" id="downloadRecord">下載學習紀錄（PDF）</button></div>
       </section>
     </main>
-    <div class="profile-modal" id="profileModal" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
-      <form class="profile-panel" id="profileForm">
-        <span class="profile-mark">✦</span>
-        <p class="eyebrow">探究實驗室 · 模組 1</p>
-        <h2 id="profileTitle">開始你的探究</h2>
-        <p>輸入顯示名稱和班別，系統只會把這些資料儲存在這部裝置，用作標示你的學習紀錄。</p>
-        <label>姓名或稱呼<input id="profileName" name="name" required maxlength="24" autocomplete="name" placeholder="例如：陳小明" /></label>
-        <label>班別及學號<input id="profileClass" name="class" required maxlength="16" placeholder="例如：S4X1-05" /></label>
-        <label>電郵地址<input id="profileEmail" name="email" type="email" required autocomplete="email" placeholder="例如：student@school.edu.hk" /></label>
-        <p class="privacy-note">🔒 此版本只把資料儲存在本裝置；公開 GitHub Pages 不會把資料傳送到老師帳戶。</p>
-        <button class="primary" type="submit">進入實驗室 →</button>
-      </form>
-    </div>
+    <div class="profile-modal" id="profileModal" role="dialog" aria-modal="true" aria-labelledby="profileTitle"><section class="profile-panel"><span class="profile-mark">✦</span><p class="eyebrow">探究實驗室 · 模組 1</p><h2 id="profileTitle">開始你的探究</h2><p>請先使用 Google 帳戶登入，再輸入姓名、班別及學號。</p><button class="primary" id="googleLogin" type="button">使用 Google 登入</button><p class="privacy-note" id="authNote"></p><form id="profileForm" hidden><label>姓名<input id="profileName" required maxlength="24" autocomplete="name"/></label><label>班別及學號<input id="profileClass" required maxlength="16" placeholder="例如：S4X1-05"/></label><button class="primary" type="submit">進入實驗室 →</button></form></section></div>
+    <dialog id="teacherDialog"><section class="teacher-panel"><button id="closeTeacher" class="dialog-close">×</button><p class="eyebrow">教師儀表板</p><h2>學生學習紀錄</h2><p id="dashboardStatus">正在載入……</p><button class="primary" id="exportCsv">下載 Excel CSV</button><div class="table-wrap"><table><thead><tr><th>學生</th><th>班別</th><th>更新時間</th><th>試驗</th><th>互動／嘗試</th></tr></thead><tbody id="teacherData"></tbody></table></div></section></dialog>
+    <section id="printReport" class="print-report"></section>
     <div class="toast" id="toast" role="status"></div>
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
   </body>
 </html>
