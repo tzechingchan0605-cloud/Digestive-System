@@ -33,6 +33,7 @@ const experiments = {
 };
 const state = {
   phase: 1, liquid: 'XY', heat: 'none', records: [], profile: null, user: null,
+  demoMode: false,
   variableChoices: { iv: [], dv: [], cv: [] }, setupMade: false, setupSaved: false,
   setupMethod: '', setupImage: '', selectedObservation: '', experimentHasRun: false,
   events: [], started: Date.now(), phaseStarted: Date.now(),
@@ -146,16 +147,28 @@ async function saveRecord() {
 }
 
 function setupAuth() {
-  $('#authNote').textContent=firebaseReady?'登入後才會顯示學生資料欄。':'尚未設定 Firebase：請先把 app.js 頂部的 FIREBASE_CONFIG 填妥。'; $('#googleLogin').disabled=!firebaseReady;
+  $('#authNote').textContent=firebaseReady
+    ? 'Google 登入後，正式學習紀錄會同步至教師儀表板。'
+    : 'Firebase 尚未設定，因此 Google 登入及教師雲端紀錄暫不可用；你仍可用本機模式完整試用實驗。';
+  $('#googleLogin').disabled=!firebaseReady;
+  $('#demoLogin').onclick=()=>{
+    state.demoMode=true;
+    $('#googleLogin').hidden=true;
+    $('#demoLogin').hidden=true;
+    $('#profileForm').hidden=false;
+    $('#emailField').hidden=false;
+    $('#profileEmail').required=true;
+    $('#authNote').textContent='本機試用模式：紀錄只保存在這部裝置，不會傳送給教師。';
+  };
   $('#googleLogin').onclick=async()=>{try{await signInWithPopup(auth,new GoogleAuthProvider());}catch(error){toast(`登入失敗：${error.message}`);}};
-  if(!auth)return; onAuthStateChanged(auth,user=>{state.user=user;if(!user)return;const email=user.email.toLowerCase();if(email===TEACHER_EMAIL){setProfile({name:user.displayName||'教師',classInfo:'教師',email});$('#profileModal').classList.remove('show');$('#teacherButton').hidden=false;startTeacherDashboard();}else{$('#googleLogin').hidden=true;$('#profileForm').hidden=false;$('#profileName').value=user.displayName||'';}});
+  if(!auth)return; onAuthStateChanged(auth,user=>{state.user=user;if(!user)return;const email=user.email.toLowerCase();if(email===TEACHER_EMAIL){setProfile({name:user.displayName||'教師',classInfo:'教師',email});$('#profileModal').classList.remove('show');$('#teacherButton').hidden=false;startTeacherDashboard();}else{$('#googleLogin').hidden=true;$('#demoLogin').hidden=true;$('#emailField').hidden=true;$('#profileEmail').required=false;$('#profileForm').hidden=false;$('#profileName').value=user.displayName||'';}});
 }
 function startTeacherDashboard(){if(!database)return;onSnapshot(collection(database,COLLECTION),snapshot=>{const records=snapshot.docs.map(item=>item.data());window.teacherRecords=records;$('#dashboardStatus').textContent=`現有 ${records.length} 份紀錄，資料會即時更新。`;$('#teacherData').innerHTML=records.map(record=>`<tr><td>${record.profile?.name||'—'}</td><td>${record.profile?.classInfo||'—'}</td><td>${record.savedAt||'—'}</td><td>${record.phase3?.trials?.length||0}</td><td>${record.telemetry?.length||0}</td></tr>`).join('')||'<tr><td colspan="5">暫無紀錄</td></tr>';});}
 function exportCsv(){const rows=[['姓名','班別','電郵','完成時間','總秒數','各階段秒數','假設','理由','獨立變量','因變量','控制變量','裝置方式','試驗與觀察','結論','嘗試次數']];(window.teacherRecords||[]).forEach(r=>rows.push([r.profile?.name,r.profile?.classInfo,r.profile?.email,r.savedAt,r.durationSeconds,JSON.stringify(r.phaseDurations),`${r.phase2?.hypothesis?.liquid}/${r.phase2?.hypothesis?.outcome}`,r.phase2?.hypothesis?.reason,r.phase2?.variableChoices?.iv?.join('；'),r.phase2?.variableChoices?.dv?.join('；'),r.phase2?.variableChoices?.cv?.join('；'),r.phase2?.setup?.method,JSON.stringify(r.phase3?.trials),JSON.stringify(r.phase4?.conclusions),JSON.stringify(r.attemptCounts)]));const csv='\ufeff'+rows.map(row=>row.map(value=>`"${String(value??'').replaceAll('"','""')}"`).join(',')).join('\n');const link=document.createElement('a');link.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));link.download='digestive-lab-records.csv';link.click();URL.revokeObjectURL(link.href);}
 function renderPrint(record){const esc=value=>String(value??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'})[c]);$('#printReport').innerHTML=`<h1>神秘消化液 X 與 Y｜學習紀錄</h1><p>${esc(record.profile?.name)}｜${esc(record.profile?.classInfo)}｜${esc(record.profile?.email)}</p><h2>01 了解情境</h2><p>已閱讀研究情境。</p><h2>02 設計探究</h2><p>假設：${esc(JSON.stringify(record.phase2.hypothesis))}</p><p>變量：${esc(JSON.stringify(record.phase2.variableChoices))}</p>${record.phase2.setup.image?`<img src="${record.phase2.setup.image}">`:''}<h2>03 進行探究</h2><p>${esc(JSON.stringify(record.phase3.trials))}</p><h2>04 分析與結論</h2><p>${esc(JSON.stringify(record.phase4.conclusions))}</p><p>總用時：${record.durationSeconds} 秒</p>`;}
 
-$('#profileForm').onsubmit=event=>{event.preventDefault();setProfile({name:$('#profileName').value.trim(),classInfo:$('#profileClass').value.trim(),email:state.user.email.toLowerCase()});$('#profileModal').classList.remove('show');logEvent('lab_started');};
-$('#changeProfile').onclick=()=>{if(state.user?.email.toLowerCase()!==TEACHER_EMAIL)$('#profileModal').classList.add('show');};
+$('#profileForm').onsubmit=event=>{event.preventDefault();const email=state.user?.email?.toLowerCase()||$('#profileEmail').value.trim().toLowerCase();setProfile({name:$('#profileName').value.trim(),classInfo:$('#profileClass').value.trim(),email,mode:state.demoMode?'local-demo':'google'});$('#profileModal').classList.remove('show');logEvent('lab_started',{mode:state.demoMode?'local-demo':'google'});};
+$('#changeProfile').onclick=()=>{if(state.user?.email.toLowerCase()!==TEACHER_EMAIL){$('#profileModal').classList.add('show');if(state.demoMode){$('#googleLogin').hidden=true;$('#demoLogin').hidden=true;$('#profileForm').hidden=false;$('#emailField').hidden=false;}}};
 $$('[data-next]').forEach(button=>button.onclick=()=>{const next=+button.dataset.next;if(next===2)$('.step[data-phase="2"]').disabled=false;if(next===3)$('.step[data-phase="3"]').disabled=false;setPhase(next);});
 $$('[data-back]').forEach(button=>button.onclick=()=>setPhase(+button.dataset.back));$$('.step').forEach(button=>button.onclick=()=>!button.disabled&&setPhase(+button.dataset.phase));
 $('#reason').oninput=()=>{logEvent('reason_updated');refreshDesignGate();};$('#hypothesisLiquid').onchange=e=>logEvent('hypothesis_liquid',{value:e.target.value});$('#hypothesisOutcome').onchange=e=>logEvent('hypothesis_outcome',{value:e.target.value});
