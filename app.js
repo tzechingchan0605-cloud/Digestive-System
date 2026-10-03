@@ -1,21 +1,9 @@
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
-import { GoogleAuthProvider, getAuth, onAuthStateChanged, signInWithPopup } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
-import { collection, doc, getFirestore, onSnapshot, serverTimestamp, setDoc } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
-
-// Paste the Firebase web-app values from Firebase Console here before publishing.
-const FIREBASE_CONFIG = {
-  apiKey: '', authDomain: '', projectId: '', storageBucket: '',
-  messagingSenderId: '', appId: ''
-};
 const TEACHER_EMAIL = 'tzechingchan0605@gmail.com';
-const COLLECTION = 'digestiveLabRecords';
 const STORAGE_KEY = 'digestiveLab.v4';
+const RECORDS_KEY = 'digestiveLab.localRecords.v1';
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
-const firebaseReady = ['apiKey', 'authDomain', 'projectId', 'appId'].every(key => FIREBASE_CONFIG[key]);
-const firebaseApp = firebaseReady ? initializeApp(FIREBASE_CONFIG) : null;
-const auth = firebaseApp ? getAuth(firebaseApp) : null;
-const database = firebaseApp ? getFirestore(firebaseApp) : null;
+const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
 
 const variableNames = ['油和水總體積', '反應溫度', '反應時間', '混合物外觀', '消化液組合'];
 const variableGroups = [
@@ -32,8 +20,7 @@ const experiments = {
   'XY-Y': ['cloudy', '變得混濁', '油脂只分散成小油滴，停留在混濁狀態。']
 };
 const state = {
-  phase: 1, liquid: 'XY', heat: 'none', records: [], profile: null, user: null,
-  demoMode: false,
+  phase: 1, liquid: 'XY', heat: 'none', records: [], profile: null,
   variableChoices: { iv: [], dv: [], cv: [] }, setupMade: false, setupSaved: false,
   setupMethod: '', setupImage: '', selectedObservation: '', experimentHasRun: false,
   events: [], started: Date.now(), phaseStarted: Date.now(),
@@ -47,8 +34,8 @@ function toast(message) {
 }
 function queueSave() {
   clearTimeout(queueSave.timer);
-  if (!state.profile || !state.user || !database || state.user.email.toLowerCase() === TEACHER_EMAIL) return;
-  queueSave.timer = setTimeout(() => saveRecord().catch(console.warn), 700);
+  if (!state.profile || state.profile.email === TEACHER_EMAIL) return;
+  queueSave.timer = setTimeout(saveRecord, 700);
 }
 function logEvent(type, details = {}) {
   state.events.push({ type, at: new Date().toISOString(), atSeconds: Math.round((Date.now() - state.started) / 1000), ...details });
@@ -140,35 +127,33 @@ function buildRecord() {
     phase1:{contextViewed:true}, phase2:{hypothesis:{liquid:$('#hypothesisLiquid').value,outcome:$('#hypothesisOutcome').value,reason:$('#reason').value.trim()},variableChoices:state.variableChoices,setup:{saved:state.setupSaved,method:state.setupMethod,image:state.setupImage}},
     phase3:{trials:state.records}, phase4:{conclusions:{q1:$('#q1').value,q2:$('#q2').value,q3:$('#q3').value}}, telemetry:state.events };
 }
-async function saveRecord() {
-  const record=buildRecord(); localStorage.setItem(STORAGE_KEY,JSON.stringify(record));
-  if(database&&state.user&&state.profile&&state.user.email.toLowerCase()!==TEACHER_EMAIL) await setDoc(doc(database,COLLECTION,`${state.user.uid}_digestion`),{...record,uid:state.user.uid,updatedAt:serverTimestamp()});
+function readLocalRecords() {
+  try { return JSON.parse(localStorage.getItem(RECORDS_KEY)) || []; }
+  catch { return []; }
+}
+function saveRecord() {
+  const record = buildRecord();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(record));
+  const records = readLocalRecords();
+  const identity = `${record.profile.email}|${record.moduleId}`;
+  const index = records.findIndex(item => `${item.profile?.email}|${item.moduleId}` === identity);
+  if (index >= 0) records[index] = record; else records.push(record);
+  localStorage.setItem(RECORDS_KEY, JSON.stringify(records));
+  if (!$('#teacherDialog').open) return record;
+  startTeacherDashboard();
   return record;
 }
-
-function setupAuth() {
-  $('#authNote').textContent=firebaseReady
-    ? 'Google 登入後，正式學習紀錄會同步至教師儀表板。'
-    : 'Firebase 尚未設定，因此 Google 登入及教師雲端紀錄暫不可用；你仍可用本機模式完整試用實驗。';
-  $('#googleLogin').disabled=!firebaseReady;
-  $('#demoLogin').onclick=()=>{
-    state.demoMode=true;
-    $('#googleLogin').hidden=true;
-    $('#demoLogin').hidden=true;
-    $('#profileForm').hidden=false;
-    $('#emailField').hidden=false;
-    $('#profileEmail').required=true;
-    $('#authNote').textContent='本機試用模式：紀錄只保存在這部裝置，不會傳送給教師。';
-  };
-  $('#googleLogin').onclick=async()=>{try{await signInWithPopup(auth,new GoogleAuthProvider());}catch(error){toast(`登入失敗：${error.message}`);}};
-  if(!auth)return; onAuthStateChanged(auth,user=>{state.user=user;if(!user)return;const email=user.email.toLowerCase();if(email===TEACHER_EMAIL){setProfile({name:user.displayName||'教師',classInfo:'教師',email});$('#profileModal').classList.remove('show');$('#teacherButton').hidden=false;startTeacherDashboard();}else{$('#googleLogin').hidden=true;$('#demoLogin').hidden=true;$('#emailField').hidden=true;$('#profileEmail').required=false;$('#profileForm').hidden=false;$('#profileName').value=user.displayName||'';}});
+function startTeacherDashboard() {
+  const records = readLocalRecords().filter(record => record.profile?.email !== TEACHER_EMAIL);
+  window.teacherRecords = records;
+  $('#dashboardStatus').textContent = `這部瀏覽器現有 ${records.length} 份學生紀錄。資料不會跨裝置同步。`;
+  $('#teacherData').innerHTML = records.map(record => `<tr><td>${escapeHtml(record.profile?.name || '—')}</td><td>${escapeHtml(record.profile?.classInfo || '—')}</td><td>${escapeHtml(record.savedAt || '—')}</td><td>${record.phase3?.trials?.length || 0}</td><td>${record.telemetry?.length || 0}</td></tr>`).join('') || '<tr><td colspan="5">這部瀏覽器暫無學生紀錄</td></tr>';
 }
-function startTeacherDashboard(){if(!database)return;onSnapshot(collection(database,COLLECTION),snapshot=>{const records=snapshot.docs.map(item=>item.data());window.teacherRecords=records;$('#dashboardStatus').textContent=`現有 ${records.length} 份紀錄，資料會即時更新。`;$('#teacherData').innerHTML=records.map(record=>`<tr><td>${record.profile?.name||'—'}</td><td>${record.profile?.classInfo||'—'}</td><td>${record.savedAt||'—'}</td><td>${record.phase3?.trials?.length||0}</td><td>${record.telemetry?.length||0}</td></tr>`).join('')||'<tr><td colspan="5">暫無紀錄</td></tr>';});}
 function exportCsv(){const rows=[['姓名','班別','電郵','完成時間','總秒數','各階段秒數','假設','理由','獨立變量','因變量','控制變量','裝置方式','試驗與觀察','結論','嘗試次數']];(window.teacherRecords||[]).forEach(r=>rows.push([r.profile?.name,r.profile?.classInfo,r.profile?.email,r.savedAt,r.durationSeconds,JSON.stringify(r.phaseDurations),`${r.phase2?.hypothesis?.liquid}/${r.phase2?.hypothesis?.outcome}`,r.phase2?.hypothesis?.reason,r.phase2?.variableChoices?.iv?.join('；'),r.phase2?.variableChoices?.dv?.join('；'),r.phase2?.variableChoices?.cv?.join('；'),r.phase2?.setup?.method,JSON.stringify(r.phase3?.trials),JSON.stringify(r.phase4?.conclusions),JSON.stringify(r.attemptCounts)]));const csv='\ufeff'+rows.map(row=>row.map(value=>`"${String(value??'').replaceAll('"','""')}"`).join(',')).join('\n');const link=document.createElement('a');link.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));link.download='digestive-lab-records.csv';link.click();URL.revokeObjectURL(link.href);}
 function renderPrint(record){const esc=value=>String(value??'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'})[c]);$('#printReport').innerHTML=`<h1>神秘消化液 X 與 Y｜學習紀錄</h1><p>${esc(record.profile?.name)}｜${esc(record.profile?.classInfo)}｜${esc(record.profile?.email)}</p><h2>01 了解情境</h2><p>已閱讀研究情境。</p><h2>02 設計探究</h2><p>假設：${esc(JSON.stringify(record.phase2.hypothesis))}</p><p>變量：${esc(JSON.stringify(record.phase2.variableChoices))}</p>${record.phase2.setup.image?`<img src="${record.phase2.setup.image}">`:''}<h2>03 進行探究</h2><p>${esc(JSON.stringify(record.phase3.trials))}</p><h2>04 分析與結論</h2><p>${esc(JSON.stringify(record.phase4.conclusions))}</p><p>總用時：${record.durationSeconds} 秒</p>`;}
 
-$('#profileForm').onsubmit=event=>{event.preventDefault();const email=state.user?.email?.toLowerCase()||$('#profileEmail').value.trim().toLowerCase();setProfile({name:$('#profileName').value.trim(),classInfo:$('#profileClass').value.trim(),email,mode:state.demoMode?'local-demo':'google'});$('#profileModal').classList.remove('show');logEvent('lab_started',{mode:state.demoMode?'local-demo':'google'});};
-$('#changeProfile').onclick=()=>{if(state.user?.email.toLowerCase()!==TEACHER_EMAIL){$('#profileModal').classList.add('show');if(state.demoMode){$('#googleLogin').hidden=true;$('#demoLogin').hidden=true;$('#profileForm').hidden=false;$('#emailField').hidden=false;}}};
+$('#profileForm').onsubmit=event=>{event.preventDefault();const email=$('#profileEmail').value.trim().toLowerCase();const teacher=email===TEACHER_EMAIL;setProfile({name:teacher?'教師':$('#profileName').value.trim(),classInfo:teacher?'教師帳戶':$('#profileClass').value.trim(),email,mode:'local'});$('#profileModal').classList.remove('show');$('#teacherButton').hidden=!teacher;if(teacher){startTeacherDashboard();$('#teacherDialog').showModal();}else{logEvent('lab_started',{mode:'local'});}};
+$('#changeProfile').onclick=()=>{$('#profileModal').classList.add('show');};
 $$('[data-next]').forEach(button=>button.onclick=()=>{const next=+button.dataset.next;if(next===2)$('.step[data-phase="2"]').disabled=false;if(next===3)$('.step[data-phase="3"]').disabled=false;setPhase(next);});
 $$('[data-back]').forEach(button=>button.onclick=()=>setPhase(+button.dataset.back));$$('.step').forEach(button=>button.onclick=()=>!button.disabled&&setPhase(+button.dataset.phase));
 $('#reason').oninput=()=>{logEvent('reason_updated');refreshDesignGate();};$('#hypothesisLiquid').onchange=e=>logEvent('hypothesis_liquid',{value:e.target.value});$('#hypothesisOutcome').onchange=e=>logEvent('hypothesis_outcome',{value:e.target.value});
@@ -179,5 +164,5 @@ $$('#observationChoice button').forEach(button=>button.onclick=()=>{state.select
 $('#recordData').onclick=()=>{if(!state.experimentHasRun||!state.selectedObservation)return;const [actual,label]=experiments[key()];const studentLabel=$(`[data-observation="${state.selectedObservation}"]`).textContent;const record={key:key(),liquid:state.liquid,heat:state.heat,studentObservation:state.selectedObservation,studentLabel,actual,correct:state.selectedObservation===actual};const index=state.records.findIndex(item=>item.key===record.key);if(index>=0)state.records[index]=record;else state.records.push(record);logEvent('observation_recorded',record);renderTable();updateUnlock();resetObservation();toast('答案已記錄；毋須答對也可繼續。');};
 $('#revealConcept').onclick=async()=>{if(!$('#q1').value||!$('#q2').value||!$('#q3').value)return $('#conclusionFeedback').textContent='請回答三題；答案毋須正確。';logEvent('conclusions_saved',{q1:$('#q1').value,q2:$('#q2').value,q3:$('#q3').value});$('#conceptReveal').classList.add('show');$('#conclusionFeedback').textContent='已保留你的原始推論，現在可與概念揭示比較。';await saveRecord();};
 $('#downloadRecord').onclick=async()=>{const record=await saveRecord();renderPrint(record);document.body.classList.add('print-record');print();setTimeout(()=>document.body.classList.remove('print-record'),500);};
-$('#resetLab').onclick=()=>confirm('要清除目前紀錄並重新開始嗎？')&&(localStorage.removeItem(STORAGE_KEY),location.reload());$('#teacherButton').onclick=()=>$('#teacherDialog').showModal();$('#closeTeacher').onclick=()=>$('#teacherDialog').close();$('#exportCsv').onclick=exportCsv;
-renderVariableQuiz();setupCanvas();setupAuth();$('#profileModal').classList.add('show');
+$('#resetLab').onclick=()=>confirm('要清除目前紀錄並重新開始嗎？')&&(localStorage.removeItem(STORAGE_KEY),location.reload());$('#teacherButton').onclick=()=>{startTeacherDashboard();$('#teacherDialog').showModal();};$('#closeTeacher').onclick=()=>$('#teacherDialog').close();$('#exportCsv').onclick=exportCsv;
+renderVariableQuiz();setupCanvas();$('#profileModal').classList.add('show');
