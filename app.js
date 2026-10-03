@@ -17,7 +17,7 @@ const experiments = {
   'Y-none': ['thin-oil', '油水分層（油層變薄）', '油層仍在水面，但比對照組薄。'],
   'XY-none': ['clear', '變得清澈', '油滴逐漸消失，混合物變得清澈。'],
   'XY-X': ['clear', '變得清澈', '即使 X 曾被煮沸，混合物仍變得清澈。'],
-  'XY-Y': ['cloudy', '變得混濁', '油脂只分散成小油滴，停留在混濁狀態。']
+  'XY-Y': ['cloudy', '變得混濁', '脂質只分散成小油滴，停留在混濁狀態。']
 };
 const state = {
   phase: 1, liquid: 'XY', heat: 'none', records: [], profile: null,
@@ -163,58 +163,82 @@ function startTeacherDashboard() {
 const outcomeLabels = { cloudy: '變得混濁', clear: '變得清澈', separated: '油水分層', 'thin-oil': '油水分層（油層變薄）' };
 const conclusionAnswers = { q1: { answer: 'cloudy', label: '混濁乳狀液' }, q2: { answer: 'Y', label: '消化液 Y' }, q3: { answer: 'increase', label: '增加' } };
 const conclusionLabels = { q1: { cloudy: '混濁乳狀液', clear: '清澈溶液' }, q2: { X: '消化液 X', Y: '消化液 Y' }, q3: { increase: '增加', decrease: '減少' } };
-const questionLabels = { q1: '消化液 X 對油脂的主要作用結果', q2: '煮沸後失去作用的消化液', q3: '消化液 X 使油滴分散後的總表面積' };
+const questionLabels = { q1: '消化液 X 對脂質的主要作用結果', q2: '煮沸後失去作用的消化液', q3: '消化液 X 使油滴分散後的總表面積' };
 function formatDuration(seconds = 0) { const minutes = Math.floor(seconds / 60); return minutes ? `${minutes} 分 ${seconds % 60} 秒` : `${seconds} 秒`; }
 function formatDate(value) { return value ? new Intl.DateTimeFormat('zh-HK', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '—'; }
 function answerMark(correct) { return `<span class="answer-mark ${correct ? 'correct' : 'incorrect'}">${correct ? '✓ 正確' : '✕ 可再思考'}</span>`; }
 
-function exportExcel() {
-  const trialKeys = ['none-none', 'X-none', 'Y-none', 'XY-none', 'XY-X', 'XY-Y'];
-  const headings = ['姓名','班別及學號','電郵','更新時間','總用時','階段一用時','階段二用時','階段三用時','階段四用時','假設－消化液','假設－預測外觀','假設－理由','獨立變量選擇','因變量選擇','控制變量選擇','裝置設計方式','裝置設計圖'];
-  trialKeys.forEach((_, index) => headings.push(`測試 ${index + 1}－學生觀察`, `測試 ${index + 1}－正確觀察`, `測試 ${index + 1}－結果`));
-  headings.push('結論 1－學生答案','結論 1－正確答案','結論 2－學生答案','結論 2－正確答案','結論 3－學生答案','結論 3－正確答案','進行實驗次數','選擇觀察答案次數','記錄觀察次數','更新理由次數');
-  const rows = (window.teacherRecords || []).map(record => {
-    const hypothesis = record.phase2?.hypothesis || {}, choices = record.phase2?.variableChoices || {};
-    const row = [record.profile?.name,record.profile?.classInfo,record.profile?.email,formatDate(record.savedAt),formatDuration(record.durationSeconds),...[1,2,3,4].map(phase => formatDuration(record.phaseDurations?.[phase])),liquidLabel(hypothesis.liquid),outcomeLabels[hypothesis.outcome],hypothesis.reason,choices.iv?.join('；'),choices.dv?.join('；'),choices.cv?.join('；'),record.phase2?.setup?.method === 'photo' ? '上載相片' : '繪圖',record.phase2?.setup?.image || '未提供'];
-    trialKeys.forEach(trialKey => { const trial = (record.phase3?.trials || []).find(item => item.key === trialKey); row.push(trial?.studentLabel || '未回答', experiments[trialKey]?.[1] || '—', trial ? (trial.correct ? '正確' : '錯誤') : '未回答'); });
-    const conclusions = record.phase4?.conclusions || {};
-    ['q1','q2','q3'].forEach(q => row.push(conclusionLabels[q][conclusions[q]] || '未回答', conclusionAnswers[q].label));
-    row.push(record.attemptCounts?.trial_run || 0,record.attemptCounts?.observation_selected || 0,record.attemptCounts?.observation_recorded || 0,record.attemptCounts?.reason_updated || 0);
-    return row;
-  });
-  const embeddedImages = [];
-  const cell = value => {
-    const text = String(value ?? '—');
-    if (text.startsWith('data:image/')) {
-      const [metadata, base64] = text.split(',');
-      const mime = metadata.match(/^data:([^;]+)/)?.[1] || 'image/jpeg';
-      const contentId = `setup-${embeddedImages.length}@digestive-lab`;
-      embeddedImages.push({ contentId, mime, base64 });
-      return `<td><img src="cid:${contentId}" width="320" style="background:#fff;border:1px solid #aaa"></td>`;
-    }
-    const safe = /^[=+\-@]/.test(text) ? `'${text}` : text;
-    return `<td>${escapeHtml(safe)}</td>`;
-  };
-  const html = `<!doctype html><html><head><meta charset="utf-8"><style>table{border-collapse:collapse;font-family:Arial,sans-serif;font-size:11pt}caption{font-size:18pt;font-weight:bold;color:#086f6b;padding:14px}th{background:#087b78;color:white;padding:9px;border:1px solid #bddbd6}td{padding:7px;border:1px solid #d5e5e2;vertical-align:top}tr:nth-child(even) td{background:#eef8f5}</style></head><body><table><caption>未知消化液 X 與 Y｜全班學習紀錄</caption><thead><tr>${headings.map(heading => `<th>${heading}</th>`).join('')}</tr></thead><tbody>${rows.map(row => `<tr>${row.map(cell).join('')}</tr>`).join('')}</tbody></table></body></html>`;
-  const boundary = '----=_DigestiveLab_Report';
-  const imageParts = embeddedImages.map(image => `--${boundary}\r\nContent-Type: ${image.mime}\r\nContent-Transfer-Encoding: base64\r\nContent-Location: ${image.contentId}\r\nContent-ID: <${image.contentId}>\r\n\r\n${image.base64}\r\n`).join('');
-  const workbook = `MIME-Version: 1.0\r\nContent-Type: multipart/related; boundary="${boundary}"\r\n\r\n--${boundary}\r\nContent-Type: text/html; charset="utf-8"\r\nContent-Location: workbook.html\r\n\r\n${html}\r\n${imageParts}--${boundary}--`;
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(new Blob([workbook], { type: 'application/vnd.ms-excel' }));
-  link.download = '消化液虛擬實驗_全班學習紀錄.xls';
-  link.click();
-  URL.revokeObjectURL(link.href);
+function xmlEscape(value) {
+  return String(value ?? '').replace(/[&<>"']/g, character => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&apos;' })[character]);
 }
-
+function columnName(index) {
+  let name = '';
+  for (let value = index + 1; value; value = Math.floor((value - 1) / 26)) name = String.fromCharCode(65 + ((value - 1) % 26)) + name;
+  return name;
+}
+function worksheetXml(rows, widths = []) {
+  const columns = widths.length ? `<cols>${widths.map((width,index)=>`<col min="${index+1}" max="${index+1}" width="${width}" customWidth="1"/>`).join('')}</cols>` : '';
+  const sheetRows = rows.map((row,rowIndex)=>`<row r="${rowIndex+1}"${rowIndex ? '' : ' ht="26" customHeight="1"'}>${row.map((value,columnIndex)=>`<c r="${columnName(columnIndex)}${rowIndex+1}" t="inlineStr"${rowIndex ? '' : ' s="1"'}><is><t xml:space="preserve">${xmlEscape(value)}</t></is></c>`).join('')}</row>`).join('');
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">${columns}<sheetData>${sheetRows}</sheetData><autoFilter ref="A1:${columnName((rows[0]?.length||1)-1)}${rows.length}"/></worksheet>`;
+}
+const crcTable = Array.from({length:256},(_,number)=>{let crc=number;for(let bit=0;bit<8;bit++)crc=(crc&1)?0xedb88320^(crc>>>1):crc>>>1;return crc>>>0;});
+function crc32(bytes){let crc=0xffffffff;for(const byte of bytes)crc=crcTable[(crc^byte)&255]^(crc>>>8);return (crc^0xffffffff)>>>0;}
+function zipStore(files){
+  const encoder=new TextEncoder(),parts=[],central=[];let offset=0;
+  const u16=value=>new Uint8Array([value&255,(value>>>8)&255]);
+  const u32=value=>new Uint8Array([value&255,(value>>>8)&255,(value>>>16)&255,(value>>>24)&255]);
+  const join=arrays=>{const size=arrays.reduce((sum,array)=>sum+array.length,0),out=new Uint8Array(size);let position=0;for(const array of arrays){out.set(array,position);position+=array.length;}return out;};
+  for(const [name,data] of Object.entries(files)){
+    const nameBytes=encoder.encode(name),bytes=typeof data==='string'?encoder.encode(data):data,crc=crc32(bytes);
+    const local=join([u32(0x04034b50),u16(20),u16(0),u16(0),u16(0),u16(0),u32(crc),u32(bytes.length),u32(bytes.length),u16(nameBytes.length),u16(0),nameBytes,bytes]);
+    parts.push(local);
+    central.push(join([u32(0x02014b50),u16(20),u16(20),u16(0),u16(0),u16(0),u16(0),u32(crc),u32(bytes.length),u32(bytes.length),u16(nameBytes.length),u16(0),u16(0),u16(0),u16(0),u32(0),u32(offset),nameBytes]));
+    offset+=local.length;
+  }
+  const directory=join(central),end=join([u32(0x06054b50),u16(0),u16(0),u16(central.length),u16(central.length),u32(directory.length),u32(offset),u16(0)]);
+  return new Blob([...parts,directory,end],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+}
+function dataUrlBytes(dataUrl){const base64=dataUrl.split(',')[1]||'',binary=atob(base64),bytes=new Uint8Array(binary.length);for(let index=0;index<binary.length;index++)bytes[index]=binary.charCodeAt(index);return bytes;}
+function exportExcel() {
+  const trialKeys=['none-none','X-none','Y-none','XY-none','XY-X','XY-Y'];
+  const headings=['姓名','班別及學號','電郵','更新時間','總用時','階段一用時','階段二用時','階段三用時','階段四用時','假設－消化液','假設－預測外觀','假設－理由','獨立變量選擇','因變量選擇','控制變量選擇','裝置設計方式'];
+  trialKeys.forEach((_,index)=>headings.push(`測試 ${index+1}－學生觀察`,`測試 ${index+1}－正確觀察`,`測試 ${index+1}－結果`));
+  headings.push('結論 1－學生答案','結論 1－正確答案','結論 2－學生答案','結論 2－正確答案','結論 3－學生答案','結論 3－正確答案','進行實驗次數','選擇觀察答案次數','記錄觀察次數','更新理由次數');
+  const records=window.teacherRecords||[],dataRows=[headings];
+  records.forEach(record=>{
+    const hypothesis=record.phase2?.hypothesis||{},choices=record.phase2?.variableChoices||{};
+    const row=[record.profile?.name,record.profile?.classInfo,record.profile?.email,formatDate(record.savedAt),formatDuration(record.durationSeconds),...[1,2,3,4].map(phase=>formatDuration(record.phaseDurations?.[phase])),liquidLabel(hypothesis.liquid),outcomeLabels[hypothesis.outcome],hypothesis.reason,choices.iv?.join('；'),choices.dv?.join('；'),choices.cv?.join('；'),record.phase2?.setup?.method==='photo'?'上載相片':'繪圖'];
+    trialKeys.forEach(trialKey=>{const trial=(record.phase3?.trials||[]).find(item=>item.key===trialKey);row.push(trial?.studentLabel||'未回答',experiments[trialKey]?.[1]||'—',trial?(trial.correct?'正確':'錯誤'):'未回答');});
+    const conclusions=record.phase4?.conclusions||{};['q1','q2','q3'].forEach(question=>row.push(conclusionLabels[question][conclusions[question]]||'未回答',conclusionAnswers[question].label));
+    row.push(record.attemptCounts?.trial_run||0,record.attemptCounts?.observation_selected||0,record.attemptCounts?.observation_recorded||0,record.attemptCounts?.reason_updated||0);dataRows.push(row);
+  });
+  const designRows=[['姓名','班別及學號','電郵','更新時間','裝置設計圖'],...records.map(record=>[record.profile?.name,record.profile?.classInfo,record.profile?.email,formatDate(record.savedAt),''])];
+  const files={
+    '[Content_Types].xml':'<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="jpeg" ContentType="image/jpeg"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/><Override PartName="/xl/drawings/drawing1.xml" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/></Types>',
+    '_rels/.rels':'<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>',
+    'xl/workbook.xml':'<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="全班學習紀錄" sheetId="1" r:id="rId1"/><sheet name="裝置設計圖" sheetId="2" r:id="rId2"/></sheets></workbook>',
+    'xl/_rels/workbook.xml.rels':'<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>',
+    'xl/styles.xml':'<?xml version="1.0" encoding="UTF-8"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Arial"/></font><font><b/><color rgb="FFFFFFFF"/><sz val="11"/><name val="Arial"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF087B78"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/></cellXfs></styleSheet>',
+    'xl/worksheets/sheet1.xml':worksheetXml(dataRows,headings.map((_,index)=>index===11?34:18))
+  };
+  const imageRecords=records.map((record,index)=>({record,index,dataUrl:record.phase2?.setup?.image})).filter(item=>item.dataUrl?.startsWith('data:image/'));
+  const designSheet=worksheetXml(designRows,[16,18,28,22,48]).replace('</worksheet>',`<drawing xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:id="rId1"/></worksheet>`).replace(/<row r="(\d+)"/g,(match,row)=>Number(row)>1?`${match} ht="125" customHeight="1"`:match);
+  files['xl/worksheets/sheet2.xml']=designSheet;
+  files['xl/worksheets/_rels/sheet2.xml.rels']='<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" Target="../drawings/drawing1.xml"/></Relationships>';
+  files['xl/drawings/drawing1.xml']=`<?xml version="1.0" encoding="UTF-8"?><xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">${imageRecords.map((item,imageIndex)=>`<xdr:twoCellAnchor editAs="oneCell"><xdr:from><xdr:col>4</xdr:col><xdr:colOff>60000</xdr:colOff><xdr:row>${item.index+1}</xdr:row><xdr:rowOff>60000</xdr:rowOff></xdr:from><xdr:to><xdr:col>5</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>${item.index+2}</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:to><xdr:pic><xdr:nvPicPr><xdr:cNvPr id="${imageIndex+1}" name="裝置設計圖 ${imageIndex+1}"/><xdr:cNvPicPr/></xdr:nvPicPr><xdr:blipFill><a:blip r:embed="rId${imageIndex+1}"/><a:stretch><a:fillRect/></a:stretch></xdr:blipFill><xdr:spPr><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></xdr:spPr></xdr:pic><xdr:clientData/></xdr:twoCellAnchor>`).join('')}</xdr:wsDr>`;
+  files['xl/drawings/_rels/drawing1.xml.rels']=`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${imageRecords.map((item,index)=>`<Relationship Id="rId${index+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/setup-${index+1}.jpeg"/>`).join('')}</Relationships>`;
+  imageRecords.forEach((item,index)=>files[`xl/media/setup-${index+1}.jpeg`]=dataUrlBytes(item.dataUrl));
+  const link=document.createElement('a');link.href=URL.createObjectURL(zipStore(files));link.download='消化液虛擬實驗_全班學習紀錄.xlsx';link.click();URL.revokeObjectURL(link.href);
+}
 function renderPrint(record) {
   const hypothesis = record.phase2?.hypothesis || {}, choices = record.phase2?.variableChoices || {}, trials = record.phase3?.trials || [], conclusions = record.phase4?.conclusions || {};
   const choiceLine = (title, values, expectedValues) => { const selected = values || []; const correct = selected.length === expectedValues.length && selected.every(value => expectedValues.includes(value)); return `<div class="report-answer"><b>${title}</b><span>${escapeHtml(selected.join('、') || '未回答')}</span>${answerMark(correct)}<small>正確答案：${expectedValues.join('、')}</small></div>`; };
   $('#printReport').innerHTML = `<header class="report-cover"><span class="report-logo">✦</span><div><p>IBL 虛擬實驗室 · S4 生物</p><h1>未知消化液 X 與 Y</h1><strong>個人學習紀錄與回饋</strong></div></header>
   <section class="report-profile"><div><small>學生</small><b>${escapeHtml(record.profile?.name)}</b></div><div><small>班別及學號</small><b>${escapeHtml(record.profile?.classInfo)}</b></div><div><small>完成時間</small><b>${formatDate(record.savedAt)}</b></div><div><small>總用時</small><b>${formatDuration(record.durationSeconds)}</b></div></section>
-  <section class="report-stage"><h2><span>01</span> 了解情境</h2><div class="report-card context-summary"><img src="assets/digestive-system.png" alt="人體消化系統"><div><h3>研究任務</h3><p>探究消化液 X 和消化液 Y 如何分解油脂，使其可被人體吸收。</p><span class="completed-chip">✓ 已閱讀情境</span></div></div></section>
+  <section class="report-stage"><h2><span>01</span> 了解情境</h2><div class="report-card context-summary"><img src="assets/digestive-system.png" alt="人體消化系統"><div><h3>研究任務</h3><p>探究消化液 X 和消化液 Y 如何分解脂質，使其可被人體吸收。</p><span class="completed-chip">✓ 已閱讀情境</span></div></div></section>
   <section class="report-stage"><h2><span>02</span> 設計探究</h2><div class="report-card"><p class="report-kicker">我的假設</p><p class="hypothesis-sentence">若加入 <b>${escapeHtml(liquidLabel(hypothesis.liquid))}</b>，溶液外觀將會 <b>${escapeHtml(outcomeLabels[hypothesis.outcome] || '未回答')}</b>。</p><blockquote>${escapeHtml(hypothesis.reason || '未填寫理由')}</blockquote><p class="feedback-note">此題沒有固定答案；以上保留你在實驗前的原始想法。</p></div><div class="report-card"><p class="report-kicker">我的公平測試設計</p>${choiceLine('獨立變量',choices.iv,['消化液組合'])}${choiceLine('因變量',choices.dv,['混合物外觀'])}${choiceLine('控制變量',choices.cv,['油和水總體積','反應溫度','反應時間'])}</div>${record.phase2?.setup?.image ? `<div class="report-card"><p class="report-kicker">我的實驗裝置設計</p><img class="setup-image" src="${record.phase2.setup.image}" alt="學生的實驗裝置設計"></div>` : ''}</section>
   <section class="report-stage page-break"><h2><span>03</span> 進行探究</h2><div class="report-card"><table class="report-table"><thead><tr><th>實驗裝置</th><th>你的觀察</th><th>回饋</th><th>正確觀察</th></tr></thead><tbody>${trials.filter(trial => trial.heat === 'none').map(trial => `<tr><td>${escapeHtml(liquidLabel(trial.liquid))}</td><td>${escapeHtml(trial.studentLabel)}</td><td>${answerMark(trial.correct)}</td><td>${escapeHtml(experiments[trial.key]?.[1])}</td></tr>`).join('')}</tbody></table></div></section>
-  <section class="report-stage"><h2><span>04</span> 分析與結論</h2><div class="report-card conclusion-list">${['q1','q3'].map(q => { const selected = conclusions[q], correct = selected === conclusionAnswers[q].answer; return `<div><p>${questionLabels[q]}</p><strong>你的答案：${escapeHtml(conclusionLabels[q][selected] || '未回答')}</strong>${answerMark(correct)}<small>正確答案：${conclusionAnswers[q].label}</small></div>`; }).join('')}</div><div class="report-card"><p class="report-kicker">延伸探究：加熱對消化液的影響</p><table class="report-table"><thead><tr><th>熱處理</th><th>你的觀察</th><th>回饋</th><th>正確觀察</th></tr></thead><tbody>${trials.filter(trial => trial.heat !== 'none').map(trial => `<tr><td>煮沸消化液 ${trial.heat}</td><td>${escapeHtml(trial.studentLabel)}</td><td>${answerMark(trial.correct)}</td><td>${escapeHtml(experiments[trial.key]?.[1])}</td></tr>`).join('')}</tbody></table><div class="conclusion-list"><div><p>${questionLabels.q2}</p><strong>你的答案：${escapeHtml(conclusionLabels.q2[conclusions.q2] || '未回答')}</strong>${answerMark(conclusions.q2 === conclusionAnswers.q2.answer)}<small>正確答案：${conclusionAnswers.q2.label}</small></div></div></div><div class="concept-summary"><h3>概念總結</h3><p><b>消化液 X 是膽汁：</b>把油脂乳化成細小油滴，增加表面積。</p><p><b>消化液 Y 是脂肪酶：</b>負責化學消化脂肪；高溫會令它變性失活。</p></div></section><footer class="report-footer">探究實驗室 · 這份報告保留你的原始答案，並以 ✓／✕ 和參考答案協助反思。</footer>`;
+  <section class="report-stage"><h2><span>04</span> 分析與結論</h2><div class="report-card conclusion-list">${['q1','q3'].map(q => { const selected = conclusions[q], correct = selected === conclusionAnswers[q].answer; return `<div><p>${questionLabels[q]}</p><strong>你的答案：${escapeHtml(conclusionLabels[q][selected] || '未回答')}</strong>${answerMark(correct)}<small>正確答案：${conclusionAnswers[q].label}</small></div>`; }).join('')}</div><div class="report-card"><p class="report-kicker">延伸探究：加熱對消化液的影響</p><table class="report-table"><thead><tr><th>熱處理</th><th>你的觀察</th><th>回饋</th><th>正確觀察</th></tr></thead><tbody>${trials.filter(trial => trial.heat !== 'none').map(trial => `<tr><td>煮沸消化液 ${trial.heat}</td><td>${escapeHtml(trial.studentLabel)}</td><td>${answerMark(trial.correct)}</td><td>${escapeHtml(experiments[trial.key]?.[1])}</td></tr>`).join('')}</tbody></table><div class="conclusion-list"><div><p>${questionLabels.q2}</p><strong>你的答案：${escapeHtml(conclusionLabels.q2[conclusions.q2] || '未回答')}</strong>${answerMark(conclusions.q2 === conclusionAnswers.q2.answer)}<small>正確答案：${conclusionAnswers.q2.label}</small></div></div></div><div class="concept-summary"><h3>學習重點</h3><ol><li><b>消化液 X 是膽汁。</b>它由肝臟分泌並儲存於膽囊。膽汁不含任何消化酶，其作用是透過物理消化把脂質乳化成小油滴，增加表面積提升後續化學消化的效率。</li><li><b>消化液 Y 是脂肪酶。</b>它負責催化脂質進行化學消化，將其分解為分子更小的甘油與脂肪酸，以助吸收。而脂解酶是蛋白質，高溫會使其變性，失去功能。</li></ol></div></section><footer class="report-footer">探究實驗室 · 這份報告保留你的原始答案，並以 ✓／✕ 和參考答案協助反思。</footer>`;
 }
 
 $('#profileForm').onsubmit=event=>{event.preventDefault();const email=$('#profileEmail').value.trim().toLowerCase();const teacher=email===TEACHER_EMAIL;setProfile({name:teacher?'教師':$('#profileName').value.trim(),classInfo:teacher?'教師帳戶':$('#profileClass').value.trim(),email,mode:'local'});$('#profileModal').classList.remove('show');$('#teacherButton').hidden=!teacher;if(teacher){startTeacherDashboard();$('#teacherDialog').showModal();}else{logEvent('lab_started',{mode:'local'});}};
@@ -223,12 +247,21 @@ $$('[data-next]').forEach(button=>button.onclick=()=>{const next=+button.dataset
 $$('[data-back]').forEach(button=>button.onclick=()=>setPhase(+button.dataset.back));$$('.step').forEach(button=>button.onclick=()=>!button.disabled&&setPhase(+button.dataset.phase));
 $('#reason').oninput=()=>{logEvent('reason_updated');refreshDesignGate();};$('#hypothesisLiquid').onchange=e=>logEvent('hypothesis_liquid',{value:e.target.value});$('#hypothesisOutcome').onchange=e=>logEvent('hypothesis_outcome',{value:e.target.value});
 $$('#liquidButtons button').forEach(button=>button.onclick=()=>{state.liquid=button.dataset.liquid;state.heat='none';$$('#liquidButtons button').forEach(item=>item.classList.toggle('selected',item===button));resetObservation();logEvent('liquid_selected',{liquid:state.liquid});});
-$('#runExperiment').onclick=()=>{const [outcome]=experiments[key()];const animation=$('#mainDropper').parentElement;animation.classList.remove('adding');void animation.offsetWidth;animation.classList.add('adding');$('#testTube').className='test-tube';$('#resultTitle').textContent='正在加入試劑…';$('#resultDescription').textContent='';logEvent('trial_run',{trial:key()});setTimeout(()=>{$('#testTube').className='test-tube running';$('#resultTitle').textContent='正在搖勻試管…';},900);setTimeout(()=>{$('#testTube').className=`test-tube ${outcome}`;$('#resultTitle').textContent='請自行判讀外觀';state.experimentHasRun=true;$$('#observationChoice button').forEach(button=>button.disabled=false);},1650);};
+function setDropColours(container, colours) {
+  [...container.children].forEach((drop, index) => drop.style.setProperty('--drop-colour', colours[index]));
+}
+function mainDropColours() {
+  if (state.liquid === 'X') return ['#b9dfc3','#b9dfc3','#b9dfc3','#b9dfc3'];
+  if (state.liquid === 'Y') return ['#efb7b7','#efb7b7','#efb7b7','#efb7b7'];
+  if (state.liquid === 'XY') return ['#b9dfc3','#b9dfc3','#efb7b7','#efb7b7'];
+  return ['#b9e4f2','#b9e4f2','#b9e4f2','#b9e4f2'];
+}
+$('#runExperiment').onclick=()=>{const [outcome]=experiments[key()];const animation=$('#mainDropper').parentElement;setDropColours($('#mainDrops'),mainDropColours());animation.classList.remove('adding');void animation.offsetWidth;animation.classList.add('adding');$('#testTube').className='test-tube';$('#resultTitle').textContent='正在加入試劑…';$('#resultDescription').textContent='';logEvent('trial_run',{trial:key()});setTimeout(()=>{$('#testTube').className='test-tube running';$('#resultTitle').textContent='正在搖勻試管…';},2100);setTimeout(()=>{$('#testTube').className=`test-tube ${outcome}`;$('#resultTitle').textContent='請自行判讀外觀';state.experimentHasRun=true;$$('#observationChoice button').forEach(button=>button.disabled=false);},3000);};
 $$('#observationChoice button').forEach(button=>button.onclick=()=>{state.selectedObservation=button.dataset.observation;$$('#observationChoice button').forEach(item=>item.classList.toggle('selected',item===button));$('#recordData').disabled=false;logEvent('observation_selected',{trial:key(),answer:state.selectedObservation});});
 $('#recordData').onclick=()=>{if(!state.experimentHasRun||!state.selectedObservation)return;const [actual,label]=experiments[key()];const studentLabel=$(`[data-observation="${state.selectedObservation}"]`).textContent;const record={key:key(),liquid:state.liquid,heat:state.heat,studentObservation:state.selectedObservation,studentLabel,actual,correct:state.selectedObservation===actual};const index=state.records.findIndex(item=>item.key===record.key);if(index>=0)state.records[index]=record;else state.records.push(record);logEvent('observation_recorded',record);renderTable();updateUnlock();resetObservation();toast('實驗結果已記錄。');};
 function renderExtensionTable(){const records=state.records.filter(record=>record.heat!=='none');$('#extensionDataBody').innerHTML=records.length?records.map((record,index)=>`<tr><td>${index+1}</td><td>${record.heat==='X'?'煮沸消化液 X ＋ 未煮沸消化液 Y':'未煮沸消化液 X ＋ 煮沸消化液 Y'}</td><td>${record.studentLabel}</td></tr>`).join(''):'<tr class="empty"><td colspan="3">尚未記錄延伸探究數據</td></tr>';}
 $$('[data-extension-heat]').forEach(button=>button.onclick=()=>{state.extensionHeat=button.dataset.extensionHeat;state.extensionObservation='';$$('[data-extension-heat]').forEach(item=>item.classList.toggle('selected',item===button));$('#runExtension').disabled=false;$('#recordExtension').disabled=true;$('#extensionTube').className='test-tube';$('#extensionResultTitle').textContent='等待進行延伸測試';$$('[data-extension-observation]').forEach(item=>{item.disabled=true;item.classList.remove('selected');});});
-$('#runExtension').onclick=()=>{const trialKey=`XY-${state.extensionHeat}`;const [outcome]=experiments[trialKey];const animation=$('#extensionDropper').parentElement;animation.classList.remove('adding');void animation.offsetWidth;animation.classList.add('adding');$('#extensionTube').className='test-tube';$('#extensionResultTitle').textContent='正在加入試劑…';setTimeout(()=>{$('#extensionTube').className='test-tube running';$('#extensionResultTitle').textContent='正在搖勻試管…';},900);setTimeout(()=>{$('#extensionTube').className=`test-tube ${outcome}`;$('#extensionResultTitle').textContent='請自行判讀外觀';$$('[data-extension-observation]').forEach(item=>item.disabled=false);},1650);logEvent('extension_trial_run',{trial:trialKey,outcome});};
+$('#runExtension').onclick=()=>{const trialKey=`XY-${state.extensionHeat}`;const [outcome]=experiments[trialKey];const animation=$('#extensionDropper').parentElement;setDropColours($('#extensionDrops'),['#b9dfc3','#b9dfc3','#efb7b7','#efb7b7']);animation.classList.remove('adding');void animation.offsetWidth;animation.classList.add('adding');$('#extensionTube').className='test-tube';$('#extensionResultTitle').textContent='正在加入試劑…';setTimeout(()=>{$('#extensionTube').className='test-tube running';$('#extensionResultTitle').textContent='正在搖勻試管…';},2100);setTimeout(()=>{$('#extensionTube').className=`test-tube ${outcome}`;$('#extensionResultTitle').textContent='請自行判讀外觀';$$('[data-extension-observation]').forEach(item=>item.disabled=false);},3000);logEvent('extension_trial_run',{trial:trialKey,outcome});};
 $$('[data-extension-observation]').forEach(button=>button.onclick=()=>{state.extensionObservation=button.dataset.extensionObservation;$$('[data-extension-observation]').forEach(item=>item.classList.toggle('selected',item===button));$('#recordExtension').disabled=false;});
 $('#recordExtension').onclick=()=>{const trialKey=`XY-${state.extensionHeat}`;const [actual]=experiments[trialKey];const studentLabel=$(`[data-extension-observation="${state.extensionObservation}"]`).textContent;const record={key:trialKey,liquid:'XY',heat:state.extensionHeat,studentObservation:state.extensionObservation,studentLabel,actual,correct:state.extensionObservation===actual};const index=state.records.findIndex(item=>item.key===trialKey);if(index>=0)state.records[index]=record;else state.records.push(record);logEvent('observation_recorded',record);renderEvidence();renderExtensionTable();$('#extensionFeedback').textContent=`已記錄：${state.extensionHeat==='X'?'煮沸消化液 X':'煮沸消化液 Y'}。`;toast('延伸探究結果已記錄。');};
 $('#revealConcept').onclick=async()=>{const missing=[];if(!$('#q1').value||!$('#q3').value)missing.push('第 1 及第 3 題結論');if(!has('XY-X')||!has('XY-Y'))missing.push('兩項延伸熱處理測試');if(!$('#q2').value)missing.push('延伸探究第 2 題');if(missing.length){alert(`尚未完成以下部分：\n\n• ${missing.join('\n• ')}`);return;}if(!confirm('遞交後不能修改本次答案。你仍可按「重新開始」進行新的探究。\n\n確定遞交嗎？'))return;state.submitted=true;logEvent('conclusions_saved',{q1:$('#q1').value,q2:$('#q2').value,q3:$('#q3').value});$('#conceptReveal').classList.add('show');$('#completeBar').hidden=false;$('#revealConcept').disabled=true;$('#conclusionFeedback').textContent='答案已遞交，不能修改。';$$('.phase input,.phase select,.phase textarea,.phase button').forEach(el=>{if(!['downloadRecord','restartInvestigation'].includes(el.id))el.disabled=true;});await saveRecord();};
