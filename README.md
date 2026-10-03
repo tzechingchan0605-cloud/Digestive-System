@@ -1,3 +1,7 @@
-# Firebase setup
+# 神秘消化液虛擬實驗室（本機版）
 
-Before publishing, paste the Firebase Web App configuration into `FIREBASE_CONFIG` at the top of `app.js`. In Firebase Console, enable Google Authentication, add the GitHub Pages domain under Authorized domains, create Firestore, and publish `firestore.rules`. The teacher dashboard is restricted to `tzechingchan0605@gmail.com`.
+網站不再使用 Google 登入或 Firebase。學生輸入姓名、班別及電郵後即可使用。輸入 `tzechingchan0605@gmail.com` 會開啟教師儀表板及 CSV 匯出。
+
+## 重要限制
+
+所有紀錄都儲存在目前瀏覽器的 `localStorage`。教師儀表板只能看到同一部裝置、同一個瀏覽器中完成的學生紀錄，無法看到其他學生裝置上的資料。這個電郵檢查不是安全登入，任何知道教師電郵的人都能開啟本機儀表板，因此只適合試用或由學生下載紀錄後集中收集，不適合正式的跨裝置研究資料收集。
