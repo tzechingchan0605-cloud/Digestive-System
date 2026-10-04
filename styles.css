@@ -72,3 +72,18 @@
 .concept-summary .learning-keyword{color:#c62828}
 .reflection-summary{margin-top:12px;padding:14px 17px;border:1px solid #efd1b5;border-left:5px solid #c77435;border-radius:12px;background:#fff8ee}
 .reflection-summary h3,.reflection-summary p{margin:3px 0}
+
+/* Evidence prompts, reflection and read-only teacher reports. */
+.response-card{margin-top:20px}.response-card label,.equipment-card>label,.reflection-card>label,.learning-reflection-card label{font-weight:700;display:block;margin-top:14px}
+textarea{display:block;width:100%;min-height:96px;padding:12px;border:1px solid #bbd4ce;border-radius:9px;font:inherit;resize:vertical;margin:8px 0 12px}
+.assumption-option{display:flex!important;gap:9px;align-items:flex-start;margin:10px 0!important;font-size:14px}.assumption-option input{margin-top:6px;flex:none}
+.reflection-card>select{max-width:100%;width:100%;white-space:normal;appearance:auto}#originalHypothesis blockquote{margin:16px 0;padding:12px;border-left:4px solid #c77435;background:#fff}
+.learning-reflection-card>div{min-width:0;flex:1}#reflectionStatus{margin-top:12px}.student-chip{flex-wrap:wrap;justify-content:flex-end}.student-chip button{font-size:12px!important}
+#teacherReport{margin-top:20px;background:#fff;color:var(--ink);padding:16px;border:1px solid var(--line);border-radius:12px}#teacherReport .report-cover{color:white}#teacherDetail{margin-top:20px}#teacherDetail[hidden]{display:none}
+.report-answer{display:block}.report-answer>p{margin:5px 0;white-space:pre-wrap;overflow-wrap:anywhere}.report-answer>small{display:block;font-weight:400}.report-answer .answer-mark{margin-left:9px}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #66bcb0;outline-offset:3px}button:disabled{cursor:not-allowed;opacity:.5}#setupCanvas[aria-disabled="true"]{pointer-events:none;opacity:.85}
+.profile-panel{max-height:calc(100dvh - 40px);overflow:auto}#toast{z-index:30;max-width:calc(100vw - 30px)}
+@media(max-width:760px){.topbar{height:auto;min-height:76px;gap:8px;padding:12px 0;align-items:flex-start}.student-chip{gap:5px}.student-chip button{padding:5px!important}.learning-reflection-card{padding:16px;gap:10px}.complete-actions{margin:10px 0 0;flex-wrap:wrap}.report-profile{grid-template-columns:repeat(2,1fr)}.report-answer{overflow-wrap:anywhere}.reflection-card select{font-size:12px}.report-table{font-size:10px}.report-cover{padding:15px;gap:10px}.report-cover h1{font-size:20px}.report-logo{display:none!important}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+@media print{body.print-record>main,body.print-record>dialog,body.print-record>.profile-modal,body.print-record>.toast{display:none!important}.print-report{max-width:none}.report-table{table-layout:fixed;font-size:9pt}.report-table td,.report-table th{overflow-wrap:anywhere}.report-answer{break-inside:avoid}.report-card{box-shadow:none}.report-stage h2{break-after:avoid}.reflection-summary p{white-space:pre-wrap;overflow-wrap:anywhere}.report-profile{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:760px){.brand{white-space:nowrap;font-size:16px;flex:none}.data-heading{display:block}.data-heading span{display:block;max-width:none;margin-top:8px}.report-answer small{overflow-wrap:anywhere}}

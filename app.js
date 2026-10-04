@@ -1,97 +1,126 @@
+'use strict';
 const TEACHER_EMAIL = 'tzechingchan0605@gmail.com';
 const STORAGE_KEY = 'digestiveLab.v4';
 const RECORDS_KEY = 'digestiveLab.localRecords.v1';
+const MODULE_ID = 'VL_BIO_DIGESTION_OPTION_A';
+const PAGE_TITLE = document.title;
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
-const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
-
-const variableNames = ['油和水總體積', '反應溫度', '反應時間', '混合物外觀', '消化液組合'];
-const variableGroups = [
-  ['iv', '獨立變量', '主動改變的因素'],
-  ['dv', '因變量', '量度或觀察的結果'],
-  ['cv', '控制變量', '保持不變的因素']
+const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const copy = value => structuredClone(value);
+const variableNames = ['油和水總體積','反應溫度','反應時間','加液總量','搖勻方式','混合物外觀','消化液組合'];
+const variableGroups = [['iv','獨立變量','主動改變的因素'],['dv','因變量','量度或觀察的結果'],['cv','控制變量','保持不變的因素']];
+const expectedVariables = {iv:['消化液組合'],dv:['混合物外觀'],cv:variableNames.slice(0,5)};
+const assumptions = [
+  ['temperature','各裝置的反應溫度相同（熱處理後先冷卻至相同反應溫度）。',true],
+  ['time','各裝置在相同反應時間後觀察。',true],
+  ['volume','各裝置起始油水量及加入液體的總量相同。',true],
+  ['mixing','各裝置使用相同搖勻方式。',true],
+  ['more','X＋Y 組可加入較多總液量，以便與其他組比較。',false],
+  ['hot','煮沸組應趁熱觀察，毋須控制反應溫度。',false]
 ];
+const CONTROL_REFERENCE = '以油水＋2 mL 水作對照，與油水＋2 mL X、油水＋2 mL Y、油水＋各 1 mL X 和 Y 比較。保持起始油水量、加液總量、反應溫度、反應時間及搖勻方式相同。';
+const DESIGN_REFERENCE = '四個標示清楚的基本裝置，分別是對照、X、Y、X＋Y；熱處理另比較煮沸 X 或 Y 後冷卻至 37°C 的組合，每次只改變一項因素。';
+const LIMIT_REFERENCE = '油層、混濁或清澈只提供外觀線索，不能單獨證明產生甘油和脂肪酸；需其他化學檢測。此模擬使用預設教學結果，沒有量度反應速度。';
 const experiments = {
-  'none-none': ['separated', '油水分層（沒有明顯可觀察變化）', '黃色油層仍浮在水面，與水層清楚分開。'],
-  'X-none': ['cloudy', '變得混濁', '大油滴分散成許多細小油滴，液體呈混濁。'],
-  'Y-none': ['thin-oil', '油水分層（油層變薄）', '油層仍在水面，但比對照組薄。'],
-  'XY-none': ['clear', '變得清澈', '油滴逐漸消失，混合物變得清澈。'],
-  'XY-X': ['clear', '變得清澈', '即使 X 曾被煮沸，混合物仍變得清澈。'],
-  'XY-Y': ['cloudy', '變得混濁', '脂質只分散成小油滴，停留在混濁狀態。']
+  'none-none':['separated','油水分層（沒有明顯可觀察變化）'],
+  'X-none':['cloudy','變得混濁'], 'Y-none':['thin-oil','油水分層（油層變薄）'],
+  'XY-none':['clear','變得清澈'], 'XY-X':['clear','變得清澈'], 'XY-Y':['cloudy','變得混濁']
 };
-const state = {
-  phase: 1, liquid: 'XY', heat: 'none', records: [], profile: null,
-  variableChoices: { iv: [], dv: [], cv: [] }, setupMade: false, setupSaved: false,
-  setupMethod: '', setupImage: '', selectedObservation: '', experimentHasRun: false, extensionHeat: '', extensionObservation: '', submitted: false,
-  events: [], started: Date.now(), phaseStarted: Date.now(),
-  phaseDurations: { 1: 0, 2: 0, 3: 0, 4: 0 }
-};
-
-function toast(message) {
-  $('#toast').textContent = message;
-  $('#toast').classList.add('show');
-  setTimeout(() => $('#toast').classList.remove('show'), 2500);
+const trialKeys = Object.keys(experiments);
+const outcomeLabels = {cloudy:'變得混濁',clear:'變得清澈',separated:'油水分層（沒有明顯變化）','thin-oil':'油水分層（油層變薄）'};
+const questionLabels = {q1:'X 組的主要外觀',q2:'煮沸後失去作用的消化液',q3:'小油滴的總表面積',comparison:'基本組的外觀比較',heatComparison:'熱處理與未煮沸組的比較',limitations:'外觀證據的界限'};
+const conclusionAnswers = {q1:'cloudy',q2:'Y',q3:'increase',comparison:'combined',heatComparison:'yaffected',limitations:'indirect'};
+const FIELDS = ['initialObservation','hypothesisLiquid','hypothesisOutcome','reason','controlPlan','setupDescription','q1','q2','q3','comparison','heatComparison','limitations','evidenceExplanation','reflection'];
+function freshState(profile=null) {
+  return {schemaVersion:2,moduleId:MODULE_ID,id:crypto.randomUUID(),createdAt:new Date().toISOString(),profile,
+    phase:1,unlocked:1,liquid:'XY',heat:'none',records:[],firstObservations:{},initialDesign:null,finalAnswers:null,
+    variableChoices:{iv:[],dv:[],cv:[]},assumptions:[],setupMade:false,setupSaved:false,setupMethod:'',setupImage:'',
+    selectedObservation:'',experimentHasRun:false,extensionHeat:'',extensionObservation:'',extensionHasRun:false,
+    submitted:false,submittedAt:null,reflectionSubmittedAt:null,events:[],phaseDurations:{1:0,2:0,3:0,4:0}};
 }
-function queueSave() {
-  clearTimeout(queueSave.timer);
-  if (!state.profile || state.profile.email === TEACHER_EMAIL) return;
-  queueSave.timer = setTimeout(saveRecord, 700);
+let state = freshState(), activeSince = Date.now(), timingVisible = !document.hidden;
+let saveTimer, toastTimer, allowUnload = false, previewRecord = null, sessionGeneration = 0;
+const animationTimers = new Set();
+function isTeacher(profile=state.profile) { return profile?.email?.toLowerCase() === TEACHER_EMAIL; }
+function toast(message) { $('#toast').textContent=message; $('#toast').classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),4500); }
+function accountTime() {
+  const now=Date.now();
+  if(state.profile && timingVisible && !$('#profileModal').classList.contains('show')) state.phaseDurations[state.phase]+=(now-activeSince)/1000;
+  activeSince=now;
 }
-function logEvent(type, details = {}) {
-  state.events.push({ type, at: new Date().toISOString(), atSeconds: Math.round((Date.now() - state.started) / 1000), ...details });
-  queueSave();
+function queueSave() { clearTimeout(saveTimer); if(state.profile&&!isTeacher()) saveTimer=setTimeout(saveRecord,400); }
+function logEvent(type,details={}) {
+  if(!state.profile||isTeacher()) return;
+  state.events.push({type,at:new Date().toISOString(),phase:state.phase,...copy(details)});queueSave();
 }
-function key() { return `${state.liquid}-${state.heat}`; }
-function has(test) { return state.records.some(record => record.key === test); }
-function liquidLabel(value) { return ({ none: '對照：加入2mL水（不加消化液）', X: '加入2mL消化液X', Y: '加入2mL消化液Y', XY: '加入各1mL消化液X、Y' })[value]; }
-function setProfile(value) {
-  state.profile = value;
-  $('#studentName').textContent = value.name;
-  $('#avatar').textContent = value.name[0] || '同';
+function readForms() { return Object.fromEntries(FIELDS.map(id=>[id,$('#'+id).value.trim()])); }
+function designSnapshot() { return {at:new Date().toISOString(),form:readForms(),variableChoices:copy(state.variableChoices),assumptions:[...state.assumptions],setup:{saved:state.setupSaved,method:state.setupMethod,image:state.setupImage,description:$('#setupDescription').value.trim()}}; }
+function buildRecord() {
+  accountTime(); const form=readForms();
+  const attemptCounts=state.events.reduce((out,e)=>{out[e.type]=(out[e.type]||0)+1;return out;},{});
+  return {schemaVersion:2,moduleId:MODULE_ID,id:state.id,createdAt:state.createdAt,savedAt:new Date().toISOString(),profile:copy(state.profile),
+    phase:state.phase,submitted:state.submitted,submittedAt:state.submittedAt,reflectionSubmittedAt:state.reflectionSubmittedAt,
+    durationSeconds:Math.round(Object.values(state.phaseDurations).reduce((a,b)=>a+b,0)),phaseDurations:copy(state.phaseDurations),attemptCounts,
+    initialDesign:copy(state.initialDesign),finalAnswers:copy(state.finalAnswers),firstObservations:copy(state.firstObservations),
+    phase1:{contextViewed:state.unlocked>1,observation:form.initialObservation},
+    phase2:{hypothesis:{liquid:form.hypothesisLiquid,outcome:form.hypothesisOutcome,reason:form.reason},variableChoices:copy(state.variableChoices),assumptions:[...state.assumptions],controlPlan:form.controlPlan,setup:{saved:state.setupSaved,method:state.setupMethod,image:state.setupImage,description:form.setupDescription}},
+    phase3:{trials:copy(state.records)},phase4:{conclusions:Object.fromEntries(Object.keys(conclusionAnswers).map(id=>[id,form[id]])),evidenceExplanation:form.evidenceExplanation,reflection:form.reflection},telemetry:copy(state.events)};
 }
-function setPhase(phase) {
-  const now = Date.now();
-  state.phaseDurations[state.phase] += Math.round((now - state.phaseStarted) / 1000);
-  state.phaseStarted = now;
-  state.phase = phase;
-  $$('.phase').forEach(panel => panel.classList.toggle('active', panel.id === `phase-${phase}`));
-  $$('.step').forEach(step => {
-    const number = Number(step.dataset.phase);
-    step.classList.toggle('active', number <= phase);
-    step.disabled = number > phase;
-  });
-  if (phase === 4) renderEvidence();
-  logEvent('phase_opened', { phase });
-  scrollTo({ top: 0, behavior: 'smooth' });
+function validRecord(r) { return r && r.moduleId===MODULE_ID && r.profile && typeof r.profile.email==='string'; }
+function legacyId(r) { let h=2166136261;for(const c of JSON.stringify(r)){h=Math.imul(h^c.charCodeAt(0),16777619);}return 'legacy-'+(h>>>0).toString(16); }
+function rawLocalRecords() {
+  const rows=JSON.parse(localStorage.getItem(RECORDS_KEY))||[];
+  if(!Array.isArray(rows))throw new Error('Invalid record collection');
+  return rows.map(r=>validRecord(r)?{...r,id:r.id||legacyId(r)}:r);
 }
-
+function readLocalRecords() {
+  try {return rawLocalRecords().filter(validRecord);}
+  catch {toast('未能讀取本機紀錄，原儲存內容會保留。請檢查瀏覽器儲存權限。');return [];}
+}
+function saveRecord() {
+  const record=buildRecord();
+  // Defense at the persistence boundary: no teacher or anonymous writes.
+  if(!state.profile||isTeacher())return record;
+  try {
+    const records=rawLocalRecords(),index=records.findIndex(r=>r?.id===record.id);
+    if(index<0)records.push(record);else records[index]=record;
+    localStorage.setItem(RECORDS_KEY,JSON.stringify(records));
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(record));
+  } catch {toast('未能儲存：瀏覽器空間不足或儲存權限被停用。請勿關閉此頁；完成反思後列印 PDF 保存。');}
+  return record;
+}
+function archiveCurrent() {
+  try {
+    const previous=JSON.parse(localStorage.getItem(STORAGE_KEY));if(!validRecord(previous)||isTeacher(previous.profile))return;
+    const rows=rawLocalRecords();
+    const exists=rows.filter(validRecord).some(r=>previous.id?r.id===previous.id:JSON.stringify({...r,id:undefined})===JSON.stringify({...previous,id:undefined}));
+    if(!exists){rows.push({...previous,id:previous.id||legacyId(previous)});localStorage.setItem(RECORDS_KEY,JSON.stringify(rows));}
+  } catch {toast('舊紀錄備份未能整理；原有儲存內容沒有刪除。');}
+}
+function liquidLabel(v) { return ({none:'對照：加入 2 mL 水',X:'加入 2 mL 消化液 X',Y:'加入 2 mL 消化液 Y',XY:'加入各 1 mL 消化液 X、Y'})[v]||'未提供'; }
+function trialLabel(key) { const [liquid,heat]=key.split('-');return liquidLabel(liquid)+(heat==='none'?'':`（煮沸 ${heat} 後冷卻）`); }
+function setPhase(p) {
+  if(p>state.unlocked)return;accountTime();state.phase=p;
+  $$('.phase').forEach(el=>el.classList.toggle('active',el.id===`phase-${p}`));
+  $$('.step').forEach(el=>{el.disabled=+el.dataset.phase>state.unlocked;el.classList.toggle('active',+el.dataset.phase===p);if(+el.dataset.phase===p)el.setAttribute('aria-current','step');else el.removeAttribute('aria-current');});
+  if(p===4)renderEvidence();logEvent('phase_opened',{phase:p});scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+}
 function renderVariableQuiz() {
-  $('#variableQuiz').innerHTML = variableGroups.map(([group, title, definition]) => `
-    <section class="variable-choice-group"><h4>${title}<span>（${definition}）：</span></h4><div>
-      ${variableNames.map(name => `<button type="button" class="variable-option" data-group="${group}" data-variable="${name}">${name}</button>`).join('')}
-    </div></section>`).join('');
-  $$('.variable-option').forEach(button => button.onclick = () => {
-    const { group, variable } = button.dataset;
-    const choices = state.variableChoices[group];
-    state.variableChoices[group] = choices.includes(variable) ? choices.filter(item => item !== variable) : [...choices, variable];
-    button.classList.toggle('selected', state.variableChoices[group].includes(variable));
-    logEvent('variable_choice', { group, variable, selected: button.classList.contains('selected') });
-    refreshDesignGate();
-  });
+  $('#variableQuiz').innerHTML=variableGroups.map(([group,title,definition])=>`<section class="variable-choice-group"><h4>${title}<span>（${definition}）</span></h4><div>${variableNames.map(name=>`<button type="button" class="variable-option" data-group="${group}" data-variable="${name}" aria-pressed="false">${name}</button>`).join('')}</div></section>`).join('');
+  $$('.variable-option').forEach(b=>b.onclick=()=>{if(state.submitted)return;const {group,variable}=b.dataset;const choices=state.variableChoices[group];state.variableChoices[group]=choices.includes(variable)?choices.filter(v=>v!==variable):[...choices,variable];b.classList.toggle('selected',state.variableChoices[group].includes(variable));b.setAttribute('aria-pressed',String(state.variableChoices[group].includes(variable)));logEvent('variable_choice',{group,variable,choices:state.variableChoices[group]});refreshDesignGate();});
+  $('#assumptionChoices').innerHTML=assumptions.map(([id,text])=>`<label class="assumption-option"><input type="checkbox" value="${id}"> ${text}</label>`).join('');
+  $$('#assumptionChoices input').forEach(input=>input.onchange=()=>{state.assumptions=$$('#assumptionChoices input:checked').map(el=>el.value);logEvent('assumptions_changed',{values:state.assumptions});});
 }
 function incompleteDesignParts() {
-  const missing = [];
-  if (!$('#hypothesisLiquid').value || !$('#hypothesisOutcome').value || !$('#reason').value.trim()) missing.push('假說建立器的預測及「我的理由」');
-  if (!variableGroups.every(([group]) => state.variableChoices[group].length)) missing.push('公平測試設計的三類變量');
-  if (!state.setupSaved) missing.push('請繪畫並儲存實驗裝置設計');
-  return missing;
+  const missing=[];
+  if(!$('#hypothesisLiquid').value||!$('#hypothesisOutcome').value||!$('#reason').value.trim())missing.push('假說、預測及理由');
+  if(!variableGroups.every(([g])=>state.variableChoices[g].length))missing.push('三類變量');
+  if(!state.assumptions.length)missing.push('實驗前提');
+  if(!$('#controlPlan').value.trim())missing.push('探究的對照組設計');
+  if(!state.setupSaved)missing.push('已儲存的文字、繪圖或相片裝置設計');return missing;
 }
-function refreshDesignGate() {
-  const variablesAnswered = variableGroups.every(([group]) => state.variableChoices[group].length);
-  $('#variableFeedback').textContent = variablesAnswered ? '已記錄你的變量選擇。' : '請在三類變量中各選擇至少一項。';
-  $('#saveHypothesis').disabled = false;
-  $('#saveHypothesis').textContent = '開始實驗 →';
-}
+function refreshDesignGate() { $('#variableFeedback').textContent=variableGroups.every(([g])=>state.variableChoices[g].length)?'已記錄你的變量選擇。':'請在三類變量中各選擇至少一項。'; }
 function setupCanvas() {
   const canvas = $('#setupCanvas');
   const context = canvas.getContext('2d');
@@ -101,179 +130,273 @@ function setupCanvas() {
     item.classList.toggle('selected', selected);
     item.setAttribute('aria-pressed', String(selected));
   });
+  const uploadLabel=$('[data-drawing-control="upload"]');uploadLabel.onkeydown=e=>{if(!state.submitted&&['Enter',' '].includes(e.key)){e.preventDefault();$('#setupPhoto').click();}};
   let drawing = false;
   context.fillStyle = '#fff'; context.fillRect(0, 0, canvas.width, canvas.height); context.lineCap = 'round'; context.lineJoin = 'round'; context.strokeStyle = '#111'; context.lineWidth = 4;
   const point = event => { const box = canvas.getBoundingClientRect(); return { x: (event.clientX - box.left) * canvas.width / box.width, y: (event.clientY - box.top) * canvas.height / box.height }; };
-  canvas.onpointerdown = event => { drawing = true; canvas.setPointerCapture(event.pointerId); const p = point(event); context.beginPath(); context.moveTo(p.x, p.y); };
+  canvas.onpointerdown = event => { if(state.submitted)return; drawing = true; canvas.setPointerCapture(event.pointerId); const p = point(event); context.beginPath(); context.moveTo(p.x, p.y); };
   canvas.onpointermove = event => { if (!drawing) return; const p = point(event); context.lineTo(p.x, p.y); context.stroke(); };
-  canvas.onpointerup = () => { if (drawing) { state.setupMade = true; state.setupMethod = 'drawing'; logEvent('setup_drawing_updated'); } drawing = false; };
+  canvas.onpointerup = () => { if (drawing) { state.setupMade = true; state.setupSaved = false; state.setupMethod = 'drawing'; logEvent('setup_drawing_updated'); } drawing = false; };
   $$('[data-tool]').forEach(button => button.onclick = () => { selectDrawingControl(button); const erase = button.dataset.tool === 'eraser'; context.strokeStyle = erase ? '#fff' : '#111'; context.lineWidth = erase ? 28 : 4; });
   $('#clearCanvas').onclick = event => { selectDrawingControl(event.currentTarget); context.clearRect(0, 0, canvas.width, canvas.height); context.fillStyle = '#fff'; context.fillRect(0, 0, canvas.width, canvas.height); state.setupMade = state.setupSaved = false; state.setupImage = ''; $('#setupFeedback').textContent = '繪圖區已清除。'; logEvent('setup_cleared'); refreshDesignGate(); };
   $('#setupPhoto').onchange = event => {
-    const file = event.target.files[0]; if (!file) return;
+    const file = event.target.files[0]; if (!file || state.submitted) return; const generation=sessionGeneration; if(file.size>8*1024*1024)return toast('請選擇小於 8 MB 的圖片。');
     selectDrawingControl(event.target.closest('label'));  
-    const reader = new FileReader(); reader.onload = () => { const image = new Image(); image.onload = () => { context.clearRect(0, 0, canvas.width, canvas.height); context.fillStyle = '#fff'; context.fillRect(0, 0, canvas.width, canvas.height); const scale = Math.min(canvas.width / image.width, canvas.height / image.height); context.drawImage(image, (canvas.width-image.width*scale)/2, (canvas.height-image.height*scale)/2, image.width*scale, image.height*scale); state.setupMade = true; state.setupMethod = 'photo'; $('#setupFeedback').textContent = '相片已加入；請按「儲存」。'; logEvent('setup_photo_uploaded', { filename: file.name }); }; image.src = reader.result; }; reader.readAsDataURL(file);
+    const reader = new FileReader(); reader.onload = () => { const image = new Image(); image.onload = () => { if(generation!==sessionGeneration||state.submitted)return; context.clearRect(0, 0, canvas.width, canvas.height); context.fillStyle = '#fff'; context.fillRect(0, 0, canvas.width, canvas.height); const scale = Math.min(canvas.width / image.width, canvas.height / image.height); context.drawImage(image, (canvas.width-image.width*scale)/2, (canvas.height-image.height*scale)/2, image.width*scale, image.height*scale); state.setupMade = true; state.setupSaved = false; state.setupMethod = 'photo'; $('#setupFeedback').textContent = '相片已加入；請按「儲存」。'; logEvent('setup_photo_uploaded', { filename: file.name }); }; image.src = reader.result; }; reader.readAsDataURL(file);
   };
-  $('#saveSetup').onclick = event => { selectDrawingControl(event.currentTarget); if (!state.setupMade) return $('#setupFeedback').textContent = '請先繪畫裝置或上載相片。'; state.setupSaved = true; state.setupImage = canvas.toDataURL('image/jpeg', .7); $('#setupFeedback').textContent = '已儲存裝置設計。'; logEvent('setup_saved', { method: state.setupMethod }); refreshDesignGate(); };
+  $('#saveSetup').onclick = event => { selectDrawingControl(event.currentTarget); if(state.submitted)return; if (!state.setupMade) return $('#setupFeedback').textContent = '請先繪畫裝置或上載相片。'; state.setupSaved = true; state.setupImage = canvas.toDataURL('image/jpeg', .7); $('#setupFeedback').textContent = '已儲存裝置設計。'; logEvent('setup_saved', { method: state.setupMethod });saveRecord(); refreshDesignGate(); };
 }
 
-function renderTable() {
-  const baselineRecords = state.records.filter(record => record.heat === 'none'); $('#dataBody').innerHTML = baselineRecords.length ? baselineRecords.map((record, index) => `<tr><td>${index+1}</td><td>${liquidLabel(record.liquid)}</td><td>${record.studentLabel}</td></tr>`).join('') : '<tr class="empty"><td colspan="3">尚未記錄數據</td></tr>';
-  const baselineCount = state.records.filter(record => record.heat === 'none').length; $('#trialPill').textContent = `${baselineCount} / 4 個實驗裝置`;
+function cancelAnimations() { animationTimers.forEach(clearTimeout);animationTimers.clear();state.running=false;state.extensionRunning=false;$$('.experiment-animation').forEach(el=>el.classList.remove('adding')); }
+function later(fn,ms) { const generation=sessionGeneration,id=setTimeout(()=>{animationTimers.delete(id);if(generation===sessionGeneration)fn();},ms);animationTimers.add(id); }
+function resetObservation() {state.selectedObservation='';state.experimentHasRun=false;$('#recordData').disabled=true;$$('#observationChoice button').forEach(b=>{b.disabled=true;b.classList.remove('selected');});}
+function resetExtension() {state.extensionObservation='';state.extensionHasRun=false;$('#recordExtension').disabled=true;$$('[data-extension-observation]').forEach(b=>{b.disabled=true;b.classList.remove('selected');});}
+function animateTrial(extension=false) {
+  if(state.submitted||state.running||state.extensionRunning)return;
+  const trial=extension?`XY-${state.extensionHeat}`:`${state.liquid}-none`;if(!experiments[trial])return;
+  const [outcome]=experiments[trial];
+  if(extension){resetExtension();state.extensionRunning=true;}else{resetObservation();state.running=true;}
+  const tube=$(extension?'#extensionTube':'#testTube'),title=$(extension?'#extensionResultTitle':'#resultTitle'),container=$(extension?'#extensionDropper':'#mainDropper').parentElement;
+  const colours=extension||state.liquid==='XY'?['#b9dfc3','#b9dfc3','#efb7b7','#efb7b7']:Array(4).fill(state.liquid==='X'?'#b9dfc3':state.liquid==='Y'?'#efb7b7':'#b9e4f2');
+  [...$(extension?'#extensionDrops':'#mainDrops').children].forEach((drop,i)=>drop.style.setProperty('--drop-colour',colours[i]));
+  tube.className='test-tube';title.textContent='正在加入試劑…';container.classList.remove('adding');void container.offsetWidth;container.classList.add('adding');
+  $$('#liquidButtons button,[data-extension-heat],#runExperiment,#runExtension').forEach(b=>b.disabled=true);
+  logEvent(extension?'extension_trial_run':'trial_run',{trial});
+  later(()=>{tube.className='test-tube running';title.textContent='正在搖勻試管…';},2100);
+  later(()=>{tube.className=`test-tube ${outcome}`;title.textContent='請自行判讀外觀';
+    if(extension){state.extensionRunning=false;state.extensionHasRun=true;$$('[data-extension-observation]').forEach(b=>b.disabled=false);}else{state.running=false;state.experimentHasRun=true;$$('#observationChoice button').forEach(b=>b.disabled=false);}
+    $$('#liquidButtons button,[data-extension-heat],#runExperiment').forEach(b=>b.disabled=false);$('#runExtension').disabled=!state.extensionHeat;
+  },3000);
 }
-function updateUnlock() {
-  const baseline = ['none-none','X-none','Y-none','XY-none'].every(has);
-  $('#unlockMessage').textContent = baseline ? '四個實驗裝置的觀察已記錄，可以分析數據。' : '請完成對照、消化液 X、消化液 Y 與消化液 X + 消化液 Y 四個實驗裝置的觀察。';
-  $('#analyseButton').disabled = !baseline;
-  $('.step[data-phase="4"]').disabled = !baseline;
+function recordTrial(extension=false) {
+  if(state.submitted||state.running||state.extensionRunning)return;
+  const key=extension?`XY-${state.extensionHeat}`:`${state.liquid}-none`,answer=extension?state.extensionObservation:state.selectedObservation;
+  if(!(extension?state.extensionHasRun:state.experimentHasRun)||!answer)return;
+  const record={key,liquid:extension?'XY':state.liquid,heat:extension?state.extensionHeat:'none',studentObservation:answer,studentLabel:outcomeLabels[answer],actual:experiments[key][0],correct:answer===experiments[key][0],at:new Date().toISOString()};
+  if(!state.firstObservations[key])state.firstObservations[key]=copy(record);
+  const index=state.records.findIndex(r=>r.key===key);if(index<0)state.records.push(record);else state.records[index]=record;
+  logEvent('observation_recorded',{...record,first:copy(state.firstObservations[key])});
+  if(extension)resetExtension();else resetObservation();renderTable();renderExtensionTable();renderEvidence();updateUnlock();saveRecord();toast('觀察已記錄，保留首次及最後確認的答案。');
 }
-function resetObservation() {
-  state.selectedObservation = ''; state.experimentHasRun = false; $('#recordData').disabled = true;
-  $$('#observationChoice button').forEach(button => { button.disabled = true; button.classList.remove('selected'); });
+function renderTable() {const rows=state.records.filter(r=>r.heat==='none');$('#dataBody').innerHTML=rows.length?rows.map((r,i)=>`<tr><td>${i+1}</td><td>${liquidLabel(r.liquid)}</td><td>${escapeHtml(r.studentLabel)}</td></tr>`).join(''):'<tr class="empty"><td colspan="3">尚未記錄數據</td></tr>';$('#trialPill').textContent=`${rows.length} / 4 個實驗裝置`;}
+function renderExtensionTable() {const rows=state.records.filter(r=>r.heat!=='none');$('#extensionDataBody').innerHTML=rows.length?rows.map((r,i)=>`<tr><td>${i+1}</td><td>${trialLabel(r.key)}</td><td>${escapeHtml(r.studentLabel)}</td></tr>`).join(''):'<tr class="empty"><td colspan="3">尚未記錄延伸探究數據</td></tr>';}
+function updateUnlock() {const complete=trialKeys.slice(0,4).every(key=>state.records.some(r=>r.key===key));if(complete)state.unlocked=4;$('#analyseButton').disabled=!complete;$('.step[data-phase="4"]').disabled=!complete;$('#unlockMessage').textContent=complete?'四個裝置已記錄，可以分析數據。':'請完成對照、X、Y、X＋Y 四個裝置的觀察。';}
+function renderEvidence() {$('#evidenceList').innerHTML=state.records.map(r=>`<div class="evidence"><strong>${trialLabel(r.key)}</strong> → 你記錄：${escapeHtml(r.studentLabel)}</div>`).join('');}
+function reflectionComplete(r) {return !!r.submitted && !!r.reflectionSubmittedAt && !!r.phase4?.reflection?.trim();}
+function currentReflectionComplete() {return state.submitted&&!!state.reflectionSubmittedAt&&!!$('#reflection').value.trim();}
+function hypothesisText(h) {return h?`若加入${liquidLabel(h.liquid)}，預測外觀會${outcomeLabels[h.outcome]||'未提供'}。`:'未提供（舊版未保存原始假說）';}
+function originalHypothesis(r) {const f=r.initialDesign?.form;return f?{liquid:f.hypothesisLiquid,outcome:f.hypothesisOutcome,reason:f.reason}:null;}
+function applyLock() {
+  $$('.phase input,.phase select,.phase textarea,.phase button').forEach(el=>{if(el.closest('#reflectionReveal')||el.closest('#completeBar')||el.dataset.back)return;if(state.submitted)el.disabled=true;});
+  // Canvas and asynchronous image handlers also enforce this lock.
+  $('#setupCanvas').setAttribute('aria-disabled',String(state.submitted));
+  $('#conceptReveal').classList.toggle('show',state.submitted);$('#reflectionReveal').classList.toggle('show',state.submitted);$('#completeBar').hidden=!state.submitted;
+  const complete=currentReflectionComplete();$('#reflection').disabled=complete;$('#saveReflection').disabled=!state.submitted||complete;$('#downloadRecord').disabled=!complete;
+  $('#reflectionStatus').textContent=complete?'學習反思已提交，可以列印／儲存 PDF。':'探究答案已鎖定；請填寫並提交反思，才可列印／儲存 PDF。';
+  $('#saveReflection').textContent=complete?'✓ 學習反思已提交':'儲存並提交學習反思';
+  $('#completeBar strong').textContent=complete?'模組完成':'探究已遞交，待提交反思';
+  $('#completeBar p').textContent=isTeacher()?'教師示範只留在目前頁面，不加入學生紀錄或 Excel。':'原始及最後答案已保存於這部瀏覽器。';
+  const h=originalHypothesis({initialDesign:state.initialDesign});$('#originalHypothesis').innerHTML=`<blockquote><strong>你的原始假說</strong><p>${escapeHtml(hypothesisText(h))}</p><p>原始理由：${escapeHtml(h?.reason||'未提供')}</p></blockquote>`;
+  $('#designReferences').innerHTML=state.submitted?`<h4>設計參考說明</h4><p>實驗前提：${assumptions.filter(a=>a[2]).map(a=>a[1]).join('；')}</p><p>${CONTROL_REFERENCE}</p><p>${DESIGN_REFERENCE}</p>`:'';
 }
-function renderEvidence() { $('#evidenceList').innerHTML = state.records.map(record => `<div class="evidence"><strong>${liquidLabel(record.liquid)}${record.heat === 'none' ? '' : `（煮沸消化液 ${record.heat}）`}</strong> → 你記錄：${record.studentLabel}</div>`).join(''); }
-function buildRecord() {
-  const phaseDurations = {...state.phaseDurations}; phaseDurations[state.phase] += Math.round((Date.now()-state.phaseStarted)/1000);
-  const attemptCounts = state.events.reduce((out,event) => { out[event.type]=(out[event.type]||0)+1; return out; },{});
-  return { moduleId:'VL_BIO_DIGESTION_OPTION_A', savedAt:new Date().toISOString(), profile:state.profile, durationSeconds:Math.round((Date.now()-state.started)/1000), phaseDurations, attemptCounts,
-    phase1:{contextViewed:true}, phase2:{hypothesis:{liquid:$('#hypothesisLiquid').value,outcome:$('#hypothesisOutcome').value,reason:$('#reason').value.trim()},variableChoices:state.variableChoices,setup:{saved:state.setupSaved,method:state.setupMethod,image:state.setupImage}},
-    phase3:{trials:state.records}, phase4:{conclusions:{q1:$('#q1').value,q2:$('#q2').value,q3:$('#q3').value}}, telemetry:state.events };
+function submitInvestigation() {
+  if(state.submitted)return;
+  if(state.running||state.extensionRunning)return toast('請等待實驗完成。');
+  const missing=Object.keys(conclusionAnswers).filter(id=>!$('#'+id).value).map(id=>questionLabels[id]);
+  if(!trialKeys.every(key=>state.records.some(r=>r.key===key)))missing.push('六組觀察');
+  if(!$('#evidenceExplanation').value.trim())missing.push('具體比較及證據說明');
+  if(missing.length)return toast('請完成：'+missing.join('、'));
+  if(!confirm('遞交後原探究答案不能修改；你仍可填寫學習反思。確定遞交嗎？'))return;
+  state.finalAnswers=designSnapshot();state.finalAnswers.trials=copy(state.records);
+  state.submitted=true;state.submittedAt=new Date().toISOString();logEvent('investigation_submitted',{answers:state.finalAnswers});saveRecord();applyLock();$('#conceptReveal').scrollIntoView({behavior:'smooth'});
 }
-function readLocalRecords() {
-  try { return JSON.parse(localStorage.getItem(RECORDS_KEY)) || []; }
-  catch { return []; }
+function resetSession(profile=null) {
+  cancelAnimations();clearTimeout(saveTimer);clearTimeout(toastTimer);sessionGeneration++;
+  state=freshState(profile);activeSince=Date.now();timingVisible=!document.hidden;previewRecord=null;
+  FIELDS.forEach(id=>{const el=$('#'+id);el.value='';el.disabled=false;});
+  $$('.phase button,.phase input,.phase select').forEach(el=>el.disabled=false);
+  $('#setupPhoto').value='';$('#teacherDetail').hidden=true;$('#teacherReport').innerHTML='';$('#printReport').innerHTML='';
+  $('#studentName').textContent=isTeacher()?'教師示範':profile?.name||'同學';$('#avatar').textContent=isTeacher()?'師':profile?.name?.[0]||'同';$('#teacherButton').hidden=!isTeacher();
+  $('#setupFeedback').textContent='';$('#conclusionFeedback').textContent='';$('#extensionFeedback').textContent='';
+  $('#resultTitle').textContent='等待進行實驗';$('#extensionResultTitle').textContent='等待進行延伸測試';$('#testTube').className='test-tube';$('#extensionTube').className='test-tube';
+  $$('#liquidButtons button').forEach(b=>b.classList.toggle('selected',b.dataset.liquid==='XY'));$$('[data-extension-heat]').forEach(b=>b.classList.remove('selected'));
+  renderVariableQuiz();setupCanvas();renderTable();renderExtensionTable();renderEvidence();resetObservation();resetExtension();$('#runExtension').disabled=true;
+  $('#revealConcept').textContent='遞交探究，查看學習重點';$('#toast').classList.remove('show');applyLock();setPhase(1);updateUnlock();
+  $('main').inert=!profile;
 }
-function saveRecord() {
-  const record = buildRecord();
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(record));
-  const records = readLocalRecords();
-  const identity = `${record.profile.email}|${record.moduleId}`;
-  const index = records.findIndex(item => `${item.profile?.email}|${item.moduleId}` === identity);
-  if (index >= 0) records[index] = record; else records.push(record);
-  localStorage.setItem(RECORDS_KEY, JSON.stringify(records));
-  if (!$('#teacherDialog').open) return record;
-  startTeacherDashboard();
-  return record;
+function returnToLogin() {
+  if(!confirm('開始新的探究？本次答案會保留；每次登入均建立新紀錄。'))return;
+  saveRecord();allowUnload=true;cancelAnimations();clearTimeout(saveTimer);location.reload();
 }
+function formatDuration(seconds) {if(!Number.isFinite(seconds))return '未提供';const n=Math.round(seconds);return `${Math.floor(n/60)} 分 ${n%60} 秒`;}
+function formatDate(value) {return value&&Number.isFinite(Date.parse(value))?new Intl.DateTimeFormat('zh-HK',{timeZone:'Asia/Hong_Kong',dateStyle:'medium',timeStyle:'short'}).format(new Date(value)):'未提供';}
+function answerText(id,value) {return value?$('#'+id).querySelector(`option[value="${CSS.escape(value)}"]`)?.textContent||'未提供':'未提供';}
+function variablesForRecord(r,g) {return r.schemaVersion!==2&&g==='cv'?expectedVariables.cv.slice(0,3):expectedVariables[g];}
+function sameChoices(a,b) {return Array.isArray(a)&&a.length===b.length&&b.every(x=>a.includes(x));}
+function answerMark(correct) {return correct===null?'':`<span class="answer-mark ${correct?'correct':'incorrect'}">${correct?'✓':'✕'}</span>`;}
+function reportAnswer(title,answer,reference='',correct=null) {return `<div class="report-answer"><b>${escapeHtml(title)}</b>${answerMark(correct)}<p>${escapeHtml(answer||'未提供')}</p><small>${correct===null?'參考說明':'參考答案'}：${escapeHtml(reference)}</small></div>`;}
+function safeImage(value) {return /^data:image\/(jpeg|png);base64,[A-Za-z0-9+/=]+$/.test(value||'')?value:'';}
+function renderPrint(r) {
+  const h=originalHypothesis(r),current=r.phase2?.hypothesis,vars=r.phase2?.variableChoices||{},trials=r.phase3?.trials||[],answers=r.phase4?.conclusions||{};
+  const open=(title,value,ref)=>reportAnswer(title,value,ref);
+  const variables=variableGroups.map(([g,title])=>reportAnswer(title,vars[g]?.join('、'),variablesForRecord(r,g).join('、'),vars[g]?.length?sameChoices(vars[g],variablesForRecord(r,g)):null)).join('');
+  const selected=r.phase2?.assumptions;
+  const image=safeImage(r.phase2?.setup?.image);
+  const table=`<table class="report-table"><thead><tr><th>裝置／條件</th><th>首次確認</th><th>最後確認</th><th>回饋</th><th>參考外觀</th></tr></thead><tbody>${trialKeys.map(key=>{const t=trials.find(t=>t.key===key),first=r.firstObservations?.[key];return `<tr><td>${trialLabel(key)}</td><td>${escapeHtml(first?.studentLabel||'未提供')}</td><td>${escapeHtml(t?.studentLabel||'未提供')}</td><td>${answerMark(t? t.studentObservation===experiments[key][0]:null)}</td><td>${experiments[key][1]}</td></tr>`;}).join('')}</tbody></table>`;
+  $('#printReport').innerHTML=`<header class="report-cover"><span class="report-logo">✦</span><div><p>IBL 虛擬實驗室 · S4 生物</p><h1>未知消化液 X 與 Y</h1><strong>個人學習紀錄與回饋${isTeacher(r.profile)?'（教師示範）':''}</strong></div></header>
+  <section class="report-profile"><div><small>學生</small><b>${escapeHtml(r.profile?.name)}</b></div><div><small>班別及學號</small><b>${escapeHtml(r.profile?.classInfo)}</b></div><div><small>紀錄時間</small><b>${formatDate(r.savedAt)}</b></div><div><small>有效探究用時${r.schemaVersion===2?'':'（舊版計時）'}</small><b>${formatDuration(r.durationSeconds)}</b></div></section>
+  <section class="report-stage"><h2>01 了解情境</h2><div class="report-card context-summary"><img src="assets/oil-water-tube.png" alt="油水試管"><div><h3>研究任務</h3><p>比較 X、Y 及其組合對油水混合物外觀的影響。</p></div></div><div class="report-card">${open('你的初步觀察',r.phase1?.observation,'描述可見的油水層及試管外觀；不要以身分猜測代替觀察。')}</div></section>
+  <section class="report-stage"><h2>02 設計探究</h2><div class="report-card">${open('第一次實驗前固定保存的原始假說',hypothesisText(h),'合理且可測試的原始假說不因預測錯誤而判錯。')}${open('原始理由',h?.reason,'說明可測試預測的理由；沒有唯一措辭。')}${open('最後保存的假說及理由',current?hypothesisText(current)+' 理由：'+(current.reason||'未提供'):'','保留修訂後的想法；原始假說仍獨立保留。')}</div><div class="report-card">${variables}${reportAnswer('實驗前提',selected?.map(id=>assumptions.find(a=>a[0]===id)?.[1]||id).join('；'),assumptions.filter(a=>a[2]).map(a=>a[1]).join('；'),selected?.length?sameChoices(selected,assumptions.filter(a=>a[2]).map(a=>a[0])):null)}${open('探究的對照組',r.phase2?.controlPlan,CONTROL_REFERENCE)}${open('裝置文字設計',r.phase2?.setup?.description,DESIGN_REFERENCE)}${image?`<img class="setup-image" src="${image}" alt="學生保存的裝置設計">`:''}<p class="feedback-note">裝置圖及開放題由教師判斷，沒有自動對錯標記。</p></div></section>
+  <section class="report-stage page-break"><h2>03 六組觀察</h2><div class="report-card">${table}<p>${LIMIT_REFERENCE}</p></div></section>
+  <section class="report-stage"><h2>04 分析與結論</h2><div class="report-card">${Object.keys(conclusionAnswers).map(id=>reportAnswer(questionLabels[id],answerText(id,answers[id]),answerText(id,conclusionAnswers[id]),answers[id]?answers[id]===conclusionAnswers[id]:null)).join('')}${open('具體比較與證據說明',r.phase4?.evidenceExplanation,'引用至少兩組觀察，區分資料、推論及證據界限。')}</div>
+  ${r.submitted||r.schemaVersion!==2?`<div class="concept-summary"><h3>學習重點</h3>${$('#conceptReveal .learning-points').outerHTML}<p>${LIMIT_REFERENCE}</p></div>`:'<p>此份紀錄尚未遞交探究，學習重點尚未開放。</p>'}
+  <div class="reflection-summary">${open('實際學習反思',r.phase4?.reflection,'判斷原始假說是否獲支持；引用具體組別比較，運用乳化、表面積、脂肪酶及變性概念修訂解釋。')}<p>反思狀態：${reflectionComplete(r)?'已提交':r.schemaVersion===2?'未提交':'未提供（舊版未記錄）'}</p></div></section><footer class="report-footer">探究實驗室 · 原始答案與參考說明 · 紀錄只保存在目前瀏覽器</footer>`;
+}
+function reportFilename(r) {const safe=v=>String(v||'未提供').replace(/[\\/:*?"<>|\u0000-\u001f]/g,'_').trim().replace(/[. ]+$/g,'')||'未提供';return `VL1_未知消化液X與Y_${safe(r.profile?.classInfo)}_${safe(r.profile?.name)}`;}
+async function printRecord(r) {
+  renderPrint(r);await Promise.all($$('#printReport img').map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;})));
+  document.title=reportFilename(r);document.body.classList.add('print-record');
+  try{window.print();}catch(e){restorePrint();throw e;}
+}
+function restorePrint() {document.title=PAGE_TITLE;document.body.classList.remove('print-record');}
+window.addEventListener('afterprint',restorePrint);
 function startTeacherDashboard() {
-  const records = readLocalRecords().filter(record => record.profile?.email !== TEACHER_EMAIL);
-  window.teacherRecords = records;
-  $('#dashboardStatus').textContent = `這部瀏覽器現有 ${records.length} 份學生紀錄。資料不會跨裝置同步。`;
-  $('#teacherData').innerHTML = records.map(record => {
-    const trials = record.phase3?.trials || [];
-    const correct = trials.filter(trial => trial.correct).length;
-    const complete = trials.length === 6 && Object.values(record.phase4?.conclusions || {}).every(Boolean);
-    return `<tr><td><strong>${escapeHtml(record.profile?.name || '—')}</strong><small>${escapeHtml(record.profile?.email || '—')}</small></td><td>${escapeHtml(record.profile?.classInfo || '—')}</td><td><span class="report-status ${complete ? 'complete' : ''}">${complete ? '已完成' : '進行中'}</span></td><td>${correct} / ${trials.length}</td><td>${formatDuration(record.durationSeconds)}</td><td>${formatDate(record.savedAt)}</td></tr>`;
-  }).join('') || '<tr><td colspan="6">這部瀏覽器暫無學生紀錄</td></tr>';
+  if(!isTeacher())return;
+  const rows=readLocalRecords().filter(r=>!isTeacher(r.profile));
+  $('#dashboardStatus').textContent=`這部瀏覽器現有 ${rows.length} 份學生探究紀錄；同一電郵的多次探究會分開保存。資料不會跨裝置同步。`;
+  $('#teacherData').innerHTML=rows.length?rows.map((r,i)=>{const trials=r.phase3?.trials||[];return `<tr><td><strong>${escapeHtml(r.profile.name)}</strong><small>${escapeHtml(r.profile.email)}</small></td><td>${escapeHtml(r.profile.classInfo)}</td><td>${reflectionComplete(r)?'已完成':r.submitted?'待提交反思':r.schemaVersion===2?'進行中':'舊版（新欄位未提供）'}</td><td>${trials.filter(t=>t.studentObservation===experiments[t.key]?.[0]).length} / ${trials.length}</td><td>${formatDuration(r.durationSeconds)}</td><td>${formatDate(r.savedAt)}</td><td><button class="secondary" data-view-record="${i}">查看紀錄</button></td></tr>`;}).join(''):'<tr><td colspan="7">暫無學生紀錄</td></tr>';
+  $$('[data-view-record]').forEach(b=>b.onclick=()=>{previewRecord=copy(rows[+b.dataset.viewRecord]);renderPrint(previewRecord);$('#teacherReport').innerHTML=$('#printReport').innerHTML;$('#teacherDetail').hidden=false;});
 }
-
-const outcomeLabels = { cloudy: '變得混濁', clear: '變得清澈', separated: '油水分層', 'thin-oil': '油水分層（油層變薄）' };
-const conclusionAnswers = { q1: { answer: 'cloudy', label: '混濁乳狀液' }, q2: { answer: 'Y', label: '消化液 Y' }, q3: { answer: 'increase', label: '增加' } };
-const conclusionLabels = { q1: { cloudy: '混濁乳狀液', clear: '清澈溶液' }, q2: { X: '消化液 X', Y: '消化液 Y' }, q3: { increase: '增加', decrease: '減少' } };
-const questionLabels = { q1: '消化液 X 對脂質的主要作用結果', q2: '煮沸後失去作用的消化液', q3: '消化液 X 使油滴分散後的總表面積' };
-function formatDuration(seconds = 0) { const minutes = Math.floor(seconds / 60); return minutes ? `${minutes} 分 ${seconds % 60} 秒` : `${seconds} 秒`; }
-function formatDate(value) { return value ? new Intl.DateTimeFormat('zh-HK', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '—'; }
-function answerMark(correct) { return `<span class="answer-mark ${correct ? 'correct' : 'incorrect'}">${correct ? '✓ 正確' : '✕ 可再思考'}</span>`; }
-
-function xmlEscape(value) {
-  return String(value ?? '').replace(/[&<>"']/g, character => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&apos;' })[character]);
-}
-function columnName(index) {
-  let name = '';
-  for (let value = index + 1; value; value = Math.floor((value - 1) / 26)) name = String.fromCharCode(65 + ((value - 1) % 26)) + name;
-  return name;
-}
-function worksheetXml(rows, widths = []) {
-  const columns = widths.length ? `<cols>${widths.map((width,index)=>`<col min="${index+1}" max="${index+1}" width="${width}" customWidth="1"/>`).join('')}</cols>` : '';
-  const sheetRows = rows.map((row,rowIndex)=>`<row r="${rowIndex+1}"${rowIndex ? '' : ' ht="26" customHeight="1"'}>${row.map((value,columnIndex)=>`<c r="${columnName(columnIndex)}${rowIndex+1}" t="inlineStr"${rowIndex ? '' : ' s="1"'}><is><t xml:space="preserve">${xmlEscape(value)}</t></is></c>`).join('')}</row>`).join('');
-  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">${columns}<sheetData>${sheetRows}</sheetData><autoFilter ref="A1:${columnName((rows[0]?.length||1)-1)}${rows.length}"/></worksheet>`;
-}
-const crcTable = Array.from({length:256},(_,number)=>{let crc=number;for(let bit=0;bit<8;bit++)crc=(crc&1)?0xedb88320^(crc>>>1):crc>>>1;return crc>>>0;});
-function crc32(bytes){let crc=0xffffffff;for(const byte of bytes)crc=crcTable[(crc^byte)&255]^(crc>>>8);return (crc^0xffffffff)>>>0;}
-function zipStore(files){
-  const encoder=new TextEncoder(),parts=[],central=[];let offset=0;
-  const u16=value=>new Uint8Array([value&255,(value>>>8)&255]);
-  const u32=value=>new Uint8Array([value&255,(value>>>8)&255,(value>>>16)&255,(value>>>24)&255]);
-  const join=arrays=>{const size=arrays.reduce((sum,array)=>sum+array.length,0),out=new Uint8Array(size);let position=0;for(const array of arrays){out.set(array,position);position+=array.length;}return out;};
-  for(const [name,data] of Object.entries(files)){
-    const nameBytes=encoder.encode(name),bytes=typeof data==='string'?encoder.encode(data):data,crc=crc32(bytes);
-    const local=join([u32(0x04034b50),u16(20),u16(0),u16(0),u16(0),u16(0),u32(crc),u32(bytes.length),u32(bytes.length),u16(nameBytes.length),u16(0),nameBytes,bytes]);
-    parts.push(local);
-    central.push(join([u32(0x02014b50),u16(20),u16(20),u16(0),u16(0),u16(0),u16(0),u32(crc),u32(bytes.length),u32(bytes.length),u16(nameBytes.length),u16(0),u16(0),u16(0),u16(0),u32(0),u32(offset),nameBytes]));
-    offset+=local.length;
-  }
-  const directory=join(central),end=join([u32(0x06054b50),u16(0),u16(0),u16(central.length),u16(central.length),u32(directory.length),u32(offset),u16(0)]);
-  return new Blob([...parts,directory,end],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-}
-function dataUrlBytes(dataUrl){const base64=dataUrl.split(',')[1]||'',binary=atob(base64),bytes=new Uint8Array(binary.length);for(let index=0;index<binary.length;index++)bytes[index]=binary.charCodeAt(index);return bytes;}
-function exportExcel() {
-  const trialKeys=['none-none','X-none','Y-none','XY-none','XY-X','XY-Y'];
-  const headings=['姓名','班別及學號','電郵','更新時間','總用時','階段一用時','階段二用時','階段三用時','階段四用時','假設－消化液','假設－預測外觀','假設－理由','獨立變量選擇','因變量選擇','控制變量選擇','裝置設計方式'];
-  trialKeys.forEach((_,index)=>headings.push(`測試 ${index+1}－學生觀察`,`測試 ${index+1}－正確觀察`,`測試 ${index+1}－結果`));
-  headings.push('結論 1－學生答案','結論 1－正確答案','結論 2－學生答案','結論 2－正確答案','結論 3－學生答案','結論 3－正確答案','進行基本實驗次數（按下「開始實驗」的總次數）','選擇基本實驗觀察答案次數（每次點選外觀選項均計算，包括重新選擇）','確認並記錄觀察次數（基本實驗及延伸測試的總次數）','修改假設理由次數（在「我的理由」欄輸入或刪改的總次數）');
-  const records=window.teacherRecords||[],dataRows=[headings];
-  records.forEach(record=>{
-    const hypothesis=record.phase2?.hypothesis||{},choices=record.phase2?.variableChoices||{};
-    const row=[record.profile?.name,record.profile?.classInfo,record.profile?.email,formatDate(record.savedAt),formatDuration(record.durationSeconds),...[1,2,3,4].map(phase=>formatDuration(record.phaseDurations?.[phase])),liquidLabel(hypothesis.liquid),outcomeLabels[hypothesis.outcome],hypothesis.reason,choices.iv?.join('；'),choices.dv?.join('；'),choices.cv?.join('；'),record.phase2?.setup?.method==='photo'?'上載相片':'繪圖'];
-    trialKeys.forEach(trialKey=>{const trial=(record.phase3?.trials||[]).find(item=>item.key===trialKey);row.push(trial?.studentLabel||'未回答',experiments[trialKey]?.[1]||'—',trial?(trial.correct?'正確':'錯誤'):'未回答');});
-    const conclusions=record.phase4?.conclusions||{};['q1','q2','q3'].forEach(question=>row.push(conclusionLabels[question][conclusions[question]]||'未回答',conclusionAnswers[question].label));
-    row.push(record.attemptCounts?.trial_run||0,record.attemptCounts?.observation_selected||0,record.attemptCounts?.observation_recorded||0,record.attemptCounts?.reason_updated||0);dataRows.push(row);
+// Activity rubric draft: scores live only in the downloaded teacher workbook.
+function scoringWorkbook(records) {
+  const columns=[
+    ['id','探究識別碼','identity'],['name','姓名','identity'],['class','班別及學號','identity'],['status','完成狀態','identity'],
+    ['observation','觀察｜初步觀察（教師 0–2）','observing',2],['trials','觀察｜六組外觀（自動 0–2）','observing'],['observing','SPS 觀察（0–4）','observing'],
+    ['iv','分類｜獨立變量（自動 0–1）','classifying'],['dv','分類｜因變量（自動 0–1）','classifying'],['cv','分類｜控制變量（自動 0–2）','classifying'],['classifying','SPS 分類（0–4）','classifying'],
+    ['hypothesis','設計｜原始假說與理由（教師 0–2）','designing',2],['assumptions','設計｜前提選擇（自動 0–1）','designing'],['control','設計｜對照組（教師 0–1）','designing',1],['designing','SPS 設計探究（0–4）','designing'],
+    ['setup','實作｜裝置品質（教師 0–2）','conducting',2],['fair','實作｜固定條件與實驗安排（教師 0–2）','conducting',2],['conducting','SPS 進行實驗（0–4）','conducting'],
+    ['inference','推論｜結論及界限（自動 0–4）','inferring'],['inferring','SPS 推論（0–4）','inferring'],
+    ['communication','溝通｜資料與主張（教師 0–4）','communicating',4],['communicating','SPS 溝通（0–4）','communicating'],['sps','SPS 總分（0–24）','score'],
+    ['emulsion','新知識｜膽汁乳化與表面積（教師 0–2）','knowledge',2],['enzyme','新知識｜脂肪酶與產物（教師 0–2）','knowledge',2],['heat','新知識｜高溫與變性（教師 0–2）','knowledge',2],['revision','新知識｜修訂解釋並連結數據（教師 0–2）','knowledge',2],['knowledge','新知識總分（0–8）','knowledge'],['overall','整體分數（0–32）','score'],['marking','評分狀態','score']
+  ];
+  const col=Object.fromEntries(columns.map(([id],i)=>[id,colName(i)]));
+  const rows=[columns.map(([,label,group])=>excelCell(label,group))],conditional=[];
+  const maxima=Object.fromEntries(columns.filter(c=>c[3]!==undefined).map(c=>[c[0],c[3]]));
+  const round=n=>Math.round(n*100)/100;
+  records.forEach((r,i)=>{
+    const n=i+2,ref=id=>col[id]+n,v=r.phase2?.variableChoices||{},a=r.phase4?.conclusions||{},trials=r.phase3?.trials||[];
+    const completeTrialSet=trialKeys.every(key=>trials.some(t=>t.key===key));
+    const objective=(g,max)=>Array.isArray(v[g])&&v[g].length?(sameChoices(v[g],expectedVariables[g])?max:0):'未提供';
+    const cv=r.schemaVersion===2&&Array.isArray(v.cv)&&v.cv.length?round(expectedVariables.cv.filter(x=>v.cv.includes(x)).length/5*2*(v.cv.some(x=>!expectedVariables.cv.includes(x))?0:1)):'未提供';
+    const weight={q1:.5,q2:.5,q3:.5,comparison:.75,heatComparison:.75,limitations:1};
+    const values={id:r.id,name:r.profile?.name,class:r.profile?.classInfo,status:reflectionComplete(r)?'已完成':r.schemaVersion!==2?'舊版／未提供':r.submitted?'待提交反思':'進行中',
+      trials:completeTrialSet?round(trialKeys.filter(key=>trials.find(t=>t.key===key)?.studentObservation===experiments[key][0]).length/6*2):'未提供',
+      iv:objective('iv',1),dv:objective('dv',1),cv,
+      assumptions:r.phase2?.assumptions?.length?(sameChoices(r.phase2.assumptions,assumptions.filter(x=>x[2]).map(x=>x[0]))?1:0):'未提供',
+      inference:Object.keys(weight).every(id=>a[id])?Object.entries(weight).reduce((sum,[id,w])=>sum+(a[id]===conclusionAnswers[id]?w:0),0):'未提供'};
+    // Validate numeric ranges in formulas too: pasted invalid scores cannot create an overall total.
+    const valid=ids=>ids.map(id=>maxima[id]!==undefined?`AND(ISNUMBER(${ref(id)}),${ref(id)}>=0,${ref(id)}<=${maxima[id]},IFERROR(MOD(${ref(id)},1)=0,FALSE))`:`ISNUMBER(${ref(id)})`).join(',');
+    const sum=ids=>`IF(AND(${valid(ids)}),ROUND(SUM(${ids.map(ref).join(',')}),2),"待評")`;
+    const sps=['observing','classifying','designing','conducting','inferring','communicating'],knowledge=['emulsion','enzyme','heat','revision'];
+    const formulas={observing:sum(['observation','trials']),classifying:sum(['iv','dv','cv']),designing:sum(['hypothesis','assumptions','control']),conducting:sum(['setup','fair']),inferring:sum(['inference']),communicating:sum(['communication']),sps:sum(sps),knowledge:sum(knowledge),
+      overall:`IF(AND(ISNUMBER(${ref('sps')}),ISNUMBER(${ref('knowledge')}),${ref('status')}="已完成"),ROUND(SUM(${ref('sps')},${ref('knowledge')}),2),"待評／未完成")`,
+      marking:`IF(AND(${valid(Object.keys(maxima))},ISNUMBER(${ref('sps')}),ISNUMBER(${ref('knowledge')}),${ref('status')}="已完成"),"評分完成","待評／學生未完成／分數不符範圍")`};
+    rows.push(columns.map(([id,,group,max])=>formulas[id]?excelFormula(formulas[id],group):excelCell(max!==undefined?'':values[id],group)));
+    const allMax={...maxima,trials:2,iv:1,dv:1,cv:2,assumptions:1,inference:4,observing:4,classifying:4,designing:4,conducting:4,inferring:4,communicating:4,sps:24,knowledge:8,overall:32};
+    Object.entries(allMax).forEach(([id,max])=>conditional.push(colourRule(ref(id),ref(id),max)));
   });
-  const designRows=[['姓名','班別及學號','電郵','更新時間','裝置設計圖'],...records.map(record=>[record.profile?.name,record.profile?.classInfo,record.profile?.email,formatDate(record.savedAt),''])];
-  const files={
-    '[Content_Types].xml':'<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="jpeg" ContentType="image/jpeg"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/><Override PartName="/xl/drawings/drawing1.xml" ContentType="application/vnd.openxmlformats-officedocument.drawing+xml"/></Types>',
-    '_rels/.rels':'<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>',
-    'xl/workbook.xml':'<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="全班學習紀錄" sheetId="1" r:id="rId1"/><sheet name="裝置設計圖" sheetId="2" r:id="rId2"/></sheets></workbook>',
-    'xl/_rels/workbook.xml.rels':'<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>',
-    'xl/styles.xml':'<?xml version="1.0" encoding="UTF-8"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Arial"/></font><font><b/><color rgb="FFFFFFFF"/><sz val="11"/><name val="Arial"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF087B78"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/></cellXfs></styleSheet>',
-    'xl/worksheets/sheet1.xml':worksheetXml(dataRows,headings.map((_,index)=>index===11?34:18))
-  };
-  const imageRecords=records.map((record,index)=>({record,index,dataUrl:record.phase2?.setup?.image})).filter(item=>item.dataUrl?.startsWith('data:image/'));
-  const designSheet=worksheetXml(designRows,[16,18,28,22,48]).replace('</worksheet>',`<drawing xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:id="rId1"/></worksheet>`).replace(/<row r="(\d+)"/g,(match,row)=>Number(row)>1?`${match} ht="125" customHeight="1"`:match);
-  files['xl/worksheets/sheet2.xml']=designSheet;
-  files['xl/worksheets/_rels/sheet2.xml.rels']='<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" Target="../drawings/drawing1.xml"/></Relationships>';
-  files['xl/drawings/drawing1.xml']=`<?xml version="1.0" encoding="UTF-8"?><xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">${imageRecords.map((item,imageIndex)=>`<xdr:twoCellAnchor editAs="oneCell"><xdr:from><xdr:col>4</xdr:col><xdr:colOff>60000</xdr:colOff><xdr:row>${item.index+1}</xdr:row><xdr:rowOff>60000</xdr:rowOff></xdr:from><xdr:to><xdr:col>5</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>${item.index+2}</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:to><xdr:pic><xdr:nvPicPr><xdr:cNvPr id="${imageIndex+1}" name="裝置設計圖 ${imageIndex+1}"/><xdr:cNvPicPr/></xdr:nvPicPr><xdr:blipFill><a:blip r:embed="rId${imageIndex+1}"/><a:stretch><a:fillRect/></a:stretch></xdr:blipFill><xdr:spPr><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></xdr:spPr></xdr:pic><xdr:clientData/></xdr:twoCellAnchor>`).join('')}</xdr:wsDr>`;
-  files['xl/drawings/_rels/drawing1.xml.rels']=`<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${imageRecords.map((item,index)=>`<Relationship Id="rId${index+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/setup-${index+1}.jpeg"/>`).join('')}</Relationships>`;
-  imageRecords.forEach((item,index)=>files[`xl/media/setup-${index+1}.jpeg`]=dataUrlBytes(item.dataUrl));
-  const link=document.createElement('a');link.href=URL.createObjectURL(zipStore(files));link.download='消化液虛擬實驗_全班學習紀錄.xlsx';link.click();URL.revokeObjectURL(link.href);
+  const validations=records.length?columns.filter(c=>c[3]!==undefined).map(([id,,,max])=>({range:`${col[id]}2:${col[id]}${records.length+1}`,max})):[];
+  const rubric=[['類別／題目','最高分','評分方式','滿分準則','部分得分準則','零分／缺漏處理']];
+  const add=(g,title,max,method,full,partial,zero)=>rubric.push([excelCell(title,g),max,method,full,partial,zero]);
+  add('reference','活動 rubric 初稿：待研究者校準',32,'研究說明','六項 SPS 各 4 分；新知識四項各 2 分。總分 32。','跨 VL 的題目、難度、機會與評分者一致性需校準。','不是已驗證量表；與 SPSAI／CKT 分開。紙本需提供相同問題與靜態資料。');
+  add('observing','初步觀察',2,'人工','2：準確描述可見油水層及圖像細節，區分觀察與猜測。','1：有具體但不完整的描述。','0：無有效觀察；缺少舊版欄位保留待評，不捏造。');
+  add('observing','六組外觀',2,'自動','六組均有確認答案；按符合預設外觀的組數／6×2，四捨五入至兩位小數。','部分符合參考外觀按比例得分。','已答但均不符合為 0；缺少組別顯示未提供，不以完成率當能力分數。');
+  add('classifying','獨立變量',1,'自動','只選消化液組合。','無部分分數。','有答案但不符為 0；未提供不補 0。');
+  add('classifying','因變量',1,'自動','只選混合物外觀。','無部分分數。','有答案但不符為 0；未提供不補 0。');
+  add('classifying','控制變量',2,'自動','五項固定條件全選，且無選錯。','選中正確控制變量數／5×2；選錯類別為 0。','舊版只問三項；不能以缺少新選項推斷原能力。跨版比較需另行校準。');
+  add('designing','原始可測試假說與理由',2,'人工','2：具可比較條件、可觀察預測及合理理由。','1：可測試但理由或條件不完整。','0：不可測試或沒有合理內容；合理假說不因猜錯而扣分。沒有原始快照時待評。');
+  add('designing','實驗前提',1,'自動','只選溫度、時間、起始油水及加液總量、搖勻方式四項。','無部分分數。','有答案但不符為 0；舊版沒有此題為未提供。');
+  add('designing','對照組',1,'人工','1：2 mL 水對照、明確比較組及相同條件。','此欄只填整數 0 或 1。','0：無有效對照方案；沒有此題則待評。');
+  add('conducting','裝置品質',2,'人工','2：圖／相片／文字清晰、四組標示、用量合理。','1：方案可操作但標示或用量不完整。','0：無可操作方案；不能因使用文字而扣分。');
+  add('conducting','固定條件與實驗安排',2,'人工','2：依設計與操作證據保持公平比較，熱處理冷卻後使用，每次只改變一因素。','1：基本合理但條件或熱處理安排不完整。','0：安排不能有效比較。六組完整性只作證據，不以完成率、點擊或用時直接換分。');
+  add('inferring','結論、比較及界限',4,'自動','q1/q2/q3 各 0.5；基本及熱處理比較各 0.75；證據界限 1，共 4。','只按各題明確參考答案得分。','所有六題已答才自動合計；舊版缺新題顯示未提供，不補答案。');
+  add('communicating','資料與主張',4,'人工','4：清楚組織資料，引用至少兩組具體觀察，連結主張並說明界限。','3：完整比較但界限稍弱；2：有效比較但連結不足；1：僅單一相關描述。','0：無有效溝通。評分依證據說明及數據表，不重複評新知識；缺資料保留待評。');
+  add('knowledge','膽汁乳化與表面積',2,'人工：只看學習後反思','2：膽汁不含消化酶，乳化是物理作用，小油滴增加總表面積。','1：概念部分正確但解釋不完整。','0：沒有運用或概念錯誤；未提交反思不能當作零分。');
+  add('knowledge','脂肪酶化學消化及產物',2,'人工：只看學習後反思','2：脂肪酶催化化學消化，形成甘油和脂肪酸。','1：酶作用或產物部分正確。','0：沒有運用或概念錯誤；不是關鍵字計分。');
+  add('knowledge','高溫造成酶變性',2,'人工：只看學習後反思','2：把煮沸 Y 的觀察連結酶蛋白質變性及失去功能。','1：知道高溫影響但欠機理解釋。','0：沒有運用或概念錯誤。');
+  add('knowledge','修訂原始解釋與數據',2,'人工：只看學習後反思','2：回應原始假說是否受支持，引用具體比較，運用概念修訂／完善並注意外觀界限。','1：有比較或修訂但連結不完整。','0：沒有有效修訂或數據連結。');
+  add('score','SPS、新知識及整體分數',32,'公式','六項 SPS=24；四項新知識=8。學生已提交反思且所有必要評分完整才顯示整體。','空白顯示待評；填 0 才是零分。教師欄只接受範圍內整數。','貼上超範圍或非整數也不會得到有效總分；評分欄沒有內容時勿填 0 代替待評。');
+  add('reference','色彩、紀錄及人工分數保存',0,'說明','綠字正確／滿分、紅字錯誤／零分、橙字部分分數；底色區分題目與 SPS 類別。','原始、首次觀察、最後答案與完整事件分表；時間是可見頁面有效秒數。','人工分數只在此 Excel；另存檔保留，重新匯出不會帶入。學生 PDF 無分數。');
+  return {sheet:{name:'教師評分',rows,validations,conditional},rubric:{name:'評分準則',rows:rubric},col};
 }
-function renderPrint(record) {
-  const hypothesis = record.phase2?.hypothesis || {}, choices = record.phase2?.variableChoices || {}, trials = record.phase3?.trials || [], conclusions = record.phase4?.conclusions || {};
-  const choiceLine = (title, values, expectedValues) => { const selected = values || []; const correct = selected.length === expectedValues.length && selected.every(value => expectedValues.includes(value)); return `<div class="report-answer"><b>${title}</b><span>${escapeHtml(selected.join('、') || '未回答')}</span>${answerMark(correct)}<small>正確答案：${expectedValues.join('、')}</small></div>`; };
-  $('#printReport').innerHTML = `<header class="report-cover"><span class="report-logo">✦</span><div><p>IBL 虛擬實驗室 · S4 生物</p><h1>未知消化液 X 與 Y</h1><strong>個人學習紀錄與回饋</strong></div></header>
-  <section class="report-profile"><div><small>學生</small><b>${escapeHtml(record.profile?.name)}</b></div><div><small>班別及學號</small><b>${escapeHtml(record.profile?.classInfo)}</b></div><div><small>完成時間</small><b>${formatDate(record.savedAt)}</b></div><div><small>總用時</small><b>${formatDuration(record.durationSeconds)}</b></div></section>
-  <section class="report-stage"><h2><span>01</span> 了解情境</h2><div class="report-card context-summary"><img src="assets/digestive-system.png" alt="人體消化系統"><div><h3>研究任務</h3><p>探究消化液 X 和消化液 Y 如何分解脂質，使其可被人體吸收。</p><span class="completed-chip">✓ 已閱讀情境</span></div></div></section>
-  <section class="report-stage"><h2><span>02</span> 設計探究</h2><div class="report-card"><p class="report-kicker">我的假設</p><p class="hypothesis-sentence">若加入 <b>${escapeHtml(liquidLabel(hypothesis.liquid))}</b>，溶液外觀將會 <b>${escapeHtml(outcomeLabels[hypothesis.outcome] || '未回答')}</b>。</p><blockquote>${escapeHtml(hypothesis.reason || '未填寫理由')}</blockquote><p class="feedback-note">此題沒有固定答案；以上保留你在實驗前的原始想法。</p></div><div class="report-card"><p class="report-kicker">我的公平測試設計</p>${choiceLine('獨立變量',choices.iv,['消化液組合'])}${choiceLine('因變量',choices.dv,['混合物外觀'])}${choiceLine('控制變量',choices.cv,['油和水總體積','反應溫度','反應時間'])}</div>${record.phase2?.setup?.image ? `<div class="report-card"><p class="report-kicker">我的實驗裝置設計</p><img class="setup-image" src="${record.phase2.setup.image}" alt="學生的實驗裝置設計"></div>` : ''}</section>
-  <section class="report-stage page-break"><h2><span>03</span> 進行探究</h2><div class="report-card"><table class="report-table"><thead><tr><th>實驗裝置</th><th>你的觀察</th><th>回饋</th><th>正確觀察</th></tr></thead><tbody>${trials.filter(trial => trial.heat === 'none').map(trial => `<tr><td>${escapeHtml(liquidLabel(trial.liquid))}</td><td>${escapeHtml(trial.studentLabel)}</td><td>${answerMark(trial.correct)}</td><td>${escapeHtml(experiments[trial.key]?.[1])}</td></tr>`).join('')}</tbody></table></div></section>
-  <section class="report-stage"><h2><span>04</span> 分析與結論</h2><div class="report-card conclusion-list">${['q1','q3'].map(q => { const selected = conclusions[q], correct = selected === conclusionAnswers[q].answer; return `<div><p>${questionLabels[q]}</p><strong>你的答案：${escapeHtml(conclusionLabels[q][selected] || '未回答')}</strong>${answerMark(correct)}<small>正確答案：${conclusionAnswers[q].label}</small></div>`; }).join('')}</div><div class="report-card"><p class="report-kicker">延伸探究：加熱對消化液的影響</p><table class="report-table"><thead><tr><th>熱處理</th><th>你的觀察</th><th>回饋</th><th>正確觀察</th></tr></thead><tbody>${trials.filter(trial => trial.heat !== 'none').map(trial => `<tr><td>煮沸消化液 ${trial.heat}</td><td>${escapeHtml(trial.studentLabel)}</td><td>${answerMark(trial.correct)}</td><td>${escapeHtml(experiments[trial.key]?.[1])}</td></tr>`).join('')}</tbody></table><div class="conclusion-list"><div><p>${questionLabels.q2}</p><strong>你的答案：${escapeHtml(conclusionLabels.q2[conclusions.q2] || '未回答')}</strong>${answerMark(conclusions.q2 === conclusionAnswers.q2.answer)}<small>正確答案：${conclusionAnswers.q2.label}</small></div></div></div><div class="concept-summary"><h3>學習重點</h3><ol><li><b>消化液 X 是<span class="learning-keyword">膽汁</span>。</b>它由肝臟製造並儲存於膽囊。膽汁不含任何消化酶，其作用是透過<span class="learning-keyword">物理消化</span>把<span class="learning-keyword">脂質乳化</span>成<span class="learning-keyword">小油滴</span>，增加表面積提升後續化學消化的效率。</li><li><b>消化液 Y 是<span class="learning-keyword">脂肪酶</span>。</b>它負責催化脂質進行<span class="learning-keyword">化學消化</span>，將其<span class="learning-keyword">分解為</span>分子更小的<span class="learning-keyword">甘油</span>與<span class="learning-keyword">脂肪酸</span>，以助吸收。而脂肪酶是蛋白質，高溫會使其<span class="learning-keyword">變性</span>，失去功能。</li></ol></div><div class="reflection-summary"><h3>學習反思</h3><p>你的起始探究預測與實驗結果相符嗎？試參考學習重點內容，思考為何你的假說成立／不成立。</p></div></section><footer class="report-footer">探究實驗室 · 這份報告保留你的原始答案，並以 ✓／✕ 和參考答案協助反思。</footer>`;
+function colourRule(cell,score,max) {return {cell,formulas:[`AND(ISNUMBER(${score}),${score}=${max})`,`AND(ISNUMBER(${score}),${score}=0)`,`AND(ISNUMBER(${score}),${score}>0,${score}<${max})`]};}
+function download(blob,name) {const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download=name;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+function exportExcel() {
+  if(!isTeacher())return;
+  const records=readLocalRecords().filter(r=>!isTeacher(r.profile));
+  const headings=['探究識別碼','姓名','班別及學號','電郵','狀態','建立時間','探究提交時間','反思提交時間','初步觀察','原始假說','原始理由','最後假說','最後理由','獨立變量','因變量','控制變量','實驗前提','對照組設計','裝置文字設計',...Object.values(questionLabels),'具體比較與證據說明','實際學習反思','總有效秒數','階段一秒數','階段二秒數','階段三秒數','階段四秒數','基本實驗次數','延伸實驗次數','確認觀察次數','理由修改次數'];
+  const groups=headings.map((_,c)=>c<8?'identity':c===8?'observing':c<13?'designing':c<16?'classifying':c<19?'designing':c<25?'inferring':c===25?'communicating':c===26?'knowledge':'identity');
+  const answers=[headings.map((h,c)=>excelCell(h,groups[c]))],observations=[['探究識別碼','姓名','裝置','首次確認外觀','最後確認外觀','參考外觀','最後回饋','首次確認時間','最後確認時間']];
+  const events=[['探究識別碼','姓名','事件','時間（香港）','階段','原始時間戳','內容分段','完整事件內容']];
+  const snapshots=[['探究識別碼','姓名','快照類別','保存時間','內容分段','原始完整內容（唯讀）']];
+  const designs=[['姓名','班別及學號','電郵','文字設計','裝置設計圖']],images=[];
+  records.forEach(r=>{
+    const h=originalHypothesis(r),last=r.phase2?.hypothesis,v=r.phase2?.variableChoices||{},conclusions=r.phase4?.conclusions||{},selection=r.phase2?.assumptions;
+    const row=[r.id,r.profile.name,r.profile.classInfo,r.profile.email,reflectionComplete(r)?'已完成':r.submitted?'待提交反思':r.schemaVersion===2?'進行中':'舊版／未提供',formatDate(r.createdAt),formatDate(r.submittedAt),formatDate(r.reflectionSubmittedAt),r.phase1?.observation||'未提供',hypothesisText(h),h?.reason||'未提供',last?hypothesisText(last):'未提供',last?.reason||'未提供',v.iv?.join('、')||'未提供',v.dv?.join('、')||'未提供',v.cv?.join('、')||'未提供',selection?.map(id=>assumptions.find(a=>a[0]===id)?.[1]||id).join('；')||'未提供',r.phase2?.controlPlan||'未提供',r.phase2?.setup?.description||'未提供',...Object.keys(questionLabels).map(id=>answerText(id,conclusions[id])),r.phase4?.evidenceExplanation||'未提供',r.phase4?.reflection||'未提供',r.durationSeconds??'未提供',...[1,2,3,4].map(p=>r.phaseDurations?.[p]===undefined?'未提供':Math.round(r.phaseDurations[p])),...['trial_run','extension_trial_run','observation_recorded','reason_updated'].map(id=>r.attemptCounts?.[id]??'未提供')];
+    const checks={13:v.iv?.length?sameChoices(v.iv,expectedVariables.iv):null,14:v.dv?.length?sameChoices(v.dv,expectedVariables.dv):null,15:v.cv?.length?sameChoices(v.cv,variablesForRecord(r,'cv')):null,16:selection?.length?sameChoices(selection,assumptions.filter(a=>a[2]).map(a=>a[0])):null};
+    Object.keys(conclusionAnswers).forEach((id,i)=>checks[19+i]=conclusions[id]?conclusions[id]===conclusionAnswers[id]:null);
+    answers.push(row.map((value,c)=>excelCell(value,groups[c],checks[c]??null)));
+    trialKeys.forEach(key=>{const first=r.firstObservations?.[key],last=(r.phase3?.trials||[]).find(t=>t.key===key);observations.push([excelCell(r.id),excelCell(r.profile.name),excelCell(trialLabel(key),'conducting'),excelCell(first?.studentLabel||'未提供','observing',first?first.studentObservation===experiments[key][0]:null),excelCell(last?.studentLabel||'未提供','observing',last?last.studentObservation===experiments[key][0]:null),excelCell(experiments[key][1],'reference'),last?(last.studentObservation===experiments[key][0]?'正確':'錯誤'):'未提供',formatDate(first?.at),formatDate(last?.at)]);});
+    (r.telemetry||[]).forEach(e=>excelChunks(JSON.stringify(e)).forEach((chunk,i)=>events.push([r.id,r.profile.name,eventLabel(e.type),formatDate(e.at),e.phase??'未提供',e.at,i+1,chunk])));
+    [[r.initialDesign,'第一次實驗前固定快照',r.initialDesign?.at],[r.finalAnswers,'遞交時最後答案',r.submittedAt],[r,'本機完整紀錄（含舊版原值）',r.savedAt]].forEach(([snapshot,label,at])=>excelChunks(snapshot?JSON.stringify(snapshot):'未提供').forEach((chunk,i)=>snapshots.push([r.id,r.profile.name,label,formatDate(at),i+1,chunk])));
+    designs.push([r.profile.name,r.profile.classInfo,r.profile.email,r.phase2?.setup?.description||'未提供',safeImage(r.phase2?.setup?.image)?'圖像如下':'未提供']);
+    const image=safeImage(r.phase2?.setup?.image);if(image)images.push({row:designs.length-1,data:image,ext:image.startsWith('data:image/png')?'png':'jpeg'});
+  });
+  const scoring=scoringWorkbook(records),conditional=[];
+  records.forEach((r,i)=>{const n=i+2;[[8,'observation',2],[9,'hypothesis',2],[10,'hypothesis',2],[17,'control',1],[18,'setup',2],[25,'communication',4],[26,'knowledge',8]].forEach(([c,id,max])=>conditional.push(colourRule(colName(c)+n,`INDIRECT("'教師評分'!${scoring.col[id]}${n}")`,max)));});
+  download(workbook([{name:'學生探究答案',rows:answers,conditional},{name:'六組觀察紀錄',rows:observations},scoring.sheet,scoring.rubric,{name:'操作事件紀錄',rows:events},{name:'原始與遞交快照',rows:snapshots},{name:'裝置設計圖',rows:designs}],images),'VL1_未知消化液X與Y_全班學習紀錄.xlsx');
 }
+// Excel limits cell text to 32,767 UTF-16 units; split raw payloads without losing content.
+function excelChunks(text) {
+  const out=[];let chunk='';
+  for(const character of text){if(chunk.length+character.length>30000){out.push(chunk);chunk='';}chunk+=character;}
+  out.push(chunk);return out;
+}
+function eventLabel(type) {return ({phase_opened:'開啟階段',variable_choice:'選擇變量',assumptions_changed:'修改實驗前提',setup_drawing_updated:'修改繪圖',setup_photo_uploaded:'上載相片',setup_saved:'儲存裝置',setup_cleared:'清除裝置',trial_run:'進行基本實驗',extension_trial_run:'進行熱處理實驗',observation_selected:'選擇觀察',observation_recorded:'確認觀察',answer_changed:'修改答案',reason_updated:'修改理由',design_confirmed:'確認設計',lab_started:'開始探究',investigation_submitted:'提交探究',reflection_submitted:'提交反思',pdf_print_requested:'列印 PDF',liquid_selected:'選擇消化液',extension_selected:'選擇熱處理'})[type]||type;}
 
-$('#profileForm').onsubmit=event=>{event.preventDefault();const email=$('#profileEmail').value.trim().toLowerCase();const teacher=email===TEACHER_EMAIL;setProfile({name:teacher?'教師':$('#profileName').value.trim(),classInfo:teacher?'教師帳戶':$('#profileClass').value.trim(),email,mode:'local'});$('#profileModal').classList.remove('show');$('#teacherButton').hidden=!teacher;if(teacher){startTeacherDashboard();$('#teacherDialog').showModal();}else{logEvent('lab_started',{mode:'local'});}};
-$('#changeProfile').onclick=()=>{$('#profileModal').classList.add('show');};
-$$('[data-next]').forEach(button=>button.onclick=()=>{const next=+button.dataset.next;if(next===3){const missing=incompleteDesignParts();if(missing.length){alert(`尚未完成以下部分：\n\n• ${missing.join('\n• ')}\n\n請完成後再開始實驗。`);return;}}if(next===2)$('.step[data-phase="2"]').disabled=false;if(next===3)$('.step[data-phase="3"]').disabled=false;setPhase(next);});
-$$('[data-back]').forEach(button=>button.onclick=()=>setPhase(+button.dataset.back));$$('.step').forEach(button=>button.onclick=()=>!button.disabled&&setPhase(+button.dataset.phase));
-$('#reason').oninput=()=>{logEvent('reason_updated');refreshDesignGate();};$('#hypothesisLiquid').onchange=e=>logEvent('hypothesis_liquid',{value:e.target.value});$('#hypothesisOutcome').onchange=e=>logEvent('hypothesis_outcome',{value:e.target.value});
-$$('#liquidButtons button').forEach(button=>button.onclick=()=>{state.liquid=button.dataset.liquid;state.heat='none';$$('#liquidButtons button').forEach(item=>item.classList.toggle('selected',item===button));resetObservation();logEvent('liquid_selected',{liquid:state.liquid});});
-function setDropColours(container, colours) {
-  [...container.children].forEach((drop, index) => drop.style.setProperty('--drop-colour', colours[index]));
-}
-function mainDropColours() {
-  if (state.liquid === 'X') return ['#b9dfc3','#b9dfc3','#b9dfc3','#b9dfc3'];
-  if (state.liquid === 'Y') return ['#efb7b7','#efb7b7','#efb7b7','#efb7b7'];
-  if (state.liquid === 'XY') return ['#b9dfc3','#b9dfc3','#efb7b7','#efb7b7'];
-  return ['#b9e4f2','#b9e4f2','#b9e4f2','#b9e4f2'];
-}
-$('#runExperiment').onclick=()=>{const [outcome]=experiments[key()];const animation=$('#mainDropper').parentElement;setDropColours($('#mainDrops'),mainDropColours());animation.classList.remove('adding');void animation.offsetWidth;animation.classList.add('adding');$('#testTube').className='test-tube';$('#resultTitle').textContent='正在加入試劑…';$('#resultDescription').textContent='';logEvent('trial_run',{trial:key()});setTimeout(()=>{$('#testTube').className='test-tube running';$('#resultTitle').textContent='正在搖勻試管…';},2100);setTimeout(()=>{$('#testTube').className=`test-tube ${outcome}`;$('#resultTitle').textContent='請自行判讀外觀';state.experimentHasRun=true;$$('#observationChoice button').forEach(button=>button.disabled=false);},3000);};
-$$('#observationChoice button').forEach(button=>button.onclick=()=>{state.selectedObservation=button.dataset.observation;$$('#observationChoice button').forEach(item=>item.classList.toggle('selected',item===button));$('#recordData').disabled=false;logEvent('observation_selected',{trial:key(),answer:state.selectedObservation});});
-$('#recordData').onclick=()=>{if(!state.experimentHasRun||!state.selectedObservation)return;const [actual,label]=experiments[key()];const studentLabel=$(`[data-observation="${state.selectedObservation}"]`).textContent;const record={key:key(),liquid:state.liquid,heat:state.heat,studentObservation:state.selectedObservation,studentLabel,actual,correct:state.selectedObservation===actual};const index=state.records.findIndex(item=>item.key===record.key);if(index>=0)state.records[index]=record;else state.records.push(record);logEvent('observation_recorded',record);renderTable();updateUnlock();resetObservation();toast('實驗結果已記錄。');};
-function renderExtensionTable(){const records=state.records.filter(record=>record.heat!=='none');$('#extensionDataBody').innerHTML=records.length?records.map((record,index)=>`<tr><td>${index+1}</td><td>${record.heat==='X'?'煮沸消化液 X ＋ 未煮沸消化液 Y':'未煮沸消化液 X ＋ 煮沸消化液 Y'}</td><td>${record.studentLabel}</td></tr>`).join(''):'<tr class="empty"><td colspan="3">尚未記錄延伸探究數據</td></tr>';}
-$$('[data-extension-heat]').forEach(button=>button.onclick=()=>{state.extensionHeat=button.dataset.extensionHeat;state.extensionObservation='';$$('[data-extension-heat]').forEach(item=>item.classList.toggle('selected',item===button));$('#runExtension').disabled=false;$('#recordExtension').disabled=true;$('#extensionTube').className='test-tube';$('#extensionResultTitle').textContent='等待進行延伸測試';$$('[data-extension-observation]').forEach(item=>{item.disabled=true;item.classList.remove('selected');});});
-$('#runExtension').onclick=()=>{const trialKey=`XY-${state.extensionHeat}`;const [outcome]=experiments[trialKey];const animation=$('#extensionDropper').parentElement;setDropColours($('#extensionDrops'),['#b9dfc3','#b9dfc3','#efb7b7','#efb7b7']);animation.classList.remove('adding');void animation.offsetWidth;animation.classList.add('adding');$('#extensionTube').className='test-tube';$('#extensionResultTitle').textContent='正在加入試劑…';setTimeout(()=>{$('#extensionTube').className='test-tube running';$('#extensionResultTitle').textContent='正在搖勻試管…';},2100);setTimeout(()=>{$('#extensionTube').className=`test-tube ${outcome}`;$('#extensionResultTitle').textContent='請自行判讀外觀';$$('[data-extension-observation]').forEach(item=>item.disabled=false);},3000);logEvent('extension_trial_run',{trial:trialKey,outcome});};
-$$('[data-extension-observation]').forEach(button=>button.onclick=()=>{state.extensionObservation=button.dataset.extensionObservation;$$('[data-extension-observation]').forEach(item=>item.classList.toggle('selected',item===button));$('#recordExtension').disabled=false;});
-$('#recordExtension').onclick=()=>{const trialKey=`XY-${state.extensionHeat}`;const [actual]=experiments[trialKey];const studentLabel=$(`[data-extension-observation="${state.extensionObservation}"]`).textContent;const record={key:trialKey,liquid:'XY',heat:state.extensionHeat,studentObservation:state.extensionObservation,studentLabel,actual,correct:state.extensionObservation===actual};const index=state.records.findIndex(item=>item.key===trialKey);if(index>=0)state.records[index]=record;else state.records.push(record);logEvent('observation_recorded',record);renderEvidence();renderExtensionTable();$('#extensionFeedback').textContent=`已記錄：${state.extensionHeat==='X'?'煮沸消化液 X':'煮沸消化液 Y'}。`;toast('延伸探究結果已記錄。');};
-$('#revealConcept').onclick=async()=>{const missing=[];if(!$('#q1').value||!$('#q3').value)missing.push('第 1 及第 3 題結論');if(!has('XY-X')||!has('XY-Y'))missing.push('兩項延伸熱處理測試');if(!$('#q2').value)missing.push('延伸探究第 2 題');if(missing.length){alert(`尚未完成以下部分：\n\n• ${missing.join('\n• ')}`);return;}if(!confirm('遞交後不能修改本次答案。你仍可按「重新開始」進行新的探究。\n\n確定遞交嗎？'))return;state.submitted=true;logEvent('conclusions_saved',{q1:$('#q1').value,q2:$('#q2').value,q3:$('#q3').value});$('#conceptReveal').classList.add('show');$('#reflectionReveal').classList.add('show');$('#completeBar').hidden=false;$('#revealConcept').disabled=true;$('#conclusionFeedback').textContent='答案已遞交，不能修改。';$$('.phase input,.phase select,.phase textarea,.phase button').forEach(el=>{if(!['downloadRecord','restartInvestigation'].includes(el.id))el.disabled=true;});await saveRecord();};
-async function waitForReportImages(){const images=$$('#printReport img');await Promise.all(images.map(image=>image.complete&&image.naturalWidth?Promise.resolve():new Promise(resolve=>{image.onload=resolve;image.onerror=resolve;})));}
-$('#downloadRecord').onclick=async()=>{const record=await saveRecord();renderPrint(record);await waitForReportImages();document.body.classList.add('print-record');requestAnimationFrame(()=>{print();setTimeout(()=>document.body.classList.remove('print-record'),500);});};
-$('#restartInvestigation').onclick=()=>confirm('要開始新的探究嗎？目前作答會從此裝置清除。')&&(localStorage.removeItem(STORAGE_KEY),location.reload());
-$('#resetLab').onclick=()=>confirm('要清除目前紀錄並重新開始嗎？')&&(localStorage.removeItem(STORAGE_KEY),location.reload());$('#teacherButton').onclick=()=>{startTeacherDashboard();$('#teacherDialog').showModal();};$('#closeTeacher').onclick=()=>$('#teacherDialog').close();$('#exportCsv').onclick=exportExcel;
-renderVariableQuiz();setupCanvas();$('#profileModal').classList.add('show');
+FIELDS.forEach(id=>{
+  $('#'+id).addEventListener('input',()=>{if(id==='setupDescription'){state.setupSaved=false;$('#setupFeedback').textContent='文字設計已更新，請儲存。';}logEvent(id==='reason'?'reason_updated':'answer_changed',{field:id,value:$('#'+id).value});});
+  $('#'+id).addEventListener('change',()=>logEvent('answer_changed',{field:id,value:$('#'+id).value}));
+});
+$('#profileForm').onsubmit=e=>{
+  e.preventDefault();const profile={name:$('#profileName').value.trim(),classInfo:$('#profileClass').value.trim(),email:$('#profileEmail').value.trim().toLowerCase(),mode:'local'};
+  if(!profile.name||!profile.classInfo||!profile.email)return;
+  saveRecord();resetSession(profile);$('#profileModal').classList.remove('show');logEvent('lab_started',{mode:'local'});saveRecord();
+  if(isTeacher()){startTeacherDashboard();$('#teacherDialog').showModal();}
+};
+$('#changeProfile').onclick=()=>{saveRecord();accountTime();$('#profileForm').reset();$('#profileModal').classList.add('show');$('main').inert=true;};
+$$('[data-next]').forEach(b=>b.onclick=()=>{
+  const next=+b.dataset.next;if(state.submitted){setPhase(next);return;}
+  if(next===2&&!$('#initialObservation').value.trim())return toast('請先記錄你的初步觀察。');
+  if(next===3){const missing=incompleteDesignParts();if(missing.length)return toast('請完成：'+missing.join('、'));if(!state.initialDesign)state.initialDesign=designSnapshot();logEvent('design_confirmed',{design:designSnapshot()});}
+  state.unlocked=Math.max(state.unlocked,next);setPhase(next);saveRecord();
+});
+$$('[data-back]').forEach(b=>b.onclick=()=>setPhase(+b.dataset.back));$$('.step').forEach(b=>b.onclick=()=>setPhase(+b.dataset.phase));
+$('#saveTextSetup').onclick=()=>{if(state.submitted)return;if(!$('#setupDescription').value.trim())return toast('請先填寫文字設計。');state.setupSaved=true;state.setupMethod='text';state.setupImage='';$('#setupFeedback').textContent='文字設計已儲存。';logEvent('setup_saved',{method:'text',description:$('#setupDescription').value});saveRecord();};
+$$('#liquidButtons button').forEach(b=>b.onclick=()=>{if(state.submitted||state.running||state.extensionRunning)return;state.liquid=b.dataset.liquid;$$('#liquidButtons button').forEach(el=>el.classList.toggle('selected',el===b));resetObservation();logEvent('liquid_selected',{liquid:state.liquid});});
+$$('[data-extension-heat]').forEach(b=>b.onclick=()=>{if(state.submitted||state.running||state.extensionRunning)return;state.extensionHeat=b.dataset.extensionHeat;$$('[data-extension-heat]').forEach(el=>el.classList.toggle('selected',el===b));resetExtension();$('#runExtension').disabled=false;logEvent('extension_selected',{heat:state.extensionHeat});});
+$('#runExperiment').onclick=()=>animateTrial();$('#runExtension').onclick=()=>animateTrial(true);
+$$('#observationChoice button').forEach(b=>b.onclick=()=>{if(!state.experimentHasRun||state.submitted)return;state.selectedObservation=b.dataset.observation;$$('#observationChoice button').forEach(el=>el.classList.toggle('selected',el===b));$('#recordData').disabled=false;logEvent('observation_selected',{trial:`${state.liquid}-none`,answer:state.selectedObservation});});
+$$('[data-extension-observation]').forEach(b=>b.onclick=()=>{if(!state.extensionHasRun||state.submitted)return;state.extensionObservation=b.dataset.extensionObservation;$$('[data-extension-observation]').forEach(el=>el.classList.toggle('selected',el===b));$('#recordExtension').disabled=false;logEvent('observation_selected',{trial:`XY-${state.extensionHeat}`,answer:state.extensionObservation});});
+$('#recordData').onclick=()=>recordTrial();$('#recordExtension').onclick=()=>recordTrial(true);$('#revealConcept').onclick=submitInvestigation;
+$('#saveReflection').onclick=()=>{if(!state.submitted||state.reflectionSubmittedAt)return;if(!$('#reflection').value.trim())return toast('請先寫下學習反思。');state.reflectionSubmittedAt=new Date().toISOString();logEvent('reflection_submitted',{value:$('#reflection').value.trim()});saveRecord();applyLock();};
+$('#downloadRecord').onclick=async()=>{if(!currentReflectionComplete())return toast('請先提交學習反思。');logEvent('pdf_print_requested');await printRecord(saveRecord());};
+$('#resetLab').onclick=returnToLogin;$('#restartInvestigation').onclick=returnToLogin;
+$('#teacherButton').onclick=()=>{if(!isTeacher())return;startTeacherDashboard();$('#teacherDialog').showModal();};
+$('#closeTeacher').onclick=()=>$('#teacherDialog').close();$('#teacherDemo').onclick=()=>{if(!isTeacher())return;const profile=copy(state.profile);resetSession(profile);$('#teacherDialog').close();toast('教師示範：不會寫入學生紀錄、事件或 Excel。');};
+$('#exportCsv').onclick=exportExcel;$('#teacherPDF').onclick=()=>{if(isTeacher()&&previewRecord)printRecord(previewRecord);};
+document.addEventListener('visibilitychange',()=>{accountTime();timingVisible=!document.hidden;activeSince=Date.now();if(document.hidden)saveRecord();});
+window.addEventListener('beforeunload',e=>{if(!state.profile||allowUnload)return;saveRecord();e.preventDefault();e.returnValue='';});
+window.addEventListener('pagehide',()=>{if(state.profile)saveRecord();});
+setInterval(()=>{if(state.profile&&!document.hidden)saveRecord();},15000);
+archiveCurrent();resetSession();$('#profileForm').reset();$('#profileModal').classList.add('show');
