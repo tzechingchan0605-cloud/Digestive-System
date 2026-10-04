@@ -36,10 +36,25 @@ const questionLabels = {q1:'結論 1｜X 組的主要外觀',q3:'結論 2｜小�
 const conclusionAnswers = {q1:'cloudy',q3:'increase',limitations:'indirect',q2:'Y'};
 const previousConclusionAnswers = {...conclusionAnswers,comparison:'combined',heatComparison:'yaffected'};
 const FIELDS = ['initialObservation','hypothesisLiquid','hypothesisOutcome','reason','controlPlan','setupDescription','q1','q2','q3','limitations','reflection'];
+function shuffledChoices(values,random=Math.random) {
+  const result=[...values];
+  for(let i=result.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[result[i],result[j]]=[result[j],result[i]];}
+  return result;
+}
+function freshOptionOrder() {
+  return {assumptions:shuffledChoices(assumptions.map(([id])=>id)),
+    conclusions:Object.fromEntries(Object.keys(conclusionAnswers).map(id=>[id,shuffledChoices([...$('#'+id).options].map(o=>o.value).filter(Boolean))]))};
+}
+function renderAnswerOrder() {
+  for(const [id,values] of Object.entries(state.optionOrder.conclusions)){
+    const select=$('#'+id),options=new Map([...select.options].map(o=>[o.value,o]));
+    values.forEach(value=>select.append(options.get(value)));
+  }
+}
 function freshState(profile=null) {
   return {schemaVersion:2,uiVersion:3,moduleId:MODULE_ID,id:crypto.randomUUID(),createdAt:new Date().toISOString(),profile,
     phase:1,unlocked:1,liquid:'XY',heat:'none',records:[],firstObservations:{},initialDesign:null,finalAnswers:null,
-    variableChoices:{iv:[],dv:[],cv:[]},assumptions:[],setupMade:false,setupSaved:false,setupMethod:'',setupImage:'',
+    optionOrder:freshOptionOrder(),variableChoices:{iv:[],dv:[],cv:[]},assumptions:[],setupMade:false,setupSaved:false,setupMethod:'',setupImage:'',
     selectedObservation:'',experimentHasRun:false,extensionHeat:'',extensionObservation:'',extensionHasRun:false,
     submitted:false,submittedAt:null,reflectionSubmittedAt:null,events:[],phaseDurations:{1:0,2:0,3:0,4:0}};
 }
@@ -64,7 +79,7 @@ function buildRecord() {
   accountTime(); const form=readForms();
   const attemptCounts=state.events.reduce((out,e)=>{out[e.type]=(out[e.type]||0)+1;return out;},{});
   return {schemaVersion:2,uiVersion:3,moduleId:MODULE_ID,id:state.id,createdAt:state.createdAt,savedAt:new Date().toISOString(),profile:copy(state.profile),
-    phase:state.phase,submitted:state.submitted,submittedAt:state.submittedAt,reflectionSubmittedAt:state.reflectionSubmittedAt,
+    phase:state.phase,optionOrder:copy(state.optionOrder),submitted:state.submitted,submittedAt:state.submittedAt,reflectionSubmittedAt:state.reflectionSubmittedAt,
     durationSeconds:Math.round(Object.values(state.phaseDurations).reduce((a,b)=>a+b,0)),phaseDurations:copy(state.phaseDurations),attemptCounts,
     initialDesign:copy(state.initialDesign),finalAnswers:copy(state.finalAnswers),firstObservations:copy(state.firstObservations),
     phase1:{contextViewed:state.unlocked>1,observation:form.initialObservation},
@@ -113,7 +128,8 @@ function setPhase(p) {
 function renderVariableQuiz() {
   $('#variableQuiz').innerHTML=variableGroups.map(([group,title,definition])=>`<section class="variable-choice-group"><h4>${title}<span>（${definition}）</span></h4><div>${variableNames.map(name=>`<button type="button" class="variable-option" data-group="${group}" data-variable="${name}" aria-pressed="false">${name}</button>`).join('')}</div></section>`).join('');
   $$('.variable-option').forEach(b=>b.onclick=()=>{if(state.submitted)return;const {group,variable}=b.dataset;const choices=state.variableChoices[group];state.variableChoices[group]=choices.includes(variable)?choices.filter(v=>v!==variable):[...choices,variable];b.classList.toggle('selected',state.variableChoices[group].includes(variable));b.setAttribute('aria-pressed',String(state.variableChoices[group].includes(variable)));logEvent('variable_choice',{group,variable,choices:state.variableChoices[group]});refreshDesignGate();});
-  $('#assumptionChoices').innerHTML=assumptions.map(([id,text])=>`<label class="assumption-option"><input type="checkbox" value="${id}"> ${text}</label>`).join('');
+  $('#assumptionChoices').innerHTML=state.optionOrder.assumptions.map(id=>assumptions.find(a=>a[0]===id)).map(([id,text])=>`<label class="assumption-option"><input type="checkbox" value="${id}"> ${text}</label>`).join('');
+  renderAnswerOrder();
   $$('#assumptionChoices input').forEach(input=>input.onchange=()=>{state.assumptions=$$('#assumptionChoices input:checked').map(el=>el.value);logEvent('assumptions_changed',{values:state.assumptions});});
 }
 function incompleteDesignParts() {
@@ -252,7 +268,7 @@ function renderPrint(r) {
   <section class="report-stage"><h2>02 設計探究</h2><div class="report-card">${open('第一次實驗前固定保存的原始假說',hypothesisText(h),'合理且可測試的原始假說不因預測錯誤而判錯。')}${open('原始理由',h?.reason,'說明可測試預測的理由；沒有唯一措辭。')}</div><div class="report-card">${variables}${reportAnswer('實驗前提',selected?.map(assumptionText).join('；'),recordAssumptions.filter(a=>a[2]).map(a=>a[1]).join('；'),selected?.length?sameChoices(selected,recordAssumptions.filter(a=>a[2]).map(a=>a[0])):null)}${open('探究的對照組',r.phase2?.controlPlan,CONTROL_REFERENCE)}${open('裝置文字設計',r.phase2?.setup?.description,DESIGN_REFERENCE)}${image?`<img class="setup-image" src="${image}" alt="學生保存的裝置設計">`:''}<p class="feedback-note">裝置圖及開放題由教師判斷，沒有自動對錯標記。</p></div></section>
   <section class="report-stage page-break"><h2>03 六組觀察</h2><div class="report-card">${table}<p>${LIMIT_REFERENCE}</p></div></section>
   <section class="report-stage"><h2>04 分析與結論</h2><div class="report-card">${Object.keys(conclusionAnswers).map(id=>reportAnswer(questionLabels[id],answerText(id,answers[id]),answerText(id,conclusionAnswers[id]),answers[id]?answers[id]===conclusionAnswers[id]:null)).join('')}</div>
-  ${r.submitted||r.schemaVersion!==2?`<div class="concept-summary"><h3>學習重點</h3>${$('#conceptReveal .learning-points').outerHTML}<p>${LIMIT_REFERENCE}</p></div>`:'<p>此份紀錄尚未遞交探究，學習重點尚未開放。</p>'}
+  ${r.submitted||r.schemaVersion!==2?`<div class="concept-summary"><h3>學習重點</h3>${$('#conceptReveal .learning-points').outerHTML}${$('#conceptReveal .learning-diagrams').outerHTML}<p>${LIMIT_REFERENCE}</p></div>`:'<p>此份紀錄尚未遞交探究，學習重點尚未開放。</p>'}
   <div class="reflection-summary">${open('實際學習反思',r.phase4?.reflection,'判斷原始假說是否獲支持；引用具體組別比較，運用乳化、表面積、脂肪酶及變性概念修訂解釋。')}<p>反思狀態：${reflectionComplete(r)?'已提交':r.schemaVersion===2?'未提交':'未提供（舊版未記錄）'}</p></div></section><footer class="report-footer">探究實驗室 · 原始答案與參考說明 · 紀錄只保存在目前瀏覽器</footer>`;
 }
 function reportFilename(r) {const safe=v=>String(v||'未提供').replace(/[\\/:*?"<>|\u0000-\u001f]/g,'_').trim().replace(/[. ]+$/g,'')||'未提供';return `VL1_未知消化液X與Y_${safe(r.profile?.classInfo)}_${safe(r.profile?.name)}`;}
@@ -320,7 +336,7 @@ function scoringWorkbook(records) {
   add('classifying','控制變量',2,'自動','五項固定條件全選，且無選錯。','選中正確控制變量數／5×2；選錯類別為 0。','舊版只問三項；不能以缺少新選項推斷原能力。跨版比較需另行校準。');
   add('designing','原始可測試假說與理由',2,'人工','2：具可比較條件、可觀察預測及合理理由。','1：可測試但理由或條件不完整。','0：不可測試或沒有合理內容；合理假說不因猜錯而扣分。沒有原始快照時待評。');
   add('designing','實驗前提',1,'自動','現版只選時間、起始油水及加液總量、搖勻方式三項；不選增加總加液量。','無部分分數。','有答案但不符為 0；舊版沒有此題為未提供。');
-  add('designing','對照組',1,'人工','1：認為需要對照組，並合理說明比較基準或排除其他因素的用途；裝置詳情另評。','此欄只填整數 0 或 1。','0：無有效對照用途說明或理由不合理；沒有此題則待評。');
+  add('designing','對照組',1,'人工','1：合理說明需要對照組的比較用途，提出不加消化液的比較裝置並保持條件相同。','此欄只填整數 0 或 1。','0：無有效對照用途說明或理由不合理；沒有此題則待評。');
   add('conducting','裝置品質',2,'人工','2：圖／相片／文字清晰、四組標示、用量合理。','1：方案可操作但標示或用量不完整。','0：無可操作方案；不能因使用文字而扣分。');
   add('conducting','固定條件與實驗安排',2,'人工','2：依設計與操作證據保持公平比較，熱處理冷卻後使用，每次只改變一因素。','1：基本合理但條件或熱處理安排不完整。','0：安排不能有效比較。六組完整性只作證據，不以完成率、點擊或用時直接換分。');
   add('inferring','結論、比較及界限',4,'自動','現版三項推論（外觀、表面積、證據界限）及延伸結論各 1，共 4；歷史版按原六題權重（0.5、0.5、0.5、0.75、0.75、1）。','只按各題明確參考答案得分。','按紀錄版本檢查當時的全部題目；不要求現版回答已刪除題目，歷史缺題不補答案。');

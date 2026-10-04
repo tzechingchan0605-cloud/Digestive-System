@@ -13,7 +13,7 @@ const assert=require('node:assert/strict');
  assert.equal(await page.locator('#assumptionChoices input').count(),4);assert.equal(await page.locator('#assumptionChoices input[value="temperature"],#assumptionChoices input[value="hot"]').count(),0);
  assert((await page.locator('#assumptionChoices').locator('..').innerText()).includes('此探究的假設是什麼？'));
  assert((await page.locator('#assumptionChoices').locator('..').innerText()).includes('請選出所有適用的假設，可選多於一項。'));
- assert((await page.locator('#controlPlan').locator('..').innerText()).includes('你認為此實驗需要對照組嗎？'));
+ assert((await page.locator('#controlPlan').locator('..').innerText()).includes('你認為此實驗需要對照組嗎？如需要，你會如何設計比較裝置？'));
  assert((await page.locator('#controlPlan').locator('..').innerText()).includes('而不是其他外在因素的干擾。'));
  assert(await page.evaluate(()=>!!(document.querySelector('#setupCanvas').compareDocumentPosition(document.querySelector('#setupDescription'))&Node.DOCUMENT_POSITION_FOLLOWING)));
  await page.locator('#assumptionChoices').locator('..').screenshot({path:'/tmp/vl1-assumptions.png'});

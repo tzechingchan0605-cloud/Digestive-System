@@ -100,3 +100,29 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 #observationTable{scroll-margin-top:20px}#setupDescription{margin-top:10px}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 @media(max-width:760px){.conclusions-card .field select{font-size:12px}.conclusions-card .fill-sentence select{font-size:13px}}
+
+/* Quiet scaffolding and two printable digestion diagrams. */
+#phase-2 .scaffold-hint{font-size:12px;color:var(--muted);font-weight:400;line-height:1.7;margin:8px 0 14px}
+#phase-2 .scaffold-hint strong{color:inherit;font-weight:600}
+#conceptReveal>div{min-width:0;flex:1}.learning-diagrams{display:grid;gap:16px;margin:20px 0}
+.digestion-diagram{margin:0;padding:18px;border:1px solid #c8dfd7;border-radius:12px;background:#fff;color:var(--ink)}
+.digestion-diagram h4{margin:0 0 14px;color:var(--teal);font-size:16px}
+.physical-diagram img{display:block;width:100%;max-width:640px;height:auto;margin:0 auto}
+.digestion-diagram figcaption{margin-top:12px;color:var(--muted);font-size:12px;line-height:1.7}
+.chemical-flow{display:grid;grid-template-columns:minmax(210px,1fr) 90px minmax(260px,1.3fr);gap:10px;align-items:center}
+.molecule-card{min-width:0;text-align:center;padding:12px 6px;border:1px solid #e2ece6;border-radius:9px;background:#fafdfb}
+.molecule-card>strong{display:block;color:#24474a;font-size:13px;min-height:24px}
+.molecule-card>img{display:block;width:100%;height:200px;object-fit:contain}
+.bond-key{display:block;font-size:11px;color:#a95022}
+.reaction-step{display:grid;gap:5px;text-align:center;font-size:12px;color:var(--muted)}.reaction-step strong{color:var(--teal)}.reaction-arrow{font-size:38px;color:var(--teal);line-height:1}
+.reaction-products{display:grid;grid-template-columns:1fr 18px 1.15fr;gap:3px;align-items:center}.product-plus{text-align:center;color:var(--teal);font-size:21px}
+.digestion-equation{margin:14px 0 0!important;padding:10px;border-radius:8px;background:#eaf7f1;color:#24474a!important;text-align:center;font-size:13px!important}
+@media(max-width:1000px){.chemical-flow{grid-template-columns:1fr}.reactant{max-width:300px;width:100%;margin:auto}.reaction-step{gap:2px}.reaction-arrow{transform:rotate(90deg);margin:8px 0}.reaction-products{max-width:440px;width:100%;margin:auto}}
+@media(max-width:760px){.digestion-diagram{padding:12px}.digestion-diagram h4{font-size:14px}.digestion-diagram figcaption{font-size:11px}.reaction-products{grid-template-columns:1fr}.reaction-products .molecule-card{max-width:240px;width:100%;margin:auto}.molecule-card>img{height:200px}.reveal-card{gap:10px;padding:16px}.reveal-icon{width:30px;height:30px;font-size:18px}}
+@media print{.digestion-diagram{break-inside:avoid;box-shadow:none;padding:10px}.chemical-flow{grid-template-columns:minmax(160px,1fr) 70px minmax(200px,1.3fr)}.reaction-arrow{transform:none}.reaction-products{grid-template-columns:1fr 18px 1.15fr}.molecule-card>img{height:145px}.physical-diagram img{height:65mm;max-height:65mm}.digestion-diagram figcaption{font-size:8pt}}
+
+@media(max-width:760px){#conceptReveal.show{display:block}#conceptReveal .reveal-icon{float:left;margin:0 10px 8px 0}#conceptReveal .learning-diagrams{clear:both}}
+
+.reaction-water{display:block;margin-top:8px;font-size:13px;color:var(--muted)}
+
+.reaction-arrow{display:block;width:60px;height:24px;justify-self:center}.reaction-arrow svg{display:block;width:100%;height:100%}.equation-arrow{display:inline-flex;width:30px;height:13px;vertical-align:middle;color:#24474a;margin:0 4px}.equation-arrow svg{width:100%;height:100%}
