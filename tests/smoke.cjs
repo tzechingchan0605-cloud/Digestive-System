@@ -12,7 +12,7 @@ async function design(page,{draw=false,badAssumptions=false}={}) {
   await page.fill('#initialObservation','油和水分成兩層，黃色油層在上方。');await page.click('[data-next="2"]');
   await page.selectOption('#hypothesisLiquid','X');await page.selectOption('#hypothesisOutcome','clear');await page.fill('#reason','我預測 X 會令油水混合物變清澈。');
   for(const [g,values] of [['iv',['消化液組合']],['dv',['混合物外觀']],['cv',['油和水總體積','反應溫度','反應時間','加液總量','搖勻方式']]])for(const value of values)await page.click(`[data-group="${g}"][data-variable="${value}"]`);
-  for(const value of ['temperature','time','volume','mixing'])await page.check(`#assumptionChoices input[value="${value}"]`);
+  for(const value of ['time','volume','mixing'])await page.check(`#assumptionChoices input[value="${value}"]`);
   if(badAssumptions)await page.check('#assumptionChoices input[value="more"]');
   await page.fill('#controlPlan','油水加2 mL水作對照；與X、Y、XY比較，油水量、加液量、37°C、時間及搖勻方式相同。');
   if(draw){await page.locator('#setupCanvas').scrollIntoViewIfNeeded();const box=await page.locator('#setupCanvas').boundingBox();await page.mouse.move(box.x+30,box.y+30);await page.mouse.down();await page.mouse.move(box.x+120,box.y+120,{steps:6});await page.mouse.up();await page.click('#saveSetup');}
@@ -24,6 +24,7 @@ async function trial(page,liquid,outcome) {
   assert(await page.locator('#recordData').isDisabled());assert(await page.locator('[data-liquid="X"]').isDisabled());
   await page.waitForFunction(()=>!document.querySelector('[data-observation="clear"]').disabled);
   await page.click(`[data-observation="${outcome}"]`);await page.click('#recordData');
+  await page.waitForFunction(()=>window.scrollTargets.at(-1)==='observationTable'&&document.querySelector('#observationTable').getBoundingClientRect().top<innerHeight&&document.querySelector('#observationTable').getBoundingClientRect().bottom>0);
 }
 async function finish(page,{revision=false}={}) {
   if(revision){await trial(page,'X','clear');await trial(page,'X','cloudy');await page.click('[data-back="2"]');await page.selectOption('#hypothesisLiquid','XY');await page.selectOption('#hypothesisOutcome','clear');await page.fill('#reason','實驗後修改：XY 共同作用。');await page.click('#saveHypothesis');}
@@ -31,8 +32,7 @@ async function finish(page,{revision=false}={}) {
   await page.click('#analyseButton');await page.waitForSelector('#phase-4.active');
   await page.click('#revealConcept');assert.equal(await page.locator('#conceptReveal').evaluate(el=>el.classList.contains('show')),false);
   for(const [heat,outcome] of [['X','clear'],['Y','cloudy']]){await page.click(`[data-extension-heat="${heat}"]`);await page.click('#runExtension');assert(await page.locator('#recordExtension').isDisabled());await page.waitForFunction(()=>!document.querySelector('[data-extension-observation="clear"]').disabled);await page.click(`[data-extension-observation="${outcome}"]`);await page.click('#recordExtension');}
-  for(const [id,value] of Object.entries({q1:'cloudy',q2:'Y',q3:'increase',comparison:'combined',heatComparison:'yaffected',limitations:'indirect'}))await page.selectOption('#'+id,value);
-  await page.fill('#evidenceExplanation','X組混濁而對照油水分層；XY清澈但煮沸Y後混濁，外觀不能單獨證明產物。');
+  for(const [id,value] of Object.entries({q1:'cloudy',q2:'Y',q3:'increase',limitations:'indirect'}))await page.selectOption('#'+id,value);
   await page.click('#revealConcept');await page.waitForSelector('#conceptReveal.show');
   assert(await page.locator('#q1').isDisabled());assert(await page.locator('#controlPlan').isDisabled());assert(await page.locator('#saveHypothesis').isDisabled());assert(await page.locator('#downloadRecord').isDisabled());assert.equal(await page.locator('#reflection').isDisabled(),false);
   await page.click('#saveReflection');assert.equal(await page.evaluate(()=>state.reflectionSubmittedAt),null);
@@ -44,13 +44,13 @@ async function finish(page,{revision=false}={}) {
  try{
  const context=await browser.newContext({acceptDownloads:true});const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
  await page.route('https://fonts.googleapis.com/**',r=>r.abort());await page.route('https://fonts.gstatic.com/**',r=>r.abort());
- await page.goto(base);page.on('dialog',async d=>{if(d.type()!=='beforeunload')await d.accept();});
+ await page.goto(base);await page.evaluate(()=>{const original=Element.prototype.scrollIntoView;window.scrollTargets=[];Element.prototype.scrollIntoView=function(options){window.scrollTargets.push(this.id);return original.call(this,options);};});page.on('dialog',async d=>{if(d.type()!=='beforeunload')await d.accept();});
  await page.evaluate(()=>{window.print=()=>{window.printCalls=(window.printCalls||[]).concat({title:document.title,text:document.querySelector('#printReport').innerText});window.dispatchEvent(new Event('afterprint'));};});
  assert.equal(await page.locator('#profileName').inputValue(),'');
  await login(page);await page.click('[data-next="2"]');assert(await page.locator('#phase-1').evaluate(e=>e.classList.contains('active')));
  await design(page,{draw:true,badAssumptions:true});await finish(page,{revision:true});
  await page.click('#downloadRecord');await page.waitForFunction(()=>window.printCalls?.length===1);
- const printed=await page.evaluate(()=>window.printCalls[0]);assert.equal(printed.title,'VL1_未知消化液X與Y_S4_01_陳小明');assert(printed.text.includes('原始X清澈假說不獲支持'));assert(!/SPS|總分|新知識總分|整體分數/.test(printed.text));
+ const printed=await page.evaluate(()=>window.printCalls[0]);assert.equal(printed.title,'VL1_未知消化液X與Y_S4_01_陳小明');assert(printed.text.includes('原始X清澈假說不獲支持'));assert(!printed.text.includes('最後保存的假說及理由'));assert(!printed.text.includes('若加入加入'));assert(!printed.text.includes('具體比較與證據說明'));assert(!/SPS|總分|新知識總分|整體分數/.test(printed.text));
  const first=await page.evaluate(k=>JSON.parse(localStorage.getItem(k))[0],RECORDS);
  assert.equal(first.initialDesign.form.hypothesisLiquid,'X');assert.equal(first.phase2.hypothesis.liquid,'XY');assert.equal(first.firstObservations['X-none'].studentObservation,'clear');assert.equal(first.phase3.trials.find(t=>t.key==='X-none').studentObservation,'cloudy');assert(first.finalAnswers&&first.reflectionSubmittedAt);assert(first.telemetry.some(e=>e.type==='investigation_submitted'));assert(first.telemetry.some(e=>e.type==='reflection_submitted'));
  await page.evaluate(()=>document.body.classList.add('print-record'));await page.pdf({path:'/tmp/vl1-student.pdf',format:'A4',printBackground:true});await page.evaluate(()=>document.body.classList.remove('print-record'));
@@ -72,7 +72,7 @@ async function finish(page,{revision=false}={}) {
  await page.click('[data-view-record="0"]');assert((await page.locator('#teacherReport').innerText()).includes('原始X清澈假說不獲支持'));
  await page.evaluate(()=>{window.print=()=>{window.printCalls=(window.printCalls||[]).concat(document.title);window.dispatchEvent(new Event('afterprint'));};});await page.click('#teacherPDF');await page.waitForFunction(()=>window.printCalls?.length>0);
  let dlPromise=page.waitForEvent('download');await page.click('#exportCsv');let dl=await dlPromise;await dl.saveAs('/tmp/vl1-records.xlsx');
- await page.click('#teacherDemo');await design(page);await finish(page);await page.click('#downloadRecord');
+ await page.click('#teacherDemo');await page.evaluate(()=>{const original=Element.prototype.scrollIntoView;window.scrollTargets=[];Element.prototype.scrollIntoView=function(options){window.scrollTargets.push(this.id);return original.call(this,options);};});await design(page);await finish(page);await page.click('#downloadRecord');
  assert.equal(await page.evaluate(k=>localStorage.getItem(k),RECORDS),storedBefore);assert.equal(await page.evaluate(()=>localStorage.getItem('digestiveLab.v4')),currentBefore);assert.equal(await page.evaluate(()=>state.events.length),0);
  await page.click('#teacherButton');dlPromise=page.waitForEvent('download');await page.click('#exportCsv');dl=await dlPromise;await dl.saveAs('/tmp/vl1-after-demo.xlsx');assert.deepEqual(fs.readFileSync('/tmp/vl1-records.xlsx'),fs.readFileSync('/tmp/vl1-after-demo.xlsx'));
  assert.equal(errors.length,0,errors.join('\n'));console.log('PASS: student full workflow, frozen hypothesis, first/final observations, reflection/PDF gates, account switching, same-email IDs, stale animations, native reload cancel/accept, active timing, legacy data, teacher preview/PDF/demo, byte-identical Excel and unchanged storage.');

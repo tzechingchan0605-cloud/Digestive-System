@@ -20,11 +20,11 @@ assert len(w['裝置設計圖']._images) == 1
 assert answers['N2'].font.color.rgb == 'FF00834A'  # Independent variable, correct.
 assert answers['Q2'].font.color.rgb == 'FFC03030'  # Deliberately incorrect premise selection.
 assert answers['I2'].font.color.rgb == 'FF173E34'  # Open observation remains unmarked.
-assert len({answers[f'{c}2'].fill.fgColor.rgb for c in ['I', 'N', 'Q', 'T', 'Z', 'AA']}) == 6
+assert len({answers[f'{c}2'].fill.fgColor.rgb for c in ['I', 'N', 'Q', 'T', 'X', 'Y']}) == 6
 assert observations['D3'].font.color.rgb == 'FFC03030'  # First X answer was incorrect.
 assert observations['E3'].font.color.rgb == 'FF00834A'  # Final X answer was correct.
 assert len(scores.data_validations.dataValidation) == 10
-assert len(answers.conditional_formatting) == 4 * 7
+assert len(answers.conditional_formatting) == 4 * 6
 assert len(scores.conditional_formatting) == 4 * 25
 assert w.calculation.fullCalcOnLoad and w.calculation.forceFullCalc
 assert w['評分準則'].max_row >= 19
@@ -141,8 +141,8 @@ scores['E2'] = 2; assert colour_matches('I2') == [0]
 scores['E2'] = 0; assert colour_matches('I2') == [1]
 scores['E2'] = 1; assert colour_matches('I2') == [2]
 for c in ['X2', 'Y2', 'Z2', 'AA2']: scores[c] = 0
-assert colour_matches('AA2') == [1]
-scores['X2'] = None; assert colour_matches('AA2') == []
+assert colour_matches('Y2') == [1]
+scores['X2'] = None; assert colour_matches('Y2') == []
 # Legacy missing new answers must not manufacture scores or original responses.
 assert answers['J5'].value == '未提供（舊版未保存原始假說）'
 assert scores['J5'].value == '未提供'
