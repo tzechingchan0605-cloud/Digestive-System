@@ -4,14 +4,14 @@
   let current = 'zh';
   const sources = new WeakMap(), attributes = new WeakMap();
   const originalTitle = document.title;
-  const ignored = 'script,style,textarea,[data-language-user]';
+  const ignored = 'script,style,[data-language-user]';
   const translatedAttributes = ['alt','title','aria-label','placeholder','src','srcset'];
   const images = {
-    'assets/emulsification.svg':'assets/emulsification-en.svg',
-    'assets/emulsification-mobile.svg':'assets/emulsification-mobile-en.svg',
-    'assets/triglyceride-structure.svg':'assets/triglyceride-structure-en.svg',
-    'assets/glycerol-structure.svg':'assets/glycerol-structure-en.svg',
-    'assets/fatty-acids-structure.svg':'assets/fatty-acids-structure-en.svg'
+    'assets/emulsification.svg':'assets/emulsification-en.svg?v=2',
+    'assets/emulsification-mobile.svg':'assets/emulsification-mobile-en.svg?v=2',
+    'assets/triglyceride-structure.svg':'assets/triglyceride-structure-en.svg?v=2',
+    'assets/glycerol-structure.svg':'assets/glycerol-structure-en.svg?v=2',
+    'assets/fatty-acids-structure.svg':'assets/fatty-acids-structure-en.svg?v=2'
   };
   function text(value) {
     const source = String(value ?? '');
@@ -35,7 +35,8 @@
   }
   function ignoredElement(element) {return element?.closest(ignored);}
   function translateNode(node) {
-    if (ignoredElement(node.parentElement)) return;
+    // Textarea attributes are UI instructions; its text/value belongs to the student.
+    if (ignoredElement(node.parentElement) || node.parentElement?.closest('textarea')) return;
     let item=sources.get(node);
     if (!item || node.nodeValue !== item.rendered) item={source:node.nodeValue};
     const rendered=text(item.source);
