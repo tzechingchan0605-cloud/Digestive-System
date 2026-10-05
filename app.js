@@ -281,7 +281,7 @@ async function printRecord(r) {
 function restorePrint() {document.title=PAGE_TITLE;document.body.classList.remove('print-record');}
 window.addEventListener('afterprint',restorePrint);
 let dashboardGeneration=0;
-const cloudSync=createCloudSync({endpoint:window.VL1_CLOUD_CONFIG?.endpoint||'',storage:localStorage,records:readLocalRecords,
+const cloudSync=createCloudSync({endpoint:window.VL1_CLOUD_CONFIG?.endpoint||'',transport:window.VL1_CLOUD_CONFIG?.transport||'auto',storage:localStorage,records:readLocalRecords,
   status:(kind,message)=>{for(const id of ['cloudStatus','loginCloudStatus']){$('#'+id).textContent=message;$('#'+id).dataset.state=kind;}for(const id of ['retryCloud','loginRetryCloud'])$('#'+id).hidden=!cloudSync.enabled||!['error','pending'].includes(kind);}});
 function mergeRecords(local,remote) {
   const merged=new Map();

@@ -31,7 +31,35 @@ function equalHash(a, b) {
   return result === 0;
 }
 function output(value) {return ContentService.createTextOutput(JSON.stringify(value)).setMimeType(ContentService.MimeType.JSON);}
-function doGet() {return output({ok: true, service: 'VL1集中紀錄', version: 1});}
+function doGet(event) {
+  if (event?.parameter?.view === 'bridge') return bridgePage_(event.parameter);
+  return output({ok: true, service: 'VL1集中紀錄', version: 2});
+}
+// The embedded page uses Google's own RPC transport instead of cross-origin fetch.
+function bridgePage_(parameters) {
+  if (!/^[0-9a-f-]{36}$/i.test(parameters.channel || '') || !/^https?:\/\/[^\/\s?#]+$/.test(parameters.parentOrigin || '')) throw Error('連線參數無效');
+  const safe = value => JSON.stringify(value).replace(/</g, '\\u003c');
+  const html = `<!doctype html><html><head><meta charset="utf-8"></head><body><script>
+    const channel = ${safe(parameters.channel)}, parentOrigin = ${safe(parameters.parentOrigin)};
+    const topWindow = window.top;
+    function announce() {topWindow.postMessage({type:'vl1-ready',channel},parentOrigin);}
+    const readyTimer = setInterval(announce,500);
+    window.addEventListener('message',function(event) {
+      if(event.source !== topWindow || event.origin !== parentOrigin || !event.data || event.data.channel !== channel) return;
+      const message=event.data;
+      if(message.type==='vl1-connected') {clearInterval(readyTimer);return;}
+      if(message.type!=='vl1-request' || typeof message.id!=='string') return;
+      const respond=reply=>topWindow.postMessage(Object.assign({type:'vl1-response',channel,id:message.id},reply),parentOrigin);
+      google.script.run.withSuccessHandler(result=>respond({result}))
+        .withFailureHandler(error=>respond({error:error.message||'雲端執行失敗'})).collectorBridge(message.payload);
+    });
+    announce();
+  </script></body></html>`;
+  return HtmlService.createHtmlOutput(html).setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+function collectorBridge(data) {
+  return JSON.parse(doPost({postData:{contents:JSON.stringify(data)}}).getContent());
+}
 function doPost(event) {
   let lock;
   try {

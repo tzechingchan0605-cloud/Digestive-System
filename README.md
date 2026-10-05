@@ -31,7 +31,7 @@ Excel 包含七張工作表：學生探究答案、六組觀察紀錄、教師�
 
 ## 重要限制與舊版相容
 
-跨裝置收集設定見 [雲端收集設定](cloud/SETUP.md)。`cloud-config.js` 的 `endpoint` 未設定時只使用本機備份，介面會明確提示。設定後學生紀錄自動上傳，教師憑指定電郵及額外密碼讀取全班紀錄；匯出 Excel 前會重新載入雲端資料，失敗不下載部分紀錄。舊手機紀錄須在原瀏覽器重新開啟網站補傳；本機儲存已清除的答案不能復原。
+跨裝置收集設定見 [雲端收集設定](cloud/SETUP.md)。`cloud-config.js` 的 `endpoint` 未設定時只使用本機備份，介面會明確提示。Apps Script 第 2 版使用嵌入頁及 Google RPC 連線，避免直接跨來源讀取失敗；舊部署需依設定文件更新至新版本。設定後學生紀錄自動上傳，教師憑指定電郵及額外密碼讀取全班紀錄；匯出 Excel 前會重新載入雲端資料，失敗不下載部分紀錄。舊手機紀錄須在原瀏覽器重新開啟網站補傳；本機儲存已清除的答案不能復原。
 
 網站不會更新電腦上已下載的 Excel；重新下載生成最新全班檔案。人工評分仍只存在教師另存的 Excel。指定電郵本身不是 Google 身分驗證；雲端讀取另有密碼保護，學生電郵仍為自行輸入。
 
@@ -45,6 +45,7 @@ Excel 包含七張工作表：學生探究答案、六組觀察紀錄、教師�
 node --check app.js
 node --check excel.js
 node --check cloud-sync.js
+node --check cloud-bridge.js
 node tests/cloud.cjs
 node tests/smoke.cjs
 node tests/edge_cases.cjs
