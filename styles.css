@@ -134,3 +134,17 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 #cloudTeacherForm label {display:block;font-weight:600;}
 #cloudTeacherPassword {display:block;max-width:100%;margin:8px 0;padding:10px;border:1px solid var(--line);border-radius:8px;}
 @media print {.cloud-status,#retryCloud {display:none;}}
+
+/* Language controls stay reachable while the login overlay is open. */
+.language-switch{position:fixed;top:14px;right:16px;z-index:40;padding:9px 13px;border:1px solid #a9d1ca;border-radius:9px;background:#fff;color:var(--teal);font:700 13px "Noto Sans HK",system-ui,sans-serif;cursor:pointer;box-shadow:0 3px 10px rgba(12,60,60,.08)}
+.topbar{padding:12px 130px 12px 0;height:auto;min-height:76px;gap:14px;flex-wrap:wrap}
+#teacherLanguageSwitch{position:absolute;right:54px;top:14px}
+.teacher-panel{padding-top:65px}
+#languageDialog{width:min(430px,calc(100% - 32px));max-height:calc(100dvh - 32px)}
+.language-panel{padding:24px}.language-panel h2{margin:0 0 12px;font-size:22px}.language-panel p{color:var(--muted);font-size:14px}.language-panel label{display:block;font-weight:700}
+#languageCode{display:block;width:100%;margin:8px 0;padding:12px;border:1px solid #bbd4ce;border-radius:8px;font:inherit}
+#languageError{min-height:24px;color:#b43f34}.language-panel .action-row{gap:12px}.language-panel button{min-width:90px}
+html[lang="en-HK"] .step span{max-width:145px}html[lang="en-HK"] .module-label{flex-shrink:0}
+html[lang="en-HK"] .reaction-step{word-break:keep-all}
+@media(max-width:760px){.topbar{flex-wrap:wrap;padding:62px 0 14px;gap:8px}.topbar .student-chip{width:100%;justify-content:flex-start}.language-switch{top:10px;right:12px}.steps{gap:8px;align-items:flex-start}.steps i{display:none}.step{flex:1;min-width:0;flex-direction:column;text-align:center}.step span{font-size:11px;overflow-wrap:anywhere}.module-label{font-size:11px}.hero h1{overflow-wrap:anywhere}select{max-width:100%}.equipment-bank{grid-template-columns:repeat(3,minmax(0,1fr))}.equipment figcaption{overflow-wrap:anywhere}.phase-heading .trial-pill{max-width:100px;white-space:normal}.language-panel{padding:20px}}
+@media print{.language-switch{display:none!important}}

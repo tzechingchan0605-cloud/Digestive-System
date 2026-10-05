@@ -1,6 +1,6 @@
 # 未知消化液虛擬實驗室（VL1）
 
-繁體中文的四階段 IBL：了解情境 → 設計探究 → 四組基本實驗及兩組熱處理 → 結論、學習重點及反思。使用 HTML、CSS、JavaScript，無需建置。學生不需 Google 登入；跨裝置收集使用 Google 試算表及 Apps Script 後端。
+四階段 IBL：了解情境 → 設計探究 → 四組基本實驗及兩組熱處理 → 結論、學習重點及反思。預設使用繁體中文，可切換至附部分中文詞彙支援的英文介面。使用 HTML、CSS、JavaScript，無需建置。學生不需 Google 登入；跨裝置收集使用 Google 試算表及 Apps Script 後端。
 
 ## 啟動
 
@@ -10,6 +10,14 @@ python3 -m http.server 8000 --bind 127.0.0.1
 ```
 
 使用瀏覽器開啟該靜態伺服器。Google Fonts 可選，無網路時使用系統字型。本機儲存始終保留；設定雲端後，答案及裝置圖會同步至集中紀錄。
+
+## 語言切換
+
+每次重新載入頁面均以繁體中文開始。右上角的語言按鈕要求輸入課堂切換代碼；輸入 `CMI` 使用中文，輸入 `EMI` 使用英文。輸入錯誤或取消不改變目前語言及探究。切換語言保留目前頁面、已填答案、繪圖、實驗、反思及雲端同步狀態，毋須重新登入。
+
+中文介面使用中文文字；英文介面的部分科學及探究詞彙以「英文（繁體中文）」呈現，[候選詞彙校對清單](docs/LANGUAGE_GLOSSARY.md) 仍待教師確認。學生自行輸入的姓名、理由、設計與反思保留原文，不自動翻譯。學生 PDF 跟隨目前介面語言；教師 Excel 的欄名、參考答案及評分說明保持繁體中文。語言切換不改寫作答的識別值、探究 ID、原始快照、儲存佇列或既有紀錄。
+
+`CMI` 和 `EMI` 是公開程式碼中的課堂切換代碼，並非安全認證或教師雲端密碼。其他 VL 可使用 [跨 VL 語言切換提示詞](docs/CROSS_VL_LANGUAGE_PROMPT.md) 加入相同功能；各題材的詞彙需另行確認。
 
 ## 學生與紀錄
 
@@ -53,6 +61,7 @@ node tests/smoke.cjs
 node tests/edge_cases.cjs
 node tests/layout.cjs
 node tests/learning.cjs
+node tests/language.cjs http://127.0.0.1:8000
 python3 tests/excel_scores.py
 ```
 

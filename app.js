@@ -6,6 +6,8 @@ const MODULE_ID = 'VL_BIO_DIGESTION_OPTION_A';
 const PAGE_TITLE = document.title;
 const $ = selector => document.querySelector(selector);
 const $$ = selector => [...document.querySelectorAll(selector)];
+const uiText = value => window.VL1Language?.text(value) ?? value;
+const canonicalHTML = (element,inner=false) => window.VL1Language?.canonicalHTML(element,inner) ?? (inner?element.innerHTML:element.outerHTML);
 const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const copy = value => structuredClone(value);
 const variableNames = ['油和水總體積','反應溫度','反應時間','加液總量','搖勻方式','混合物外觀','消化液組合'];
@@ -218,7 +220,7 @@ function applyLock() {
   $('#saveReflection').textContent=complete?'✓ 學習反思已提交':'儲存並提交學習反思';
   $('#completeBar strong').textContent=complete?'模組完成':'探究已遞交，待提交反思';
   $('#completeBar p').textContent=isTeacher()?'教師示範只留在目前頁面，不加入學生紀錄或 Excel。':'原始及最後答案已保存於這部瀏覽器。';
-  const h=originalHypothesis({initialDesign:state.initialDesign});$('#originalHypothesis').innerHTML=`<blockquote><strong>你的原始假說</strong><p>${escapeHtml(hypothesisText(h))}</p><p>原始理由：${escapeHtml(h?.reason||'未提供')}</p></blockquote>`;
+  const h=originalHypothesis({initialDesign:state.initialDesign});$('#originalHypothesis').innerHTML=`<blockquote><strong>你的原始假說</strong><p>${escapeHtml(hypothesisText(h))}</p><p><span>原始理由：</span><span${h?.reason?' data-language-user':''}>${escapeHtml(h?.reason||'未提供')}</span></p></blockquote>`;
 }
 function submitInvestigation() {
   if(state.submitted)return;
@@ -226,7 +228,7 @@ function submitInvestigation() {
   const missing=Object.keys(conclusionAnswers).filter(id=>!$('#'+id).value).map(id=>questionLabels[id]);
   if(!trialKeys.every(key=>state.records.some(r=>r.key===key)))missing.push('六組觀察');
   if(missing.length)return toast('請完成：'+missing.join('、'));
-  if(!confirm('遞交後原探究答案不能修改；你仍可填寫學習反思。確定遞交嗎？'))return;
+  if(!confirm(uiText('遞交後原探究答案不能修改；你仍可填寫學習反思。確定遞交嗎？')))return;
   state.finalAnswers=designSnapshot();state.finalAnswers.trials=copy(state.records);
   state.submitted=true;state.submittedAt=new Date().toISOString();logEvent('investigation_submitted',{answers:state.finalAnswers});saveRecord();applyLock();$('#conceptReveal').scrollIntoView({behavior:'smooth'});
 }
@@ -236,6 +238,7 @@ function resetSession(profile=null) {
   FIELDS.forEach(id=>{const el=$('#'+id);el.value='';el.disabled=false;});
   $$('.phase button,.phase input,.phase select').forEach(el=>el.disabled=false);
   $('#setupPhoto').value='';$('#teacherDetail').hidden=true;$('#teacherReport').innerHTML='';$('#printReport').innerHTML='';
+  $('#studentName').toggleAttribute('data-language-user',!!profile&&!isTeacher());$('#avatar').toggleAttribute('data-language-user',!!profile&&!isTeacher());
   $('#studentName').textContent=isTeacher()?'教師示範':profile?.name||'同學';$('#avatar').textContent=isTeacher()?'師':profile?.name?.[0]||'同';$('#teacherButton').hidden=!isTeacher();
   $('#setupFeedback').textContent='';$('#conclusionFeedback').textContent='';$('#extensionFeedback').textContent='';
   $('#resultTitle').textContent='等待進行實驗';$('#extensionResultTitle').textContent='等待進行延伸測試';$('#testTube').className='test-tube';$('#extensionTube').className='test-tube';
@@ -245,32 +248,34 @@ function resetSession(profile=null) {
   $('main').inert=!profile;
 }
 function returnToLogin() {
-  if(!confirm('開始新的探究？本次答案會保留；每次登入均建立新紀錄。'))return;
+  if(!confirm(uiText('開始新的探究？本次答案會保留；每次登入均建立新紀錄。')))return;
   saveRecord();allowUnload=true;cancelAnimations();clearTimeout(saveTimer);location.reload();
 }
 function formatDuration(seconds) {if(!Number.isFinite(seconds))return '未提供';const n=Math.round(seconds);return `${Math.floor(n/60)} 分 ${n%60} 秒`;}
 function formatDate(value) {return value&&Number.isFinite(Date.parse(value))?new Intl.DateTimeFormat('zh-HK',{timeZone:'Asia/Hong_Kong',dateStyle:'medium',timeStyle:'short'}).format(new Date(value)):'未提供';}
-function answerText(id,value) {return value?$('#'+id).querySelector(`option[value="${CSS.escape(value)}"]`)?.textContent||'未提供':'未提供';}
+// Excel and persisted answers always use the original Chinese choice labels.
+function answerText(id,value) {return value?(window.VL1Language?.canonicalOption(id,value) ?? $('#'+id).querySelector(`option[value="${CSS.escape(value)}"]`)?.textContent)||'未提供':'未提供';}
 function variablesForRecord(r,g) {return r.schemaVersion!==2&&g==='cv'?expectedVariables.cv.slice(0,3):expectedVariables[g];}
 function sameChoices(a,b) {return Array.isArray(a)&&a.length===b.length&&b.every(x=>a.includes(x));}
 function answerMark(correct) {return correct===null?'':`<span class="answer-mark ${correct?'correct':'incorrect'}">${correct?'✓':'✕'}</span>`;}
-function reportAnswer(title,answer,reference='',correct=null) {return `<div class="report-answer"><b>${escapeHtml(title)}</b>${answerMark(correct)}<p>${escapeHtml(answer||'未提供')}</p><small>${correct===null?'參考說明':'參考答案'}：${escapeHtml(reference)}</small></div>`;}
+function reportAnswer(title,answer,reference='',correct=null,user=false) {return `<div class="report-answer"><b>${escapeHtml(title)}</b>${answerMark(correct)}<p${user&&answer?' data-language-user':''}>${escapeHtml(answer||'未提供')}</p><small>${correct===null?'參考說明':'參考答案'}：${escapeHtml(reference)}</small></div>`;}
 function safeImage(value) {return /^data:image\/(jpeg|png);base64,[A-Za-z0-9+/=]+$/.test(value||'')?value:'';}
 function renderPrint(r) {
   const h=originalHypothesis(r),vars=r.phase2?.variableChoices||{},trials=r.phase3?.trials||[],answers=r.phase4?.conclusions||{};
-  const open=(title,value,ref)=>reportAnswer(title,value,ref);
+  const open=(title,value,ref,user=true)=>reportAnswer(title,value,ref,null,user);
   const variables=variableGroups.map(([g,title])=>reportAnswer(title,vars[g]?.join('、'),variablesForRecord(r,g).join('、'),vars[g]?.length?sameChoices(vars[g],variablesForRecord(r,g)):null)).join('');
   const selected=r.phase2?.assumptions,recordAssumptions=assumptionsForRecord(r);
   const image=safeImage(r.phase2?.setup?.image);
   const table=`<table class="report-table"><thead><tr><th>裝置／條件</th><th>首次確認</th><th>最後確認</th><th>回饋</th><th>參考外觀</th></tr></thead><tbody>${trialKeys.map(key=>{const t=trials.find(t=>t.key===key),first=r.firstObservations?.[key];return `<tr><td>${trialLabel(key)}</td><td>${escapeHtml(first?.studentLabel||'未提供')}</td><td>${escapeHtml(t?.studentLabel||'未提供')}</td><td>${answerMark(t? t.studentObservation===experiments[key][0]:null)}</td><td>${experiments[key][1]}</td></tr>`;}).join('')}</tbody></table>`;
   $('#printReport').innerHTML=`<header class="report-cover"><span class="report-logo">✦</span><div><p>IBL 虛擬實驗室 · S4 生物</p><h1>未知消化液 X 與 Y</h1><strong>個人學習紀錄與回饋${isTeacher(r.profile)?'（教師示範）':''}</strong></div></header>
-  <section class="report-profile"><div><small>學生</small><b>${escapeHtml(r.profile?.name)}</b></div><div><small>班別及學號</small><b>${escapeHtml(r.profile?.classInfo)}</b></div><div><small>紀錄時間</small><b>${formatDate(r.savedAt)}</b></div><div><small>有效探究用時${r.schemaVersion===2?'':'（舊版計時）'}</small><b>${formatDuration(r.durationSeconds)}</b></div></section>
+  <section class="report-profile"><div><small>學生</small><b data-language-user>${escapeHtml(r.profile?.name)}</b></div><div><small>班別及學號</small><b data-language-user>${escapeHtml(r.profile?.classInfo)}</b></div><div><small>紀錄時間</small><b>${formatDate(r.savedAt)}</b></div><div><small>有效探究用時${r.schemaVersion===2?'':'（舊版計時）'}</small><b>${formatDuration(r.durationSeconds)}</b></div></section>
   <section class="report-stage"><h2>01 了解情境</h2><div class="report-card context-summary"><img src="assets/oil-water-tube.png" alt="油水試管"><div><h3>研究任務</h3><p>比較 X、Y 及其組合對油水混合物外觀的影響。</p></div></div><div class="report-card">${open('你的初步觀察',r.phase1?.observation,'描述可見的油水層及試管外觀；不要以身分猜測代替觀察。')}</div></section>
-  <section class="report-stage"><h2>02 設計探究</h2><div class="report-card">${open('第一次實驗前固定保存的原始假說',hypothesisText(h),'合理且可測試的原始假說不因預測錯誤而判錯。')}${open('原始理由',h?.reason,'說明可測試預測的理由；沒有唯一措辭。')}</div><div class="report-card">${variables}${reportAnswer('實驗前提',selected?.map(assumptionText).join('；'),recordAssumptions.filter(a=>a[2]).map(a=>a[1]).join('；'),selected?.length?sameChoices(selected,recordAssumptions.filter(a=>a[2]).map(a=>a[0])):null)}${open('探究的對照組',r.phase2?.controlPlan,CONTROL_REFERENCE)}${open('裝置文字設計',r.phase2?.setup?.description,DESIGN_REFERENCE)}${image?`<img class="setup-image" src="${image}" alt="學生保存的裝置設計">`:''}<p class="feedback-note">裝置圖及開放題由教師判斷，沒有自動對錯標記。</p></div></section>
+  <section class="report-stage"><h2>02 設計探究</h2><div class="report-card">${open('第一次實驗前固定保存的原始假說',hypothesisText(h),'合理且可測試的原始假說不因預測錯誤而判錯。',false)}${open('原始理由',h?.reason,'說明可測試預測的理由；沒有唯一措辭。')}</div><div class="report-card">${variables}${reportAnswer('實驗前提',selected?.map(assumptionText).join('；'),recordAssumptions.filter(a=>a[2]).map(a=>a[1]).join('；'),selected?.length?sameChoices(selected,recordAssumptions.filter(a=>a[2]).map(a=>a[0])):null)}${open('探究的對照組',r.phase2?.controlPlan,CONTROL_REFERENCE)}${open('裝置文字設計',r.phase2?.setup?.description,DESIGN_REFERENCE)}${image?`<img class="setup-image" src="${image}" alt="學生保存的裝置設計">`:''}<p class="feedback-note">裝置圖及開放題由教師判斷，沒有自動對錯標記。</p></div></section>
   <section class="report-stage page-break"><h2>03 六組觀察</h2><div class="report-card">${table}<p>${LIMIT_REFERENCE}</p></div></section>
   <section class="report-stage"><h2>04 分析與結論</h2><div class="report-card">${Object.keys(conclusionAnswers).map(id=>reportAnswer(questionLabels[id],answerText(id,answers[id]),answerText(id,conclusionAnswers[id]),answers[id]?answers[id]===conclusionAnswers[id]:null)).join('')}</div>
-  ${r.submitted||r.schemaVersion!==2?`<div class="concept-summary"><h3>學習重點</h3>${$('#conceptReveal .learning-points').outerHTML}${$('#conceptReveal .learning-diagrams').outerHTML}<p>${LIMIT_REFERENCE}</p></div>`:'<p>此份紀錄尚未遞交探究，學習重點尚未開放。</p>'}
+  ${r.submitted||r.schemaVersion!==2?`<div class="concept-summary"><h3>學習重點</h3>${canonicalHTML($('#conceptReveal .learning-points'))}${canonicalHTML($('#conceptReveal .learning-diagrams'))}<p>${LIMIT_REFERENCE}</p></div>`:'<p>此份紀錄尚未遞交探究，學習重點尚未開放。</p>'}
   <div class="reflection-summary">${open('實際學習反思',r.phase4?.reflection,'判斷原始假說是否獲支持；引用具體組別比較，運用乳化、表面積、脂肪酶及變性概念修訂解釋。')}<p>反思狀態：${reflectionComplete(r)?'已提交':r.schemaVersion===2?'未提交':'未提供（舊版未記錄）'}</p></div></section><footer class="report-footer">探究實驗室 · 原始答案與參考說明 · 答案及回饋 · 請另存此份 PDF</footer>`;
+  window.VL1Language?.refresh($('#printReport'));
 }
 function reportFilename(r) {const safe=v=>String(v||'未提供').replace(/[\\/:*?"<>|\u0000-\u001f]/g,'_').trim().replace(/[. ]+$/g,'')||'未提供';return `VL1_未知消化液X與Y_${safe(r.profile?.classInfo)}_${safe(r.profile?.name)}`;}
 async function printRecord(r) {
@@ -278,7 +283,7 @@ async function printRecord(r) {
   document.title=reportFilename(r);document.body.classList.add('print-record');
   try{window.print();}catch(e){restorePrint();throw e;}
 }
-function restorePrint() {document.title=PAGE_TITLE;document.body.classList.remove('print-record');}
+function restorePrint() {document.title=uiText(PAGE_TITLE);document.body.classList.remove('print-record');}
 window.addEventListener('afterprint',restorePrint);
 let dashboardGeneration=0;
 const cloudSync=createCloudSync({endpoint:window.VL1_CLOUD_CONFIG?.endpoint||'',transport:window.VL1_CLOUD_CONFIG?.transport||'auto',storage:localStorage,records:readLocalRecords,
@@ -312,8 +317,8 @@ async function startTeacherDashboard(password) {
   }
   if(generation!==dashboardGeneration||!isTeacher())return;
   $('#dashboardStatus').textContent=`${cloudSync.enabled?'全班雲端與本機':'這部瀏覽器'}共有 ${rows.length} 份學生探究紀錄；同一電郵的多次探究會分開保存。${cloudSync.enabled?'匯出時會重新讀取雲端最新資料。':'尚未啟用跨裝置同步。'}`;
-  $('#teacherData').innerHTML=rows.length?rows.map((r,i)=>{const trials=r.phase3?.trials||[];return `<tr><td><strong>${escapeHtml(r.profile.name)}</strong><small>${escapeHtml(r.profile.email)}</small></td><td>${escapeHtml(r.profile.classInfo)}</td><td>${reflectionComplete(r)?'已完成':r.submitted?'待提交反思':r.schemaVersion===2?'進行中':'舊版（新欄位未提供）'}</td><td>${trials.filter(t=>t.studentObservation===experiments[t.key]?.[0]).length} / ${trials.length}</td><td>${formatDuration(r.durationSeconds)}</td><td>${formatDate(r.savedAt)}</td><td><button class="secondary" data-view-record="${i}">查看紀錄</button></td></tr>`;}).join(''):'<tr><td colspan="7">暫無學生紀錄</td></tr>';
-  $$('[data-view-record]').forEach(b=>b.onclick=()=>{previewRecord=copy(rows[+b.dataset.viewRecord]);renderPrint(previewRecord);$('#teacherReport').innerHTML=$('#printReport').innerHTML;$('#teacherDetail').hidden=false;});
+  $('#teacherData').innerHTML=rows.length?rows.map((r,i)=>{const trials=r.phase3?.trials||[];return `<tr><td><strong data-language-user>${escapeHtml(r.profile.name)}</strong><small data-language-user>${escapeHtml(r.profile.email)}</small></td><td data-language-user>${escapeHtml(r.profile.classInfo)}</td><td>${reflectionComplete(r)?'已完成':r.submitted?'待提交反思':r.schemaVersion===2?'進行中':'舊版（新欄位未提供）'}</td><td>${trials.filter(t=>t.studentObservation===experiments[t.key]?.[0]).length} / ${trials.length}</td><td>${formatDuration(r.durationSeconds)}</td><td>${formatDate(r.savedAt)}</td><td><button class="secondary" data-view-record="${i}">查看紀錄</button></td></tr>`;}).join(''):'<tr><td colspan="7">暫無學生紀錄</td></tr>';
+  $$('[data-view-record]').forEach(b=>b.onclick=()=>{previewRecord=copy(rows[+b.dataset.viewRecord]);renderPrint(previewRecord);$('#teacherReport').innerHTML=canonicalHTML($('#printReport'),true);$('#teacherDetail').hidden=false;});
 }
 // Activity rubric draft: scores live only in the downloaded teacher workbook.
 function scoringWorkbook(records) {

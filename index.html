@@ -7,9 +7,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@400;500;600;700;800&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=4" />
   </head>
   <body>
+    <button type="button" id="languageSwitch" class="language-switch" data-language-switch aria-haspopup="dialog" aria-controls="languageDialog">切換語言</button>
     <main class="app-shell">
       <header class="topbar">
         <a class="brand" href="#top" aria-label="探究實驗室主頁"><span class="brand-mark">✦</span><span>探究實驗室</span></a>
@@ -110,13 +111,16 @@
       </section>
     </main>
     <div class="profile-modal" id="profileModal" role="dialog" aria-modal="true" aria-labelledby="profileTitle"><section class="profile-panel"><span class="profile-mark">✦</span><p class="eyebrow">探究實驗室 · 模組 1</p><h2 id="profileTitle">開始你的探究</h2><p>輸入姓名、班別及電郵地址。輸入指定教師電郵會開啟教師儀表板。</p><form id="profileForm"><label>姓名<input id="profileName" required maxlength="24" autocomplete="name" placeholder="例如：陳小明"/></label><label>班別及學號<input id="profileClass" required maxlength="16" placeholder="例如：S4X1-05"/></label><label>電郵地址<input id="profileEmail" type="email" required autocomplete="email" placeholder="例如：student@school.edu.hk"/></label><button class="primary" type="submit">進入實驗室 →</button></form><p id="loginCloudStatus" class="cloud-status" role="status"></p><button id="loginRetryCloud" class="secondary" type="button" hidden>重試同步舊紀錄</button><p class="privacy-note">答案保留本機備份；設定雲端後會自動同步至全班紀錄，請留意頁面同步狀態。重新整理後會返回空白登入頁；每次登入都開始新探究，舊紀錄仍會保留。</p></section></div>
-    <dialog id="teacherDialog"><section class="teacher-panel"><button id="closeTeacher" class="dialog-close">×</button><p class="eyebrow">教師儀表板</p><h2>學生學習紀錄</h2><p id="dashboardStatus">正在載入……</p><form id="cloudTeacherForm" hidden><label>教師雲端密碼<input id="cloudTeacherPassword" type="password" autocomplete="current-password" required /></label><button class="secondary" type="submit">解鎖／重新載入全班紀錄</button><p class="hint">只輸入教師電郵不會取得雲端學生資料。網站不會將密碼寫入本機儲存；請勿使用 Google 帳戶密碼。</p></form><div class="dashboard-note">Excel 包含原始與最後答案、操作事件、裝置圖及教師評分欄。rubric 是待研究者校準的初稿，並非已驗證量表。人工分數只存於教師另行保存的 Excel；重新匯出不會帶入之前填分。</div><button class="secondary" id="refreshRecords">重新載入紀錄</button><button class="secondary" id="teacherDemo">進入示範探究</button><button class="primary" id="exportCsv">下載 Excel 報告</button><div class="table-wrap"><table class="teacher-table"><thead><tr><th>學生</th><th>班別</th><th>進度</th><th>觀察準確度</th><th>總用時</th><th>更新時間</th><th>個別報告</th></tr></thead><tbody id="teacherData"></tbody></table></div><section id="teacherDetail" hidden><button class="secondary" id="teacherPDF">列印／儲存此份 PDF</button><div id="teacherReport"></div></section></section></dialog>
+    <dialog id="teacherDialog"><section class="teacher-panel"><button type="button" id="teacherLanguageSwitch" class="language-switch" data-language-switch aria-haspopup="dialog" aria-controls="languageDialog">切換語言</button><button id="closeTeacher" class="dialog-close">×</button><p class="eyebrow">教師儀表板</p><h2>學生學習紀錄</h2><p id="dashboardStatus">正在載入……</p><form id="cloudTeacherForm" hidden><label>教師雲端密碼<input id="cloudTeacherPassword" type="password" autocomplete="current-password" required /></label><button class="secondary" type="submit">解鎖／重新載入全班紀錄</button><p class="hint">只輸入教師電郵不會取得雲端學生資料。網站不會將密碼寫入本機儲存；請勿使用 Google 帳戶密碼。</p></form><div class="dashboard-note">Excel 包含原始與最後答案、操作事件、裝置圖及教師評分欄。評分準則是待研究者校準的初稿，並非已驗證量表。人工分數只存於教師另行保存的 Excel；重新匯出不會帶入之前填分。</div><button class="secondary" id="refreshRecords">重新載入紀錄</button><button class="secondary" id="teacherDemo">進入示範探究</button><button class="primary" id="exportCsv">下載 Excel 報告</button><div class="table-wrap"><table class="teacher-table"><thead><tr><th>學生</th><th>班別</th><th>進度</th><th>觀察準確度</th><th>總用時</th><th>更新時間</th><th>個別報告</th></tr></thead><tbody id="teacherData"></tbody></table></div><section id="teacherDetail" hidden><button class="secondary" id="teacherPDF">列印／儲存此份 PDF</button><div id="teacherReport"></div></section></section></dialog>
     <section id="printReport" class="print-report"></section>
     <div class="toast" id="toast" role="status"></div>
     <script src="excel.js"></script>
     <script src="cloud-config.js?v=3"></script>
     <script src="cloud-bridge.js?v=3"></script>
     <script src="cloud-sync.js?v=3"></script>
-    <script src="app.js?v=2"></script>
+    <dialog id="languageDialog" aria-labelledby="languageTitle"><form id="languageForm" class="language-panel"><h2 id="languageTitle">輸入語言代碼</h2><p>請輸入教師提供的語言代碼。切換後會保留目前答案。</p><label for="languageCode">語言代碼</label><input id="languageCode" type="text" maxlength="8" autocomplete="off" autocapitalize="characters" spellcheck="false" required /><p id="languageError" role="alert"></p><div class="action-row"><button type="button" class="secondary" id="languageCancel">取消</button><button type="submit" class="primary" id="languageConfirm">確認切換</button></div></form></dialog>
+    <script src="language-dictionary.js?v=1"></script>
+    <script src="language.js?v=1"></script>
+    <script src="app.js?v=4"></script>
   </body>
 </html>
