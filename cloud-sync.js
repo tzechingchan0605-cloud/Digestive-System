@@ -3,6 +3,11 @@
 window.createCloudSync = function ({endpoint, storage, records, status, fetcher = fetch, transport = 'auto'}) {
   const enabled = Boolean(endpoint), key = 'digestiveLab.cloudSync.v1';
   const pending = new Map();
+  let endpointProblem = '';
+  if (enabled) {
+    try {const url=new URL(endpoint);if(url.hostname==='script.google.com'&&!/^\/macros\/s\/[^/]+\/exec$/.test(url.pathname))endpointProblem='雲端網址須為網頁應用程式 /exec 網址；請教師在部署結果中複製網址';}
+    catch {endpointProblem='雲端收集網址格式無效，請教師核對網頁應用程式 /exec 網址';}
+  }
   const useBridge = enabled && (transport === 'bridge' || /^https:\/\/script\.google\.com\/macros\/s\//.test(endpoint));
   let bridge, bridgeLoader;
   let running = null, timer, credential = '', confirmed = false;
@@ -25,12 +30,13 @@ window.createCloudSync = function ({endpoint, storage, records, status, fetcher 
     return r?.moduleId === 'VL_BIO_DIGESTION_OPTION_A' && r.id && r.profile?.email && r.profile.email.toLowerCase() !== 'tzechingchan0605@gmail.com';
   }
   async function request(body, keepalive = false) {
+    if (endpointProblem) throw Error(endpointProblem);
     if (useBridge) {
       if (!bridge) {
         // Also support a cached HTML page that did not yet include this script.
         if (!window.createAppsScriptBridge) {
           if (!bridgeLoader) bridgeLoader = new Promise((resolve,reject) => {
-            const script=document.createElement('script');script.src='cloud-bridge.js?v=2';
+            const script=document.createElement('script');script.src='cloud-bridge.js?v=3';
             script.onload=resolve;script.onerror=()=>{bridgeLoader=null;script.remove();reject(Error('未能載入雲端連線程式，請重新整理後重試'));};
             document.head.append(script);
           });
@@ -84,6 +90,7 @@ window.createCloudSync = function ({endpoint, storage, records, status, fetcher 
   }
   function recover() {
     if (!enabled) {status('unconfigured', '尚未設定雲端收集網址；紀錄只存於這部瀏覽器，教師無法跨裝置收集。');return;}
+    if (endpointProblem) {status('error',endpointProblem+'；本機答案仍保留。');return;}
     records().filter(student).forEach(enqueue);
     if (!pending.size && !confirmed) status('configured', '已設定雲端收集網址；開始探究後會自動上傳。尚未確認本次連線或儲存成功。');
   }

@@ -34,15 +34,17 @@
 
 參考程式目前包含 VL1 的模組／標籤及資料欄位。請按這個 VL 的實際結構適配 MODULE、工作表／服務名稱、學生篩選、本機儲存鍵及介面文字；如果變更訊息協定前綴，必須同步修改前後端。
 
-## 最新參考來源（固定版本）
+## 參考來源（最新網站版本）
 
-- cloud/Code.gs: https://github.com/tzechingchan0605-cloud/Digestive-System/blob/efdc7f75f62c4f28e2178d6fefe71b8b708e55d5/cloud/Code.gs
-- cloud-bridge.js: https://github.com/tzechingchan0605-cloud/Digestive-System/blob/efdc7f75f62c4f28e2178d6fefe71b8b708e55d5/cloud-bridge.js
-- cloud-sync.js: https://github.com/tzechingchan0605-cloud/Digestive-System/blob/efdc7f75f62c4f28e2178d6fefe71b8b708e55d5/cloud-sync.js
-- app.js: https://github.com/tzechingchan0605-cloud/Digestive-System/blob/efdc7f75f62c4f28e2178d6fefe71b8b708e55d5/app.js
-- cloud/SETUP.md: https://github.com/tzechingchan0605-cloud/Digestive-System/blob/efdc7f75f62c4f28e2178d6fefe71b8b708e55d5/cloud/SETUP.md
-- tests/cloud_setup.cjs: https://github.com/tzechingchan0605-cloud/Digestive-System/blob/efdc7f75f62c4f28e2178d6fefe71b8b708e55d5/tests/cloud_setup.cjs
-- tests/cloud.cjs: https://github.com/tzechingchan0605-cloud/Digestive-System/blob/efdc7f75f62c4f28e2178d6fefe71b8b708e55d5/tests/cloud.cjs
+- cloud/Code.gs: https://github.com/tzechingchan0605-cloud/Digestive-System/blob/main/cloud/Code.gs
+- cloud-bridge.js: https://github.com/tzechingchan0605-cloud/Digestive-System/blob/main/cloud-bridge.js
+- cloud-sync.js: https://github.com/tzechingchan0605-cloud/Digestive-System/blob/main/cloud-sync.js
+- app.js: https://github.com/tzechingchan0605-cloud/Digestive-System/blob/main/app.js
+- cloud/SETUP.md: https://github.com/tzechingchan0605-cloud/Digestive-System/blob/main/cloud/SETUP.md
+- tests/cloud_setup.cjs: https://github.com/tzechingchan0605-cloud/Digestive-System/blob/main/tests/cloud_setup.cjs
+- tests/cloud.cjs: https://github.com/tzechingchan0605-cloud/Digestive-System/blob/main/tests/cloud.cjs
+
+- tests/bridge_retry.cjs: https://github.com/tzechingchan0605-cloud/Digestive-System/blob/main/tests/bridge_retry.cjs
 
 ## 附錄：VL1 最新 Apps Script（實際參考版本）
 

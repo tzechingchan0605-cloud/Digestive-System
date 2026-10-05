@@ -52,7 +52,7 @@ const collector=http.createServer((req,res)=>{
  res.writeHead(404);res.end();
 });
 const server=http.createServer((req,res)=>{
- if(req.url==='/cloud-config.js'){res.setHeader('Content-Type','application/javascript');res.end("window.VL1_CLOUD_CONFIG={endpoint:'http://127.0.0.1:8101/collector',transport:'bridge'};");return;}
+ if(req.url.split('?')[0]==='/cloud-config.js'){res.setHeader('Content-Type','application/javascript');res.end("window.VL1_CLOUD_CONFIG={endpoint:'http://127.0.0.1:8101/collector',transport:'bridge'};");return;}
  const pageUrl=new URL(req.url,'http://127.0.0.1:8100');
  const target=path.resolve('.','.'+(pageUrl.pathname==='/'?'/index.html':pageUrl.pathname));
  if(!target.startsWith(process.cwd()+path.sep)){res.writeHead(404);res.end();return;}
@@ -70,6 +70,16 @@ const server=http.createServer((req,res)=>{
  await page.evaluate(()=>cloudSync.flush());
  assert.equal(await page.locator('#loginCloudStatus').getAttribute('data-state'),'configured');
  assert.equal(rows.length,1);
+ const wrongLink=await page.evaluate(async()=>{
+   const values=new Map(),messages=[];let requests=0;
+   const storage={getItem:key=>values.get(key)||null,setItem:(key,value)=>values.set(key,value)};
+   const sync=createCloudSync({endpoint:'https://script.google.com/macros/library/d/example/2',storage,records:()=>[],status:(kind,message)=>messages.push({kind,message}),fetcher:async()=>{requests++;throw Error('Unexpected request');}});
+   sync.recover();
+   sync.enqueue({id:crypto.randomUUID(),moduleId:'VL_BIO_DIGESTION_OPTION_A',profile:{email:'config-test@example.com'},savedAt:new Date().toISOString()});
+   await sync.flush().catch(()=>{});
+   return {requests,last:messages.at(-1)};
+ });
+ assert.equal(wrongLink.requests,0);assert.equal(wrongLink.last.kind,'error');assert(wrongLink.last.message.includes('/exec'));
  assert(await page.evaluate(async()=>{try{await fetch('http://127.0.0.1:8101/collector',{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'noop'})});return false;}catch{return true;}}),'Direct fetch must reproduce the CORS failure');
  async function login(p,name,email){await p.fill('#profileName',name);await p.fill('#profileClass','S4-01');await p.fill('#profileEmail',email);await p.click('#profileForm button');}
  async function saved(p){await p.evaluate(async()=>{saveRecord();await cloudSync.flush();});}

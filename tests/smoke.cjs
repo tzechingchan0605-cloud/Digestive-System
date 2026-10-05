@@ -43,7 +43,7 @@ async function finish(page,{revision=false}={}) {
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true,args:['--no-sandbox']});
  try{
  const context=await browser.newContext({acceptDownloads:true});const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
- await page.route('**/cloud-config.js',r=>r.fulfill({contentType:'application/javascript',body:"window.VL1_CLOUD_CONFIG={endpoint:''};"}));
+ await page.route('**/cloud-config.js*',r=>r.fulfill({contentType:'application/javascript',body:"window.VL1_CLOUD_CONFIG={endpoint:''};"}));
  await page.route('https://script.google.com/**',r=>r.abort());await page.route('https://script.googleusercontent.com/**',r=>r.abort());
  await page.route('https://fonts.googleapis.com/**',r=>r.abort());await page.route('https://fonts.gstatic.com/**',r=>r.abort());
  await page.goto(base);await page.evaluate(()=>{const original=Element.prototype.scrollIntoView;window.scrollTargets=[];Element.prototype.scrollIntoView=function(options){window.scrollTargets.push(this.id);return original.call(this,options);};});page.on('dialog',async d=>{if(d.type()!=='beforeunload')await d.accept();});

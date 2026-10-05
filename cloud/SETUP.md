@@ -1,5 +1,12 @@
 # 啟用跨瀏覽器／手機的全班紀錄
 
+## 雲端連線逾時或更換部署網址
+
+網站需要「網頁應用程式」網址，格式為 `https://script.google.com/macros/s/…/exec`。`/macros/library/d/…` 是程式庫連結，不能作為收集端網址。請在 Apps Script「部署 → 管理部署」複製正確的網頁應用程式網址；新建或更換部署後，網站的 `cloud-config.js` 也須更新。
+
+逾時訊息只表示沒有收到橋接回應，不能單憑它判定是部署存取權、網路或瀏覽器限制。新版前端在連線及儲存回應逾時後會清除失效連線；重試建立新通道，保留本機待傳答案。Google 嵌入頁重新載入時也會重新確認發送來源，未確認的請求等待重試。
+
+
 ## 出現 Cannot call SpreadsheetApp.getUi() from this context
 
 這個錯誤表示原設定程式不能在目前執行環境開啟試算表對話框。最新 `setupCollector` 直接讀取私人 Script Properties，支援獨立 Apps Script 專案及綁定試算表的專案。
@@ -58,6 +65,8 @@
 更新 `Code.gs` 後須「管理部署 → 編輯 → 新版本 → 部署」，才能讓 `/exec` 使用新程式。改密碼時在私人 Script Properties 加入 `SETUP_TEACHER_PASSWORD` 後再執行 `setupCollector`，不會清除紀錄。
 
 ## 已驗證與仍需現場驗證
+
+`node tests/bridge_retry.cjs` 驗證逾時／載入失敗後重新建立連線、過期回應拒收、嵌入頁更換及訊息來源／要求 ID 驗證。
 
 `node tests/cloud_setup.cjs` 驗證不依賴 UI 的獨立／綁定設定、網址正規化、暫存密碼清除、重試保留設定、保留學生列及設定錯誤。
 
