@@ -1,4 +1,4 @@
-/** Bound Google Apps Script collector for VL1. Deploy as owner, accessible to anyone.
+/** Google Apps Script collector for VL1 (bound or standalone). Deploy as owner, accessible to anyone.
  * Teacher reads require a private password; students can only write their own IDs.
  * No endpoint can list records without the password. Never expose Script Properties.
  */
@@ -9,18 +9,37 @@ const CHUNK = 40000;
 const MAX_CHUNKS = 24;
 
 function setupCollector() {
-  if (Session.getEffectiveUser().getEmail().toLowerCase() !== TEACHER) throw Error('請以指定教師 Google 帳戶進行設定');
-  const ui = SpreadsheetApp.getUi();
-  const answer = ui.prompt('設定教師雲端密碼', '請輸入至少 12 字元的獨立密碼，勿使用 Google 帳戶密碼。密碼只用來讀取全班紀錄。', ui.ButtonSet.OK_CANCEL);
-  if (answer.getSelectedButton() !== ui.Button.OK) return;
-  const password = answer.getResponseText();
-  if (password.length < 12) throw Error('密碼須至少 12 字元');
-  const book = SpreadsheetApp.getActiveSpreadsheet();
-  PropertiesService.getScriptProperties().setProperties({SPREADSHEET_ID: book.getId(), TEACHER_PASSWORD_HASH: digest(password)});
+  if (Session.getEffectiveUser().getEmail().toLowerCase() !== TEACHER) throw Error('請以 tzechingchan0605@gmail.com 執行設定');
+  const properties = PropertiesService.getScriptProperties();
+  let source = String(properties.getProperty('SPREADSHEET_ID') || '').trim();
+  if (!source) {
+    // A bound script may supply its sheet. Standalone projects use a private property.
+    let active = null;
+    try {active = SpreadsheetApp.getActiveSpreadsheet();} catch (error) {}
+    if (active) source = active.getId();
+  }
+  if (!source) throw Error('請在 Project Settings → Script Properties 加入 SPREADSHEET_ID，值可填 Google Sheet 完整網址，再按 Run 執行 setupCollector');
+  const match = /^https:\/\/docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9_-]+)(?:[/?#]|$)/.exec(source);
+  const bookId = match ? match[1] : source;
+  if (!/^[a-zA-Z0-9_-]{1,200}$/.test(bookId)) throw Error('SPREADSHEET_ID 無效，請填 Google Sheet 完整網址或試算表 ID');
+  const password = properties.getProperty('SETUP_TEACHER_PASSWORD');
+  let passwordHash = properties.getProperty('TEACHER_PASSWORD_HASH');
+  if (password !== null) {
+    if (typeof password !== 'string' || password.length < 12) throw Error('SETUP_TEACHER_PASSWORD 須至少 12 字元；請使用獨立密碼，勿使用 Google 帳戶密碼');
+    passwordHash = digest(password);
+  } else if (!/^[0-9a-f]{64}$/.test(passwordHash || '')) {
+    throw Error('請在 Project Settings → Script Properties 加入 SETUP_TEACHER_PASSWORD，值為至少 12 字元的獨立教師密碼，再執行 setupCollector');
+  }
+  const book = SpreadsheetApp.openById(bookId);
   const sheet = book.getSheetByName(SHEET) || book.insertSheet(SHEET);
   if (sheet.getMaxColumns() < MAX_CHUNKS + 4) sheet.insertColumnsAfter(sheet.getMaxColumns(), MAX_CHUNKS + 4 - sheet.getMaxColumns());
   if (!sheet.getLastRow()) sheet.appendRow(['探究識別碼', '寫入權限雜湊', '版本時間', '分段數', ...Array.from({length: MAX_CHUNKS}, (_, i) => '原始紀錄分段' + (i + 1))]);
-  ui.alert('設定完成。部署為網頁應用程式，執行身分選自己，存取權選所有人。把 /exec 網址填入網站 cloud-config.js。請勿公開這份試算表。');
+  // Keep existing working configuration until the new sheet is ready. No UI APIs.
+  properties.setProperties({SPREADSHEET_ID: bookId, TEACHER_PASSWORD_HASH: passwordHash});
+  if (password !== null) properties.deleteProperty('SETUP_TEACHER_PASSWORD');
+  const message = '設定完成：已連結試算表並建立／保留 VL1雲端紀錄。請返回實驗室按重試同步。';
+  Logger.log(message);
+  return {ok: true, message};
 }
 function digest(value) {
   return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, value, Utilities.Charset.UTF_8).map(b => ('0' + ((b + 256) % 256).toString(16)).slice(-2)).join('');

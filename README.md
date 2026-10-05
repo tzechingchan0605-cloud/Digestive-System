@@ -46,6 +46,7 @@ node --check app.js
 node --check excel.js
 node --check cloud-sync.js
 node --check cloud-bridge.js
+node tests/cloud_setup.cjs
 node tests/cloud.cjs
 node tests/smoke.cjs
 node tests/edge_cases.cjs

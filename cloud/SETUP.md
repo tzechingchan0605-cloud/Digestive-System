@@ -1,5 +1,24 @@
 # 啟用跨瀏覽器／手機的全班紀錄
 
+## 出現 Cannot call SpreadsheetApp.getUi() from this context
+
+這個錯誤表示原設定程式不能在目前執行環境開啟試算表對話框。最新 `setupCollector` 直接讀取私人 Script Properties，支援獨立 Apps Script 專案及綁定試算表的專案。
+
+1. 在**目前部署網址所屬的原 Apps Script 專案**，以最新 [Code.gs](Code.gs) 取代原程式，按 **Save project**。
+2. 左側 **Project Settings**（齒輪）→ **Script Properties** → **Add script property**（已有屬性時可先按 **Edit script properties**），加入：
+
+   | Property | Value |
+   | --- | --- |
+   | `SPREADSHEET_ID` | 原 Google Sheet 完整網址或 ID |
+   | `SETUP_TEACHER_PASSWORD` | 至少 12 字元的獨立教師密碼，勿用 Google 帳戶密碼 |
+
+3. 按 **Save script properties**。回到 **Editor**，上方函式選單選 `setupCollector` → **Run**，按 Google 提示授權。
+4. **Execution log** 出現「設定完成」及「執行完畢」，原試算表會有「VL1雲端紀錄」工作表。成功後程式將密碼轉為 SHA-256 雜湊並刪除 `SETUP_TEACHER_PASSWORD`；不要提供密碼、雜湊或設定頁截圖給其他人。
+5. 回到實驗室按「重試同步」。目前第 2 版收集端會立即讀取這些設定，原有 `/exec` 網址及學生紀錄繼續使用；只修正初始化設定時毋須重新部署。
+
+這次初始化完全不使用彈出視窗，設定結果顯示在 **Execution log**。同一個專案再次執行時，若沒有提供暫存密碼，會沿用既有密碼雜湊並保留所有學生列。
+
+
 ## 已部署的網站出現「Failed to fetch」時
 
 新版改用 Google 網頁內的 `google.script.run` 連線，再以限定來源與隨機通道的訊息傳回實驗室，避免網站直接跨來源讀取 Apps Script 回應。需要同步更新網站與收集端：
@@ -18,7 +37,7 @@
 
 1. 用指定教師 Google 帳戶建立一份私人 Google 試算表，例如「VL1 全班雲端紀錄」。毋須把試算表分享給學生。
 2. 在試算表選「擴充功能 → Apps Script」。以本資料夾的 [Code.gs](Code.gs) 取代預設程式，儲存。
-3. 執行 `setupCollector`，依 Google 提示授權試算表存取。回到試算表的提示視窗設定至少 12 字元的獨立教師密碼。**不要用 Google 帳戶密碼，不要把密碼貼入聊天或 GitHub**。程式只在私人 Script Properties 保存密碼的 SHA-256 雜湊。
+3. 開啟 **Project Settings → Script Properties**，加入 `SPREADSHEET_ID`（這份試算表完整網址或 ID）及 `SETUP_TEACHER_PASSWORD`（至少 12 字元的獨立教師密碼），按 **Save script properties**。回到 **Editor** 選 `setupCollector` → **Run**，依 Google 提示授權。**Execution log** 應顯示「設定完成」。**不要用 Google 帳戶密碼，不要把密碼貼入聊天或 GitHub**。初始化成功後暫存密碼會刪除，只保留私人密碼雜湊。
 4. 在 Apps Script 選「部署 → 新增部署 → 網頁應用程式」；「執行身分」選 **自己**，「誰可以存取」選 **所有人**。學生寫入不需要 Google 登入。若學校管理員停用匿名網頁應用程式，須由管理員允許或改用其他後端，不能以僅限本人設定代替。
 5. 複製部署的 **`https://script.google.com/macros/s/…/exec`** 網址（不要用 `/dev`）。將網址提供給修改網站的人，或直接填入網站根目錄 `cloud-config.js` 的 `endpoint` 並提交至 GitHub `main`。所有學生和教師必須用相同網站及同一收集端。
 6. 等 GitHub Pages 更新後，手機用普通學生電郵登入，填寫初步觀察，等待顯示「本機學生紀錄已同步至全班雲端紀錄」。在另一個瀏覽器輸入教師電郵進入儀表板，輸入步驟 3 的 **教師雲端密碼**；應看到手機紀錄，下載 Excel 應包含該學生。
@@ -36,9 +55,11 @@
 - 原始紀錄儲存在「VL1雲端紀錄」工作表，每個 JSON 分段加上 `json:` 前綴以防公式注入；不要手動刪改 ID、權限雜湊、分段數或紀錄儲存格。用網站下載的 Excel 閱讀及評分。
 - 每份紀錄上限約 960,000 UTF-16 字元；過大的圖片或紀錄會有明確錯誤並留在本機，不會截斷答案。Apps Script 有每日及同時執行配額；正式全班測試要確認帳戶配額，斷線/配額錯誤時保留本機備份再重試。
 
-更新 `Code.gs` 後須「管理部署 → 編輯 → 新版本 → 部署」，才能讓 `/exec` 使用新程式。改密碼可重新執行 `setupCollector`，不會清除紀錄。
+更新 `Code.gs` 後須「管理部署 → 編輯 → 新版本 → 部署」，才能讓 `/exec` 使用新程式。改密碼時在私人 Script Properties 加入 `SETUP_TEACHER_PASSWORD` 後再執行 `setupCollector`，不會清除紀錄。
 
 ## 已驗證與仍需現場驗證
+
+`node tests/cloud_setup.cjs` 驗證不依賴 UI 的獨立／綁定設定、網址正規化、暫存密碼清除、重試保留設定、保留學生列及設定錯誤。
 
 `node tests/cloud.cjs` 使用實際 `Code.gs` 與 Google 服務測試替身、獨立學生/手機/教師瀏覽器，測試集中紀錄、讀取權限、寫入所有權、舊版本不覆蓋、圖片分段、同電郵多次探究、斷線重整補傳、個別報告、實際 Excel 匯出及教師示範排除。
 
