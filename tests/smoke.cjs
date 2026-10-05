@@ -16,7 +16,7 @@ async function design(page,{draw=false,badAssumptions=false}={}) {
   if(badAssumptions)await page.check('#assumptionChoices input[value="more"]');
   await page.fill('#controlPlan','油水加2 mL水作對照；與X、Y、XY比較，油水量、加液量、37°C、時間及搖勻方式相同。');
   if(draw){await page.locator('#setupCanvas').scrollIntoViewIfNeeded();const box=await page.locator('#setupCanvas').boundingBox();await page.mouse.move(box.x+30,box.y+30);await page.mouse.down();await page.mouse.move(box.x+120,box.y+120,{steps:6});await page.mouse.up();await page.click('#saveSetup');}
-  else {await page.fill('#setupDescription','四個標示裝置：對照加2 mL水、X加2 mL、Y加2 mL、XY各1 mL，保持油水量、溫度、時間及搖勻方式相同；熱處理後冷卻至37°C。');await page.click('#saveTextSetup');}
+  else {await page.fill('#setupDescription','四個標示裝置：對照加2 mL水、X加2 mL、Y加2 mL、XY各1 mL，保持油水量、溫度、時間及搖勻方式相同；熱處理後冷卻至37°C。');await page.click('#saveSetup');}
   await page.click('#saveHypothesis');await page.waitForSelector('#phase-3.active');
 }
 async function trial(page,liquid,outcome) {

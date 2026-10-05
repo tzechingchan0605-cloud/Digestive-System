@@ -11,7 +11,7 @@
 | glycerol | 甘油 |
 | fatty acid / fatty acids | 脂肪酸 |
 | denaturation | 變性 |
-| triglyceride | 三酸甘油酯 |
+| triglyceride | 甘油三酯 |
 | catalyst | 催化劑 |
 | bile | 膽汁 |
 | lipase | 脂肪酶 |

@@ -6,7 +6,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const base=process.argv[2]||'http://127.0.0.1:8000';
 const recordsKey='digestiveLab.localRecords.v1';
-const approvedChinese=new Set(['乳化作用','乳化脂質','乳狀液','物理消化','化學消化','甘油','脂肪酸','變性','三酸甘油酯','催化劑','膽汁','脂肪酶']);
+const approvedChinese=new Set(['乳化作用','乳化脂質','乳狀液','物理消化','化學消化','甘油','脂肪酸','變性','甘油三酯','催化劑','膽汁','脂肪酶']);
 const englishSVGs=['emulsification-en.svg','emulsification-mobile-en.svg','triglyceride-structure-en.svg','glycerol-structure-en.svg','fatty-acids-structure-en.svg'];
 function assertApprovedChinese(entries,label){
  for(const {source,text}of entries){
@@ -61,10 +61,14 @@ function assertApprovedChinese(entries,label){
    }),assets);
    assertApprovedChinese(entries,'English SVG');
   }
-  async function switchLanguage(code,expected){
-   await page.click('#languageSwitch');await page.fill('#languageCode',code);await page.click('#languageConfirm');
-   await page.waitForFunction(expected=>window.VL1Language.current===expected,expected);
-   await page.waitForFunction(()=>!document.querySelector('#languageDialog').open);
+  async function switchLanguage(expected,target=page,button='#languageSwitch'){
+   await target.click(button);
+   assert.equal(await target.evaluate(()=>window.VL1Language.current),expected,'One click must switch the language immediately.');
+   const expectedLabel=expected==='en'?'Switch to Chinese':'切換至英文';
+   for(const label of await target.locator('[data-language-switch]').allTextContents())assert.equal(label,expectedLabel,'The language button must name its target language.');
+   const references=await target.locator('[data-language-switch]').evaluateAll(buttons=>buttons.map(button=>({popup:button.getAttribute('aria-haspopup'),controls:button.getAttribute('aria-controls')})));
+   assert(references.every(({popup,controls})=>popup!=='dialog'&&controls!=='languageDialog'),'Language buttons must not advertise a removed dialog.');
+   assert.equal(await target.locator('#languageDialog,#languageCode,#languageForm,#languageConfirm,#languageCancel').count(),0,'Language switching must not contain a code field or confirmation dialog.');
   }
   async function stableSnapshot(){return page.evaluate(()=>({
    id:state.id,profile:state.profile,phase:state.phase,unlocked:state.unlocked,optionOrder:state.optionOrder,
@@ -95,16 +99,15 @@ function assertApprovedChinese(entries,label){
   assert.equal(await page.locator('#profileTitle').innerText(),'開始你的探究');
   assert((await page.locator('html').getAttribute('lang')).startsWith('zh'));
   assert(await page.locator('#languageSwitch').isVisible());
-  await page.click('#languageSwitch');await page.fill('#languageCode','emi');await page.click('#languageConfirm');
-  assert.equal(await page.evaluate(()=>VL1Language.current),'zh');assert((await page.locator('#languageError').innerText()).trim());
-  await page.click('#languageCancel');assert.equal(await page.locator('#languageDialog').evaluate(el=>el.open),false);
-  await page.click('#languageSwitch');await page.fill('#languageCode','EMI');await page.keyboard.press('Escape');
-  assert.equal(await page.locator('#languageDialog').evaluate(el=>el.open),false);assert.equal(await page.evaluate(()=>VL1Language.current),'zh');
-  await switchLanguage(' EMI ','en');
+  assert.equal(await page.locator('#languageSwitch').innerText(),'切換至英文');
+  assert.equal(await page.locator('#languageDialog,#languageCode').count(),0);
+  const blankState=await stableSnapshot();
+  for(const expected of ['en','zh','en','zh']){await switchLanguage(expected);assert.deepEqual(await stableSnapshot(),blankState,'Repeated one-click toggles changed the blank investigation.');}
+  await switchLanguage('en');
   assert.match(await page.locator('#profileTitle').innerText(),/start|begin/i);assert((await page.locator('html').getAttribute('lang')).startsWith('en'));
   assert.match(await page.locator('#profileName').getAttribute('placeholder'),/[A-Za-z]/);
   await assertPlaceholders('en');await assertEnglishSystemText();await assertEnglishSVGText();
-  await switchLanguage('CMI','zh');assert.equal(await page.locator('#profileTitle').innerText(),'開始你的探究');
+  await switchLanguage('zh');assert.equal(await page.locator('#profileTitle').innerText(),'開始你的探究');
   await assertPlaceholders('zh');
 
   // Free answers deliberately match UI dictionary entries; they are student text.
@@ -123,7 +126,7 @@ function assertApprovedChinese(entries,label){
   await page.evaluate(()=>{clearTimeout(saveTimer);accountTime();timingVisible=false;window.__languageFrozen=saveRecord();});
   const before=await stableSnapshot();assert(before.initialDesign);assert(/^data:image\/(?:png|jpeg);base64,/.test(before.setup.image));assert.equal(before.trials.length,1);
   const workbookZh=await exportFrozen('/tmp/vl1-language-zh.xlsx');
-  await switchLanguage('EMI','en');
+  await switchLanguage('en');
   await page.waitForFunction(()=>/[A-Za-z]/.test(document.querySelector('#variableQuiz h4').textContent));
   assert.deepEqual(await stableSnapshot(),before,'Switching language changed answers, original evidence, drawing, ordering, or investigation state.');
   assert.match(await page.locator('#variableQuiz h4').first().innerText(),/independent/i);
@@ -138,7 +141,11 @@ function assertApprovedChinese(entries,label){
   assert.equal(await page.locator('#initialObservation').inputValue(),'變得混濁');assert.equal(await page.locator('#reason').inputValue(),'開始實驗');assert.equal(await page.locator('#studentName').innerText(),'同學');
   assert.equal(await page.evaluate(()=>answerText('q1','cloudy')),'混濁乳狀液','Excel answer text must remain canonical Chinese.');
   const workbookEn=await exportFrozen('/tmp/vl1-language-en.xlsx');assert(workbookZh.equals(workbookEn),'Actual teacher XLSX bytes changed with display language.');
-  await switchLanguage('CMI','zh');assert.deepEqual(await stableSnapshot(),before);assert.equal(await page.locator('#hypothesisOutcome option[value="cloudy"]').innerText(),'變得混濁');
+  await switchLanguage('zh');assert.deepEqual(await stableSnapshot(),before);assert.equal(await page.locator('#hypothesisOutcome option[value="cloudy"]').innerText(),'變得混濁');
+  await assertPlaceholders('zh');
+  await page.evaluate(()=>{for(let i=0;i<6;i++)document.querySelector('#languageSwitch').click();});
+  assert.equal(await page.evaluate(()=>VL1Language.current),'zh');assert.equal(await page.locator('#languageSwitch').innerText(),'切換至英文');
+  assert.deepEqual(await stableSnapshot(),before,'Rapid repeated toggles changed a populated investigation.');
   await assertPlaceholders('zh');
 
   // Prepare the remaining observed trials with the real canonical schema. Run
@@ -155,11 +162,11 @@ function assertApprovedChinese(entries,label){
   assert(await page.locator('#reflection').isDisabled());assert.equal(await page.locator('#downloadRecord').isDisabled(),false);
   await page.evaluate(()=>{clearTimeout(saveTimer);window.__languageSubmitted=buildRecord();});
   const submitted=await stableSnapshot();
-  await switchLanguage('EMI','en');assert.deepEqual(await stableSnapshot(),submitted);assert(await page.locator('#reflection').isDisabled());
+  await switchLanguage('en');assert.deepEqual(await stableSnapshot(),submitted);assert(await page.locator('#reflection').isDisabled());
   await assertPlaceholders('en');await assertEnglishSystemText();
-  assert.equal(await page.locator('#conceptReveal .physical-diagram picture img').getAttribute('src'),'assets/emulsification-en.svg?v=2');
-  assert.equal(await page.locator('#conceptReveal .physical-diagram picture source').getAttribute('srcset'),'assets/emulsification-mobile-en.svg?v=2');
-  assert.deepEqual(await page.locator('#conceptReveal .chemical-diagram img').evaluateAll(imgs=>imgs.map(img=>img.getAttribute('src'))),['assets/triglyceride-structure-en.svg?v=2','assets/glycerol-structure-en.svg?v=2','assets/fatty-acids-structure-en.svg?v=2']);
+  assert.equal(await page.locator('#conceptReveal .physical-diagram picture img').getAttribute('src'),'assets/emulsification-en.svg?v=3');
+  assert.equal(await page.locator('#conceptReveal .physical-diagram picture source').getAttribute('srcset'),'assets/emulsification-mobile-en.svg?v=3');
+  assert.deepEqual(await page.locator('#conceptReveal .chemical-diagram img').evaluateAll(imgs=>imgs.map(img=>img.getAttribute('src'))),['assets/triglyceride-structure-en.svg?v=3','assets/glycerol-structure-en.svg?v=3','assets/fatty-acids-structure-en.svg?v=3']);
   await page.evaluate(()=>renderPrint(window.__languageSubmitted));
   assert.match(await page.locator('#printReport h1').innerText(),/digestive|digestion/i);
   assert.match(await page.locator('#printReport .report-stage h2').first().innerText(),/context|scenario|task|background/i);
@@ -167,11 +174,11 @@ function assertApprovedChinese(entries,label){
   for(const answer of ['變得混濁','開始實驗','探究的對照組','實驗裝置','學習重點'])assert(englishParagraphs.includes(answer),`Student answer was translated in English PDF: ${answer}`);
   assert.match(await page.locator('#printReport .concept-summary h3').innerText(),/learning/i);
   await assertEnglishSystemText();
-  assert.equal(await page.locator('#printReport .physical-diagram picture img').getAttribute('src'),'assets/emulsification-en.svg?v=2');
+  assert.equal(await page.locator('#printReport .physical-diagram picture img').getAttribute('src'),'assets/emulsification-en.svg?v=3');
   await page.waitForFunction(()=>[...document.querySelectorAll('#printReport img')].every(img=>img.complete&&img.naturalWidth>0));
   await page.evaluate(()=>document.body.classList.add('print-record'));await page.pdf({path:'/tmp/vl1-language-en.pdf',format:'A4',printBackground:true});await page.evaluate(()=>restorePrint());
   assert(fs.statSync('/tmp/vl1-language-en.pdf').size>10000);
-  await switchLanguage('CMI','zh');assert.deepEqual(await stableSnapshot(),submitted);
+  await switchLanguage('zh');assert.deepEqual(await stableSnapshot(),submitted);
   await assertPlaceholders('zh');
   assert.equal(await page.locator('#conceptReveal .physical-diagram picture img').getAttribute('src'),'assets/emulsification.svg');
   assert.equal(await page.locator('#conceptReveal .physical-diagram picture source').getAttribute('srcset'),'assets/emulsification-mobile.svg');
@@ -182,7 +189,7 @@ function assertApprovedChinese(entries,label){
   await page.waitForFunction(()=>[...document.querySelectorAll('#printReport img')].every(img=>img.complete&&img.naturalWidth>0));
   await page.evaluate(()=>document.body.classList.add('print-record'));await page.pdf({path:'/tmp/vl1-language-zh.pdf',format:'A4',printBackground:true});await page.evaluate(()=>restorePrint());
   assert(fs.statSync('/tmp/vl1-language-zh.pdf').size>10000);
-  await switchLanguage('EMI','en');
+  await switchLanguage('en');
   for(const width of [390,320]){await page.setViewportSize({width,height:844});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`English conclusions/learning diagrams overflow at ${width}px.`);}
   await page.setViewportSize({width:1440,height:1000});
   await page.reload();await page.waitForFunction(()=>window.VL1Language);
@@ -191,7 +198,7 @@ function assertApprovedChinese(entries,label){
   await page.fill('#profileName','Teacher');await page.fill('#profileClass','S4');await page.fill('#profileEmail','tzechingchan0605@gmail.com');await page.click('#profileForm button');
   await page.waitForFunction(()=>document.querySelector('#teacherDialog').open);
   const teacherRecordsBefore=await page.evaluate(key=>localStorage.getItem(key),recordsKey);
-  await page.click('#teacherLanguageSwitch');await page.fill('#languageCode','EMI');await page.click('#languageConfirm');await page.waitForFunction(()=>VL1Language.current==='en');
+  await switchLanguage('en',page,'#teacherLanguageSwitch');
   assert.equal(await page.locator('#teacherDialog').evaluate(el=>el.open),true,'Switching language closed the teacher dashboard.');
   assert.equal(await page.evaluate(key=>localStorage.getItem(key),recordsKey),teacherRecordsBefore,'Teacher language switch changed stored student data.');
   assert.equal(await page.locator('#teacherData strong').first().innerText(),'同學');
@@ -199,17 +206,18 @@ function assertApprovedChinese(entries,label){
 
   const freshContext=await browser.newContext({viewport:{width:390,height:844},reducedMotion:'reduce'});const mobile=await openPage(freshContext);
   assert.equal(await mobile.evaluate(()=>VL1Language.current),'zh');
-  await mobile.click('#languageSwitch');await mobile.fill('#languageCode','EMI');await mobile.click('#languageConfirm');await mobile.waitForFunction(()=>VL1Language.current==='en');
+  assert.equal(await mobile.locator('#languageSwitch').innerText(),'切換至英文');
+  await switchLanguage('en',mobile);
   for(const width of [390,320]){
    await mobile.setViewportSize({width,height:844});
    assert(await mobile.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`English mobile page overflows at ${width}px.`);
    const b=await mobile.locator('#languageSwitch').boundingBox();assert(b&&b.x>=0&&b.x+b.width<=width+1&&b.y>=0&&b.y<100,'Top-right language button is outside the mobile viewport.');
-   await mobile.click('#languageSwitch');assert(await mobile.locator('#languageCode').isVisible());await mobile.click('#languageCancel');
+   await switchLanguage('zh',mobile);await switchLanguage('en',mobile);
   }
   await mobile.fill('#profileName','Mobile');await mobile.fill('#profileClass','S4');await mobile.fill('#profileEmail','mobile-language@example.com');await mobile.click('#profileForm button');
   await mobile.fill('#initialObservation','Oil floats above the water.');await mobile.click('[data-next="2"]');
   for(const width of [390,320]){await mobile.setViewportSize({width,height:844});assert(await mobile.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`English design cards overflow at ${width}px.`);}
   assert.equal(errors.length,0,errors.join('\n'));
-  console.log('PASS: CMI/EMI gate/defaults, translated/restored input and textarea placeholders, original user values/defaults and research records/locks, byte-identical teacher XLSX, approved-only Chinese support in English UI/accessibility/SVGs, v2 diagrams/PDF, teacher-modal and mobile language access.');
+  console.log('PASS: immediate one-click language switching/target labels/Chinese defaults, no code dialog, translated/restored input and textarea placeholders, original user values/defaults and research records/locks, byte-identical teacher XLSX, approved-only Chinese support in English UI/accessibility/SVGs, v3 diagrams/PDF, teacher-modal and mobile language access.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

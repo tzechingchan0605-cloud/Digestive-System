@@ -159,15 +159,24 @@ function setupCanvas() {
   const point = event => { const box = canvas.getBoundingClientRect(); return { x: (event.clientX - box.left) * canvas.width / box.width, y: (event.clientY - box.top) * canvas.height / box.height }; };
   canvas.onpointerdown = event => { if(state.submitted)return; drawing = true; canvas.setPointerCapture(event.pointerId); const p = point(event); context.beginPath(); context.moveTo(p.x, p.y); };
   canvas.onpointermove = event => { if (!drawing) return; const p = point(event); context.lineTo(p.x, p.y); context.stroke(); };
-  canvas.onpointerup = () => { if (drawing) { state.setupMade = true; state.setupSaved = false; state.setupMethod = 'drawing'; logEvent('setup_drawing_updated'); } drawing = false; };
+  canvas.onpointerup = () => { if (drawing) { state.setupMade = true; state.setupSaved = false; state.setupMethod = 'drawing'; $('#setupFeedback').textContent='設計已更新，請按「儲存設計」。'; logEvent('setup_drawing_updated'); } drawing = false; };
   $$('[data-tool]').forEach(button => button.onclick = () => { selectDrawingControl(button); const erase = button.dataset.tool === 'eraser'; context.strokeStyle = erase ? '#fff' : '#111'; context.lineWidth = erase ? 28 : 4; });
   $('#clearCanvas').onclick = event => { selectDrawingControl(event.currentTarget); context.clearRect(0, 0, canvas.width, canvas.height); context.fillStyle = '#fff'; context.fillRect(0, 0, canvas.width, canvas.height); state.setupMade = state.setupSaved = false; state.setupImage = ''; $('#setupFeedback').textContent = '繪圖區已清除。'; logEvent('setup_cleared'); refreshDesignGate(); };
   $('#setupPhoto').onchange = event => {
     const file = event.target.files[0]; if (!file || state.submitted) return; const generation=sessionGeneration; if(file.size>8*1024*1024)return toast('請選擇小於 8 MB 的圖片。');
     selectDrawingControl(event.target.closest('label'));  
-    const reader = new FileReader(); reader.onload = () => { const image = new Image(); image.onload = () => { if(generation!==sessionGeneration||state.submitted)return; context.clearRect(0, 0, canvas.width, canvas.height); context.fillStyle = '#fff'; context.fillRect(0, 0, canvas.width, canvas.height); const scale = Math.min(canvas.width / image.width, canvas.height / image.height); context.drawImage(image, (canvas.width-image.width*scale)/2, (canvas.height-image.height*scale)/2, image.width*scale, image.height*scale); state.setupMade = true; state.setupSaved = false; state.setupMethod = 'photo'; $('#setupFeedback').textContent = '相片已加入；請按「儲存」。'; logEvent('setup_photo_uploaded', { filename: file.name }); }; image.src = reader.result; }; reader.readAsDataURL(file);
+    const reader = new FileReader(); reader.onload = () => { const image = new Image(); image.onload = () => { if(generation!==sessionGeneration||state.submitted)return; context.clearRect(0, 0, canvas.width, canvas.height); context.fillStyle = '#fff'; context.fillRect(0, 0, canvas.width, canvas.height); const scale = Math.min(canvas.width / image.width, canvas.height / image.height); context.drawImage(image, (canvas.width-image.width*scale)/2, (canvas.height-image.height*scale)/2, image.width*scale, image.height*scale); state.setupMade = true; state.setupSaved = false; state.setupMethod = 'photo'; $('#setupFeedback').textContent = '相片已加入；請按「儲存設計」。'; logEvent('setup_photo_uploaded', { filename: file.name }); }; image.src = reader.result; }; reader.readAsDataURL(file);
   };
-  $('#saveSetup').onclick = event => { selectDrawingControl(event.currentTarget); if(state.submitted)return; if (!state.setupMade) return $('#setupFeedback').textContent = '請先繪畫裝置或上載相片。'; state.setupSaved = true; state.setupImage = canvas.toDataURL('image/jpeg', .7); $('#setupFeedback').textContent = '已儲存裝置設計。'; logEvent('setup_saved', { method: state.setupMethod });saveRecord(); refreshDesignGate(); };
+  $('#saveSetup').onclick = () => {
+    if(state.submitted)return;
+    const description=$('#setupDescription').value.trim();
+    if(!state.setupMade&&!description)return $('#setupFeedback').textContent='請先繪圖、上載相片或填寫文字設計。';
+    state.setupSaved=true;
+    state.setupImage=state.setupMade?canvas.toDataURL('image/jpeg',.7):'';
+    if(!state.setupMade)state.setupMethod='text';
+    $('#setupFeedback').textContent='設計已儲存。';
+    logEvent('setup_saved',{method:state.setupMethod,description});saveRecord();refreshDesignGate();
+  };
 }
 
 function cancelAnimations() { animationTimers.forEach(clearTimeout);animationTimers.clear();state.running=false;state.extensionRunning=false;$$('.experiment-animation').forEach(el=>el.classList.remove('adding')); }
@@ -422,7 +431,7 @@ function excelChunks(text) {
 function eventLabel(type) {return ({phase_opened:'開啟階段',variable_choice:'選擇變量',assumptions_changed:'修改實驗前提',setup_drawing_updated:'修改繪圖',setup_photo_uploaded:'上載相片',setup_saved:'儲存裝置',setup_cleared:'清除裝置',trial_run:'進行基本實驗',extension_trial_run:'進行熱處理實驗',observation_selected:'選擇觀察',observation_recorded:'確認觀察',answer_changed:'修改答案',reason_updated:'修改理由',design_confirmed:'確認設計',lab_started:'開始探究',investigation_submitted:'提交探究',reflection_submitted:'提交反思',pdf_print_requested:'列印 PDF',liquid_selected:'選擇消化液',extension_selected:'選擇熱處理'})[type]||type;}
 
 FIELDS.forEach(id=>{
-  $('#'+id).addEventListener('input',()=>{if(id==='setupDescription'){state.setupSaved=false;$('#setupFeedback').textContent='文字設計已更新，請儲存。';}logEvent(id==='reason'?'reason_updated':'answer_changed',{field:id,value:$('#'+id).value});});
+  $('#'+id).addEventListener('input',()=>{if(id==='setupDescription'){state.setupSaved=false;$('#setupFeedback').textContent='設計已更新，請按「儲存設計」。';}logEvent(id==='reason'?'reason_updated':'answer_changed',{field:id,value:$('#'+id).value});});
   $('#'+id).addEventListener('change',()=>logEvent('answer_changed',{field:id,value:$('#'+id).value}));
 });
 $('#profileForm').onsubmit=e=>{
@@ -439,7 +448,6 @@ $$('[data-next]').forEach(b=>b.onclick=()=>{
   state.unlocked=Math.max(state.unlocked,next);setPhase(next);saveRecord();
 });
 $$('[data-back]').forEach(b=>b.onclick=()=>setPhase(+b.dataset.back));$$('.step').forEach(b=>b.onclick=()=>setPhase(+b.dataset.phase));
-$('#saveTextSetup').onclick=()=>{if(state.submitted)return;if(!$('#setupDescription').value.trim())return toast('請先填寫文字設計。');state.setupSaved=true;state.setupMethod='text';state.setupImage='';$('#setupFeedback').textContent='文字設計已儲存。';logEvent('setup_saved',{method:'text',description:$('#setupDescription').value});saveRecord();};
 $$('#liquidButtons button').forEach(b=>b.onclick=()=>{if(state.submitted||state.running||state.extensionRunning)return;state.liquid=b.dataset.liquid;$$('#liquidButtons button').forEach(el=>el.classList.toggle('selected',el===b));resetObservation();logEvent('liquid_selected',{liquid:state.liquid});});
 $$('[data-extension-heat]').forEach(b=>b.onclick=()=>{if(state.submitted||state.running||state.extensionRunning)return;state.extensionHeat=b.dataset.extensionHeat;$$('[data-extension-heat]').forEach(el=>el.classList.toggle('selected',el===b));resetExtension();$('#runExtension').disabled=false;logEvent('extension_selected',{heat:state.extensionHeat});});
 $('#runExperiment').onclick=()=>animateTrial();$('#runExtension').onclick=()=>animateTrial(true);

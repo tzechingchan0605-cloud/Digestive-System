@@ -7,11 +7,11 @@
   const ignored = 'script,style,[data-language-user]';
   const translatedAttributes = ['alt','title','aria-label','placeholder','src','srcset'];
   const images = {
-    'assets/emulsification.svg':'assets/emulsification-en.svg?v=2',
-    'assets/emulsification-mobile.svg':'assets/emulsification-mobile-en.svg?v=2',
-    'assets/triglyceride-structure.svg':'assets/triglyceride-structure-en.svg?v=2',
-    'assets/glycerol-structure.svg':'assets/glycerol-structure-en.svg?v=2',
-    'assets/fatty-acids-structure.svg':'assets/fatty-acids-structure-en.svg?v=2'
+    'assets/emulsification.svg':'assets/emulsification-en.svg?v=3',
+    'assets/emulsification-mobile.svg':'assets/emulsification-mobile-en.svg?v=3',
+    'assets/triglyceride-structure.svg':'assets/triglyceride-structure-en.svg?v=3',
+    'assets/glycerol-structure.svg':'assets/glycerol-structure-en.svg?v=3',
+    'assets/fatty-acids-structure.svg':'assets/fatty-acids-structure-en.svg?v=3'
   };
   function text(value) {
     const source = String(value ?? '');
@@ -87,27 +87,14 @@
     if (!option) return '未提供';
     return [...option.childNodes].map(node=>sources.get(node)?.source??node.textContent).join('');
   }
-  const dialog=document.getElementById('languageDialog'), input=document.getElementById('languageCode');
-  function open() {
-    input.value='';document.getElementById('languageError').textContent='';
-    refresh(dialog);dialog.showModal();input.focus();
-  }
-  document.querySelectorAll('[data-language-switch]').forEach(button=>button.addEventListener('click',open));
-  document.getElementById('languageForm').addEventListener('submit',event=>{
-    event.preventDefault();
-    const code=input.value.trim();
-    if (!['CMI','EMI'].includes(code)) {
-      document.getElementById('languageError').textContent='語言代碼不正確，請向教師確認。';
-      refresh(document.getElementById('languageError'));
-      input.focus();return;
-    }
-    current=code==='EMI'?'en':'zh';
+  function switchLanguage() {
+    current=current==='zh'?'en':'zh';
     document.documentElement.lang=current==='en'?'en-HK':'zh-Hant-HK';
     document.title=text(originalTitle);
-    refresh();dialog.close();
+    refresh();
     window.dispatchEvent(new CustomEvent('vl-language-changed',{detail:{language:current}}));
-  });
-  document.getElementById('languageCancel').addEventListener('click',()=>dialog.close());
+  }
+  document.querySelectorAll('[data-language-switch]').forEach(button=>button.addEventListener('click',switchLanguage));
   window.VL1Language={get current(){return current;},text,refresh,canonicalOption,canonicalHTML};
   refresh();
   new MutationObserver(changes=>{
