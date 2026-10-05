@@ -8,6 +8,8 @@ const key='digestiveLab.localRecords.v1';
  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',headless:true,args:['--no-sandbox']});
  try{
  const context=await browser.newContext({acceptDownloads:true});const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.route('**/cloud-config.js',r=>r.fulfill({contentType:'application/javascript',body:"window.VL1_CLOUD_CONFIG={endpoint:''};"}));
+ await page.route('https://script.google.com/**',r=>r.abort());await page.route('https://script.googleusercontent.com/**',r=>r.abort());
  await page.route('https://fonts.googleapis.com/**',r=>r.abort());await page.route('https://fonts.gstatic.com/**',r=>r.abort());await page.goto(base);
  const legacy={moduleId:'VL_BIO_DIGESTION_OPTION_A',profile:{name:'<img src=x onerror="window.injected=true">',classInfo:'=1+1',email:'legacy@example.com'},savedAt:'2026-01-01T00:00:00Z',phase2:{hypothesis:{liquid:'X',outcome:'clear',reason:'=HYPERLINK("https://example.com")'},variableChoices:{iv:['消化液組合'],dv:['混合物外觀'],cv:['油和水總體積','反應溫度','反應時間']}},phase3:{trials:[]},phase4:{conclusions:{q1:'cloudy'}},telemetry:[]};
  // Current-only migration must archive once, never auto-login or invent initial answers.

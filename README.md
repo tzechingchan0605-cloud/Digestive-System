@@ -39,7 +39,7 @@ Excel 包含七張工作表：學生探究答案、六組觀察紀錄、教師�
 
 ## 驗證
 
-測試使用獨立瀏覽器 context 與測試資料，不接觸真實學生資料。需要 Node.js、Playwright、Chromium、Python 及 openpyxl；環境現有工具已可執行。先啟動上述伺服器，再執行：
+測試使用獨立瀏覽器 context 與測試資料，不接觸真實學生資料。一般介面測試會攔截雲端設定並阻止 Google 收集端連線；`cloud.cjs` 使用本機收集端測試替身，不會把測試資料寫入教師的真實試算表。需要 Node.js、Playwright、Chromium、Python 及 openpyxl；環境現有工具已可執行。先啟動上述伺服器，再執行：
 
 ```bash
 node --check app.js
