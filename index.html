@@ -17,6 +17,8 @@
         <div class="student-chip"><span class="avatar" id="avatar">同</span><span id="studentName">同學</span><button id="teacherButton" hidden>教師儀表板</button><button id="changeProfile" title="切換帳戶並開始新探究">切換帳戶</button><button id="resetLab" title="保留紀錄並開始新探究">開始新探究</button></div>
       </header>
 
+      <p id="cloudStatus" class="cloud-status" role="status"></p>
+      <button id="retryCloud" class="secondary" type="button" hidden>重試同步</button>
       <section class="hero" id="top">
         <div>
           <p class="eyebrow">IBL 虛擬實驗室 · 15–20 分鐘</p>
@@ -107,11 +109,13 @@
         <div class="complete-bar" id="completeBar" hidden><span>✓</span><div><strong>模組完成</strong><p>你的 01–04 階段答案、嘗試及用時已儲存。</p></div><div class="complete-actions"><button class="secondary" id="downloadRecord" disabled>列印／儲存學習紀錄 PDF</button><button class="secondary" id="restartInvestigation">開始新探究</button></div></div>
       </section>
     </main>
-    <div class="profile-modal" id="profileModal" role="dialog" aria-modal="true" aria-labelledby="profileTitle"><section class="profile-panel"><span class="profile-mark">✦</span><p class="eyebrow">探究實驗室 · 模組 1</p><h2 id="profileTitle">開始你的探究</h2><p>輸入姓名、班別及電郵地址。輸入指定教師電郵會開啟本機教師儀表板。</p><form id="profileForm"><label>姓名<input id="profileName" required maxlength="24" autocomplete="name" placeholder="例如：陳小明"/></label><label>班別及學號<input id="profileClass" required maxlength="16" placeholder="例如：S4X1-05"/></label><label>電郵地址<input id="profileEmail" type="email" required autocomplete="email" placeholder="例如：student@school.edu.hk"/></label><button class="primary" type="submit">進入實驗室 →</button></form><p class="privacy-note">紀錄只保存在這部裝置。教師儀表板只能看到同一瀏覽器內的紀錄。重新整理後會返回空白登入頁；每次登入都開始新探究，舊紀錄仍會保留。</p></section></div>
-    <dialog id="teacherDialog"><section class="teacher-panel"><button id="closeTeacher" class="dialog-close">×</button><p class="eyebrow">教師儀表板</p><h2>學生學習紀錄</h2><p id="dashboardStatus">正在載入……</p><div class="dashboard-note">Excel 包含原始與最後答案、操作事件、裝置圖及教師評分欄。rubric 是待研究者校準的初稿，並非已驗證量表。人工分數只存於教師另行保存的 Excel；重新匯出不會帶入之前填分。</div><button class="secondary" id="teacherDemo">進入示範探究</button><button class="primary" id="exportCsv">下載 Excel 報告</button><div class="table-wrap"><table class="teacher-table"><thead><tr><th>學生</th><th>班別</th><th>進度</th><th>觀察準確度</th><th>總用時</th><th>更新時間</th><th>個別報告</th></tr></thead><tbody id="teacherData"></tbody></table></div><section id="teacherDetail" hidden><button class="secondary" id="teacherPDF">列印／儲存此份 PDF</button><div id="teacherReport"></div></section></section></dialog>
+    <div class="profile-modal" id="profileModal" role="dialog" aria-modal="true" aria-labelledby="profileTitle"><section class="profile-panel"><span class="profile-mark">✦</span><p class="eyebrow">探究實驗室 · 模組 1</p><h2 id="profileTitle">開始你的探究</h2><p>輸入姓名、班別及電郵地址。輸入指定教師電郵會開啟教師儀表板。</p><form id="profileForm"><label>姓名<input id="profileName" required maxlength="24" autocomplete="name" placeholder="例如：陳小明"/></label><label>班別及學號<input id="profileClass" required maxlength="16" placeholder="例如：S4X1-05"/></label><label>電郵地址<input id="profileEmail" type="email" required autocomplete="email" placeholder="例如：student@school.edu.hk"/></label><button class="primary" type="submit">進入實驗室 →</button></form><p id="loginCloudStatus" class="cloud-status" role="status"></p><button id="loginRetryCloud" class="secondary" type="button" hidden>重試同步舊紀錄</button><p class="privacy-note">答案保留本機備份；設定雲端後會自動同步至全班紀錄，請留意頁面同步狀態。重新整理後會返回空白登入頁；每次登入都開始新探究，舊紀錄仍會保留。</p></section></div>
+    <dialog id="teacherDialog"><section class="teacher-panel"><button id="closeTeacher" class="dialog-close">×</button><p class="eyebrow">教師儀表板</p><h2>學生學習紀錄</h2><p id="dashboardStatus">正在載入……</p><form id="cloudTeacherForm" hidden><label>教師雲端密碼<input id="cloudTeacherPassword" type="password" autocomplete="current-password" required /></label><button class="secondary" type="submit">解鎖／重新載入全班紀錄</button><p class="hint">只輸入教師電郵不會取得雲端學生資料。網站不會將密碼寫入本機儲存；請勿使用 Google 帳戶密碼。</p></form><div class="dashboard-note">Excel 包含原始與最後答案、操作事件、裝置圖及教師評分欄。rubric 是待研究者校準的初稿，並非已驗證量表。人工分數只存於教師另行保存的 Excel；重新匯出不會帶入之前填分。</div><button class="secondary" id="refreshRecords">重新載入紀錄</button><button class="secondary" id="teacherDemo">進入示範探究</button><button class="primary" id="exportCsv">下載 Excel 報告</button><div class="table-wrap"><table class="teacher-table"><thead><tr><th>學生</th><th>班別</th><th>進度</th><th>觀察準確度</th><th>總用時</th><th>更新時間</th><th>個別報告</th></tr></thead><tbody id="teacherData"></tbody></table></div><section id="teacherDetail" hidden><button class="secondary" id="teacherPDF">列印／儲存此份 PDF</button><div id="teacherReport"></div></section></section></dialog>
     <section id="printReport" class="print-report"></section>
     <div class="toast" id="toast" role="status"></div>
     <script src="excel.js"></script>
+    <script src="cloud-config.js"></script>
+    <script src="cloud-sync.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

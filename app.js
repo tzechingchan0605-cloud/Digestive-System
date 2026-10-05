@@ -107,6 +107,7 @@ function saveRecord() {
     localStorage.setItem(RECORDS_KEY,JSON.stringify(records));
     localStorage.setItem(STORAGE_KEY,JSON.stringify(record));
   } catch {toast('未能儲存：瀏覽器空間不足或儲存權限被停用。請勿關閉此頁；完成反思後列印 PDF 保存。');}
+  cloudSync.enqueue(record);
   return record;
 }
 function archiveCurrent() {
@@ -269,7 +270,7 @@ function renderPrint(r) {
   <section class="report-stage page-break"><h2>03 六組觀察</h2><div class="report-card">${table}<p>${LIMIT_REFERENCE}</p></div></section>
   <section class="report-stage"><h2>04 分析與結論</h2><div class="report-card">${Object.keys(conclusionAnswers).map(id=>reportAnswer(questionLabels[id],answerText(id,answers[id]),answerText(id,conclusionAnswers[id]),answers[id]?answers[id]===conclusionAnswers[id]:null)).join('')}</div>
   ${r.submitted||r.schemaVersion!==2?`<div class="concept-summary"><h3>學習重點</h3>${$('#conceptReveal .learning-points').outerHTML}${$('#conceptReveal .learning-diagrams').outerHTML}<p>${LIMIT_REFERENCE}</p></div>`:'<p>此份紀錄尚未遞交探究，學習重點尚未開放。</p>'}
-  <div class="reflection-summary">${open('實際學習反思',r.phase4?.reflection,'判斷原始假說是否獲支持；引用具體組別比較，運用乳化、表面積、脂肪酶及變性概念修訂解釋。')}<p>反思狀態：${reflectionComplete(r)?'已提交':r.schemaVersion===2?'未提交':'未提供（舊版未記錄）'}</p></div></section><footer class="report-footer">探究實驗室 · 原始答案與參考說明 · 紀錄只保存在目前瀏覽器</footer>`;
+  <div class="reflection-summary">${open('實際學習反思',r.phase4?.reflection,'判斷原始假說是否獲支持；引用具體組別比較，運用乳化、表面積、脂肪酶及變性概念修訂解釋。')}<p>反思狀態：${reflectionComplete(r)?'已提交':r.schemaVersion===2?'未提交':'未提供（舊版未記錄）'}</p></div></section><footer class="report-footer">探究實驗室 · 原始答案與參考說明 · 答案及回饋 · 請另存此份 PDF</footer>`;
 }
 function reportFilename(r) {const safe=v=>String(v||'未提供').replace(/[\\/:*?"<>|\u0000-\u001f]/g,'_').trim().replace(/[. ]+$/g,'')||'未提供';return `VL1_未知消化液X與Y_${safe(r.profile?.classInfo)}_${safe(r.profile?.name)}`;}
 async function printRecord(r) {
@@ -279,10 +280,38 @@ async function printRecord(r) {
 }
 function restorePrint() {document.title=PAGE_TITLE;document.body.classList.remove('print-record');}
 window.addEventListener('afterprint',restorePrint);
-function startTeacherDashboard() {
+let dashboardGeneration=0;
+const cloudSync=createCloudSync({endpoint:window.VL1_CLOUD_CONFIG?.endpoint||'',storage:localStorage,records:readLocalRecords,
+  status:(kind,message)=>{for(const id of ['cloudStatus','loginCloudStatus']){$('#'+id).textContent=message;$('#'+id).dataset.state=kind;}for(const id of ['retryCloud','loginRetryCloud'])$('#'+id).hidden=!cloudSync.enabled||!['error','pending'].includes(kind);}});
+function mergeRecords(local,remote) {
+  const merged=new Map();
+  for(const r of [...local,...remote].filter(validRecord).filter(r=>!isTeacher(r.profile))){
+    const previous=merged.get(r.id);
+    if(!previous||Date.parse(r.savedAt)>=Date.parse(previous.savedAt)||!previous.savedAt)merged.set(r.id,r);
+  }
+  return [...merged.values()];
+}
+async function allTeacherRecords(password) {
+  if(!cloudSync.enabled)return readLocalRecords().filter(r=>!isTeacher(r.profile));
+  // Export never silently falls back to a partial local-only collection.
+  await cloudSync.flush();
+  return mergeRecords(readLocalRecords(),await cloudSync.list(password));
+}
+async function startTeacherDashboard(password) {
   if(!isTeacher())return;
-  const rows=readLocalRecords().filter(r=>!isTeacher(r.profile));
-  $('#dashboardStatus').textContent=`這部瀏覽器現有 ${rows.length} 份學生探究紀錄；同一電郵的多次探究會分開保存。資料不會跨裝置同步。`;
+  const generation=++dashboardGeneration;
+  $('#cloudTeacherForm').hidden=!cloudSync.enabled;
+  let rows;
+  try {
+    $('#dashboardStatus').textContent=cloudSync.enabled?'正在讀取全班雲端紀錄……':'雲端未設定，以下只包含這部瀏覽器的紀錄。';
+    rows=await allTeacherRecords(password);
+  } catch(e) {
+    if(generation!==dashboardGeneration)return;
+    $('#dashboardStatus').textContent=e.message+'；尚未載入全班紀錄，不能匯出。';
+    $('#teacherData').innerHTML='';$('#teacherDetail').hidden=true;return;
+  }
+  if(generation!==dashboardGeneration||!isTeacher())return;
+  $('#dashboardStatus').textContent=`${cloudSync.enabled?'全班雲端與本機':'這部瀏覽器'}共有 ${rows.length} 份學生探究紀錄；同一電郵的多次探究會分開保存。${cloudSync.enabled?'匯出時會重新讀取雲端最新資料。':'尚未啟用跨裝置同步。'}`;
   $('#teacherData').innerHTML=rows.length?rows.map((r,i)=>{const trials=r.phase3?.trials||[];return `<tr><td><strong>${escapeHtml(r.profile.name)}</strong><small>${escapeHtml(r.profile.email)}</small></td><td>${escapeHtml(r.profile.classInfo)}</td><td>${reflectionComplete(r)?'已完成':r.submitted?'待提交反思':r.schemaVersion===2?'進行中':'舊版（新欄位未提供）'}</td><td>${trials.filter(t=>t.studentObservation===experiments[t.key]?.[0]).length} / ${trials.length}</td><td>${formatDuration(r.durationSeconds)}</td><td>${formatDate(r.savedAt)}</td><td><button class="secondary" data-view-record="${i}">查看紀錄</button></td></tr>`;}).join(''):'<tr><td colspan="7">暫無學生紀錄</td></tr>';
   $$('[data-view-record]').forEach(b=>b.onclick=()=>{previewRecord=copy(rows[+b.dataset.viewRecord]);renderPrint(previewRecord);$('#teacherReport').innerHTML=$('#printReport').innerHTML;$('#teacherDetail').hidden=false;});
 }
@@ -351,9 +380,12 @@ function scoringWorkbook(records) {
 }
 function colourRule(cell,score,max) {return {cell,formulas:[`AND(ISNUMBER(${score}),${score}=${max})`,`AND(ISNUMBER(${score}),${score}=0)`,`AND(ISNUMBER(${score}),${score}>0,${score}<${max})`]};}
 function download(blob,name) {const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download=name;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
-function exportExcel() {
+async function exportExcel() {
   if(!isTeacher())return;
-  const records=readLocalRecords().filter(r=>!isTeacher(r.profile));
+  let records;
+  try {records=await allTeacherRecords();}
+  catch(e){toast('未匯出：'+e.message+'。請解鎖雲端並重試，避免下載不完整的全班紀錄。');return;}
+  if(!isTeacher())return;
   const headings=['探究識別碼','姓名','班別及學號','電郵','狀態','建立時間','探究提交時間','反思提交時間','初步觀察','原始假說','原始理由','最後假說','最後理由','獨立變量','因變量','控制變量','實驗前提','對照組設計','裝置文字設計',...Object.values(questionLabels),'歷史具體比較說明（現版不設此題）','實際學習反思','總有效秒數','階段一秒數','階段二秒數','階段三秒數','階段四秒數','基本實驗次數','延伸實驗次數','確認觀察次數','理由修改次數'];
   const groups=headings.map((_,c)=>c<8?'identity':c===8?'observing':c<13?'designing':c<16?'classifying':c<19?'designing':c<23?'inferring':c===23?'communicating':c===24?'knowledge':'identity');
   const answers=[headings.map((h,c)=>excelCell(h,groups[c]))],observations=[['探究識別碼','姓名','裝置','首次確認外觀','最後確認外觀','參考外觀','最後回饋','首次確認時間','最後確認時間']];
@@ -394,7 +426,7 @@ $('#profileForm').onsubmit=e=>{
   saveRecord();resetSession(profile);$('#profileModal').classList.remove('show');logEvent('lab_started',{mode:'local'});saveRecord();
   if(isTeacher()){startTeacherDashboard();$('#teacherDialog').showModal();}
 };
-$('#changeProfile').onclick=()=>{saveRecord();accountTime();$('#profileForm').reset();$('#profileModal').classList.add('show');$('main').inert=true;};
+$('#changeProfile').onclick=()=>{cloudSync.clearCredential();dashboardGeneration++;$('#teacherDetail').hidden=true;$('#teacherReport').innerHTML='';$('#teacherData').innerHTML='';saveRecord();accountTime();$('#profileForm').reset();$('#profileModal').classList.add('show');$('main').inert=true;};
 $$('[data-next]').forEach(b=>b.onclick=()=>{
   const next=+b.dataset.next;if(state.submitted){setPhase(next);return;}
   if(next===2&&!$('#initialObservation').value.trim())return toast('請先記錄你的初步觀察。');
@@ -414,9 +446,14 @@ $('#downloadRecord').onclick=async()=>{if(!currentReflectionComplete())return to
 $('#resetLab').onclick=returnToLogin;$('#restartInvestigation').onclick=returnToLogin;
 $('#teacherButton').onclick=()=>{if(!isTeacher())return;startTeacherDashboard();$('#teacherDialog').showModal();};
 $('#closeTeacher').onclick=()=>$('#teacherDialog').close();$('#teacherDemo').onclick=()=>{if(!isTeacher())return;const profile=copy(state.profile);resetSession(profile);$('#teacherDialog').close();toast('教師示範：不會寫入學生紀錄、事件或 Excel。');};
+$('#refreshRecords').onclick=()=>startTeacherDashboard();
+$('#cloudTeacherForm').onsubmit=e=>{e.preventDefault();const password=$('#cloudTeacherPassword').value;$('#cloudTeacherPassword').value='';startTeacherDashboard(password);};
+$('#retryCloud').onclick=$('#loginRetryCloud').onclick=()=>{cloudSync.recover();cloudSync.flush().catch(()=>{});};
+window.addEventListener('online',()=>{cloudSync.recover();cloudSync.flush().catch(()=>{});});
 $('#exportCsv').onclick=exportExcel;$('#teacherPDF').onclick=()=>{if(isTeacher()&&previewRecord)printRecord(previewRecord);};
 document.addEventListener('visibilitychange',()=>{accountTime();timingVisible=!document.hidden;activeSince=Date.now();if(document.hidden)saveRecord();});
 window.addEventListener('beforeunload',e=>{if(!state.profile||allowUnload)return;saveRecord();e.preventDefault();e.returnValue='';});
-window.addEventListener('pagehide',()=>{if(state.profile)saveRecord();});
+window.addEventListener('pagehide',()=>{if(state.profile)saveRecord();try{cloudSync.leave();}catch{}});
 setInterval(()=>{if(state.profile&&!document.hidden)saveRecord();},15000);
-archiveCurrent();resetSession();$('#profileForm').reset();$('#profileModal').classList.add('show');
+archiveCurrent();resetSession();$('#profileForm').reset();$('#profileModal').classList.add('show');cloudSync.recover();
+setInterval(()=>{if(cloudSync.enabled)cloudSync.flush().catch(()=>{});},30000);
