@@ -286,7 +286,7 @@ function renderPrint(r) {
   <div class="reflection-summary">${open('實際學習反思',r.phase4?.reflection,'判斷原始假說是否獲支持；引用具體組別比較，運用乳化、表面積、脂肪酶及變性概念修訂解釋。')}<p>反思狀態：${reflectionComplete(r)?'已提交':r.schemaVersion===2?'未提交':'未提供（舊版未記錄）'}</p></div></section><footer class="report-footer">探究實驗室 · 原始答案與參考說明 · 答案及回饋 · 請另存此份 PDF</footer>`;
   window.VL1Language?.refresh($('#printReport'));
 }
-function reportFilename(r) {const safe=v=>String(v||'未提供').replace(/[\\/:*?"<>|\u0000-\u001f]/g,'_').trim().replace(/[. ]+$/g,'')||'未提供';return `VL1_未知消化液X與Y_${safe(r.profile?.classInfo)}_${safe(r.profile?.name)}`;}
+function reportFilename(r) {const safe=v=>String(v||'未提供').replace(/[\\/:*?"<>|\u0000-\u001f]/g,'_').trim().replace(/[. ]+$/g,'')||'未提供';return `VL1_${safe(r.profile?.classInfo)}_${safe(r.profile?.name)}`;}
 async function printRecord(r) {
   renderPrint(r);await Promise.all($$('#printReport img').map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;})));
   document.title=reportFilename(r);document.body.classList.add('print-record');

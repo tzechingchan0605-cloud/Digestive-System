@@ -48,11 +48,12 @@ async function finish(page,{revision=false}={}) {
  await page.route('https://fonts.googleapis.com/**',r=>r.abort());await page.route('https://fonts.gstatic.com/**',r=>r.abort());
  await page.goto(base);await page.evaluate(()=>{const original=Element.prototype.scrollIntoView;window.scrollTargets=[];Element.prototype.scrollIntoView=function(options){window.scrollTargets.push(this.id);return original.call(this,options);};});page.on('dialog',async d=>{if(d.type()!=='beforeunload')await d.accept();});
  await page.evaluate(()=>{window.print=()=>{window.printCalls=(window.printCalls||[]).concat({title:document.title,text:document.querySelector('#printReport').innerText});window.dispatchEvent(new Event('afterprint'));};});
+ assert.equal(await page.evaluate(()=>reportFilename({profile:{classInfo:'X1',name:'Chan Siu Ming'}})),'VL1_X1_Chan Siu Ming');
  assert.equal(await page.locator('#profileName').inputValue(),'');
  await login(page);await page.click('[data-next="2"]');assert(await page.locator('#phase-1').evaluate(e=>e.classList.contains('active')));
  await design(page,{draw:true,badAssumptions:true});await finish(page,{revision:true});
  await page.click('#downloadRecord');await page.waitForFunction(()=>window.printCalls?.length===1);
- const printed=await page.evaluate(()=>window.printCalls[0]);assert.equal(printed.title,'VL1_未知消化液X與Y_S4_01_陳小明');assert(printed.text.includes('原始X清澈假說不獲支持'));assert(!printed.text.includes('最後保存的假說及理由'));assert(!printed.text.includes('若加入加入'));assert(!printed.text.includes('具體比較與證據說明'));assert(!/SPS|總分|新知識總分|整體分數/.test(printed.text));
+ const printed=await page.evaluate(()=>window.printCalls[0]);assert.equal(printed.title,'VL1_S4_01_陳小明');assert(printed.text.includes('原始X清澈假說不獲支持'));assert(!printed.text.includes('最後保存的假說及理由'));assert(!printed.text.includes('若加入加入'));assert(!printed.text.includes('具體比較與證據說明'));assert(!/SPS|總分|新知識總分|整體分數/.test(printed.text));
  const first=await page.evaluate(k=>JSON.parse(localStorage.getItem(k))[0],RECORDS);
  assert.equal(first.initialDesign.form.hypothesisLiquid,'X');assert.equal(first.phase2.hypothesis.liquid,'XY');assert.equal(first.firstObservations['X-none'].studentObservation,'clear');assert.equal(first.phase3.trials.find(t=>t.key==='X-none').studentObservation,'cloudy');assert(first.finalAnswers&&first.reflectionSubmittedAt);assert(first.optionOrder);assert.equal(await page.locator('#printReport .digestion-diagram').count(),2);assert(first.telemetry.some(e=>e.type==='investigation_submitted'));assert(first.telemetry.some(e=>e.type==='reflection_submitted'));
  await page.evaluate(()=>document.body.classList.add('print-record'));await page.pdf({path:'/tmp/vl1-student.pdf',format:'A4',printBackground:true});await page.evaluate(()=>document.body.classList.remove('print-record'));
@@ -72,7 +73,7 @@ async function finish(page,{revision=false}={}) {
  const storedBefore=await page.evaluate(k=>localStorage.getItem(k),RECORDS);const currentBefore=await page.evaluate(()=>localStorage.getItem('digestiveLab.v4'));
  await page.click('[data-view-record="3"]');assert((await page.locator('#teacherReport').innerText()).includes('未提供（舊版未保存原始假說）'));
  await page.click('[data-view-record="0"]');assert((await page.locator('#teacherReport').innerText()).includes('原始X清澈假說不獲支持'));
- await page.evaluate(()=>{window.print=()=>{window.printCalls=(window.printCalls||[]).concat(document.title);window.dispatchEvent(new Event('afterprint'));};});await page.click('#teacherPDF');await page.waitForFunction(()=>window.printCalls?.length>0);
+ await page.evaluate(()=>{window.print=()=>{window.printCalls=(window.printCalls||[]).concat(document.title);window.dispatchEvent(new Event('afterprint'));};});await page.click('#teacherPDF');await page.waitForFunction(()=>window.printCalls?.at(-1)==='VL1_S4_01_陳小明');
  let dlPromise=page.waitForEvent('download');await page.click('#exportCsv');let dl=await dlPromise;await dl.saveAs('/tmp/vl1-records.xlsx');
  await page.click('#teacherDemo');await page.evaluate(()=>{const original=Element.prototype.scrollIntoView;window.scrollTargets=[];Element.prototype.scrollIntoView=function(options){window.scrollTargets.push(this.id);return original.call(this,options);};});await design(page);await finish(page);await page.click('#downloadRecord');
  assert.equal(await page.evaluate(k=>localStorage.getItem(k),RECORDS),storedBefore);assert.equal(await page.evaluate(()=>localStorage.getItem('digestiveLab.v4')),currentBefore);assert.equal(await page.evaluate(()=>state.events.length),0);
