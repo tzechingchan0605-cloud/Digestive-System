@@ -76,6 +76,7 @@
     '請選出所有適用的假設，可選多於一項。': 'Choose all the conditions that apply. You may choose more than one.',
     '04 · 探究的對照組': '04 · Control group',
     '你認為此實驗需要對照組嗎？如需要，你會如何設計比較裝置？': 'Does this experiment need a control group? If so, how would you design the setups to compare?',
+    '（提示：對照組主要功能是作為比較的基準，用來確認實驗中的改變是由獨立變量所引起，而非其他外在因素的干擾，因此對照組不包含獨立變量的處理條件）': '(Hint: A control group provides a starting point for comparison. It helps you check that changes are caused by the independent variable, rather than other outside factors. The control group therefore does not receive the treatment being tested.)',
     '（提示：': '(Hint: ',
     '對照組': 'a control group',
     '主要功能是作為': 'mainly provides ',
