@@ -8,15 +8,15 @@
 | emulsion | 乳狀液 |
 | physical digestion | 物理消化 |
 | chemical digestion | 化學消化 |
+| digestive tract | 消化道 |
+| gall bladder | 膽囊 |
 | glycerol | 甘油 |
 | fatty acid / fatty acids | 脂肪酸 |
-| denaturation | 變性 |
 | triglyceride | 甘油三酯 |
-| catalyst | 催化劑 |
 | bile | 膽汁 |
 | lipase | 脂肪酶 |
 
-例如：`emulsification (乳化作用)`、`emulsifies lipids (乳化脂質)`、`fatty acids (脂肪酸)`。其餘科學詞彙與探究用語只使用英文，包括 hypothesis、assumption、fair test、independent variable、dependent variable、controlled variable、control group、inference、evidence、lipid、hydrolysis 等。
+例如：`emulsification (乳化作用)`、`emulsifies lipids (乳化脂質)`、`fatty acids (脂肪酸)`。其餘科學詞彙與探究用語只使用英文，包括 hypothesis、assumption、fair test、independent variable、dependent variable、controlled variable、control group、inference、evidence、lipid、hydrolysis、denaturation、catalyst 等。
 
 一般指示使用簡單英文，例如 experiment setup 代替 apparatus；保留正式變量分類名稱，並以「the factor changed on purpose」等簡單句子解釋。簡化用語不改變生物概念或題目意思。
 

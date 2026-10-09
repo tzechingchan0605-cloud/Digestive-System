@@ -34,11 +34,11 @@
 | emulsion | 乳狀液 |
 | physical digestion | 物理消化 |
 | chemical digestion | 化學消化 |
+| digestive tract | 消化道 |
+| gall bladder | 膽囊 |
 | glycerol | 甘油 |
 | fatty acid / fatty acids | 脂肪酸 |
-| denaturation | 變性 |
 | triglyceride | 甘油三酯 |
-| catalyst | 催化劑 |
 | bile | 膽汁 |
 | lipase | 脂肪酶 |
 

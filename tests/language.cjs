@@ -6,7 +6,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const base=process.argv[2]||'http://127.0.0.1:8000';
 const recordsKey='digestiveLab.localRecords.v1';
-const approvedChinese=new Set(['乳化作用','乳化脂質','乳狀液','物理消化','化學消化','甘油','脂肪酸','變性','甘油三酯','催化劑','膽汁','脂肪酶']);
+const approvedChinese=new Set(['乳化作用','乳化脂質','乳狀液','物理消化','化學消化','甘油','脂肪酸','消化道','膽囊','甘油三酯','膽汁','脂肪酶']);
 const englishSVGs=['emulsification-en.svg','emulsification-mobile-en.svg','triglyceride-structure-en.svg','glycerol-structure-en.svg','fatty-acids-structure-en.svg'];
 function assertApprovedChinese(entries,label){
  for(const {source,text}of entries){
@@ -107,6 +107,8 @@ function assertApprovedChinese(entries,label){
   assert.match(await page.locator('#profileTitle').innerText(),/start|begin/i);assert((await page.locator('html').getAttribute('lang')).startsWith('en'));
   assert.match(await page.locator('#profileName').getAttribute('placeholder'),/[A-Za-z]/);
   await assertPlaceholders('en');await assertEnglishSystemText();await assertEnglishSVGText();
+  assert.match(await page.locator('#phase-1').innerText(),/digestive tract \(消化道\)/);
+  assert.match(await page.locator('#conceptReveal').textContent(),/gall bladder \(膽囊\)/);
   await switchLanguage('zh');assert.equal(await page.locator('#profileTitle').innerText(),'開始你的探究');
   await assertPlaceholders('zh');
 
