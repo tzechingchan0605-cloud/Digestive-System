@@ -2,7 +2,7 @@
   "zh": {
     "language": "zh",
     "moduleId": "VL_BIO_DIGESTION_OPTION_A",
-    "version": "VL1-ui3-paper1",
+    "version": "VL1-ui3-paper2",
     "questionIds": [
       "initialObservation",
       "hypothesisLiquid",
@@ -115,6 +115,7 @@
       "heading": "03 · 實驗前提",
       "question": "此探究的假設是什麼？",
       "hint": "請選出所有適用的假設，可選多於一項。",
+      "reminder": "假設是指未經證實而被視為正確的條件，用於確保實驗結果的有效性。",
       "choices": [
         {
           "id": "time",
@@ -146,6 +147,7 @@
       "question": "繪畫並標示你的實驗裝置",
       "instruction": "試參考實驗變量，繪畫並標示你的實驗裝置。",
       "hint": "（提示：此實驗需要多少個裝置？實驗組和對照組分別是什麼？）",
+      "reminder": "不用精緻地繪畫所有特徵，簡單繪畫並標示清楚便可。",
       "materials": "<div class=\"equipment-bank\"><figure class=\"equipment\"><img src=\"assets/oil-water-tube.png\" alt=\"油水試管\"><figcaption>油水試管 ×4</figcaption></figure><figure class=\"equipment\"><img src=\"assets/digestive-juice-x.png\" alt=\"消化液 X\"><figcaption>消化液 X ×1</figcaption></figure><figure class=\"equipment\"><img src=\"assets/digestive-juice-y.png\" alt=\"消化液 Y\"><figcaption>消化液 Y ×1</figcaption></figure><figure class=\"equipment\"><img src=\"assets/dropper.png\" alt=\"滴管\"><figcaption>滴管 ×4</figcaption></figure><figure class=\"equipment bath-equipment\"><img src=\"assets/water-bath-37c.png\" alt=\"37°C 水浴\"><figcaption>37°C 水浴 ×1</figcaption></figure></div>",
       "writtenLabel": "文字設計（可代替繪圖）：描述四個裝置、加液量及固定條件。"
     },
@@ -512,7 +514,7 @@
   "en": {
     "language": "en",
     "moduleId": "VL_BIO_DIGESTION_OPTION_A",
-    "version": "VL1-ui3-paper1",
+    "version": "VL1-ui3-paper2",
     "questionIds": [
       "initialObservation",
       "hypothesisLiquid",
@@ -625,6 +627,7 @@
       "heading": "03 · Conditions for a fair test",
       "question": "Which conditions does this fair test need?",
       "hint": "Choose all the conditions that apply. You may choose more than one.",
+      "reminder": "An assumption is a condition we have not proved but take as true, to help make the experiment results valid.",
       "choices": [
         {
           "id": "time",
@@ -656,6 +659,7 @@
       "question": "Draw and label your setup",
       "instruction": "Use your experimental variables to help you draw and label your setup.",
       "hint": "(Hint: How many setups do you need? Which groups will you test and which is the control group?)",
+      "reminder": "You do not need to draw every detail carefully. A simple drawing with clear labels is enough.",
       "materials": "<div class=\"equipment-bank\"><figure class=\"equipment\"><img src=\"assets/oil-water-tube.png\" alt=\"Oil–water test tube\"><figcaption>Oil–water test tubes ×4</figcaption></figure><figure class=\"equipment\"><img src=\"assets/digestive-juice-x.png\" alt=\"Digestive juice X\"><figcaption>Digestive juice X ×1</figcaption></figure><figure class=\"equipment\"><img src=\"assets/digestive-juice-y.png\" alt=\"Digestive juice Y\"><figcaption>Digestive juice Y ×1</figcaption></figure><figure class=\"equipment\"><img src=\"assets/dropper.png\" alt=\"Dropper\"><figcaption>Droppers ×4</figcaption></figure><figure class=\"equipment bath-equipment\"><img src=\"assets/water-bath-37c.png\" alt=\"37°C water bath\"><figcaption>37°C water bath ×1</figcaption></figure></div>",
       "writtenLabel": "Written design (can replace a drawing): describe the four setups, how much liquid you add and which conditions you keep the same."
     },

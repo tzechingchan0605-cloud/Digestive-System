@@ -297,7 +297,7 @@ function restorePrint() {document.title=uiText(PAGE_TITLE);document.body.classLi
 window.addEventListener('afterprint',restorePrint);
 // Read-only curriculum content. Blank paper materials never read student state.
 window.VL1InquiryContent = () => copy({
-  moduleId:MODULE_ID,version:'VL1-ui3-paper1',fields:FIELDS,variableNames,variableGroups,expectedVariables,
+  moduleId:MODULE_ID,version:'VL1-ui3-paper2',fields:FIELDS,variableNames,variableGroups,expectedVariables,
   assumptions,experiments,outcomeLabels,trialKeys,conclusionAnswers,
   controlReference:CONTROL_REFERENCE,designReference:DESIGN_REFERENCE,limitReference:LIMIT_REFERENCE,
   trials:trialKeys.map(key=>({key,label:trialLabel(key),outcome:experiments[key][0]})),

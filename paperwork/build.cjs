@@ -5,7 +5,7 @@ const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),
 const {chromium}=require('playwright');
 const {labels,rubricEn}=require('./texts.cjs');
 const root=path.resolve(__dirname,'..'),out=path.join(__dirname,'generated');
-const MATERIAL_VERSION=2;
+const MATERIAL_VERSION=3;
 const inputs=['package.json','package-lock.json','index.html','app.js','language.js','language-dictionary.js','styles.css','paperwork/fonts/NotoSansHK-paper.otf','paperwork/source.js','paperwork/print.css','paperwork/texts.cjs','paperwork/build.cjs',...fs.readdirSync(path.join(root,'assets')).filter(n=>/\.(svg|png)$/.test(n)).map(n=>'assets/'+n)].sort();
 const sha=data=>crypto.createHash('sha256').update(data).digest('hex');
 const fingerprints=()=>Object.fromEntries(inputs.map(name=>[name,sha(fs.readFileSync(path.join(root,name)))]));
@@ -29,8 +29,8 @@ function generate(model,lang){
   const pages={A:[],B:[],C:[],D:[]},add=(part,body)=>pages[part].push(body);
   add('A',`<h1>${esc(model.title)}</h1><div class="two-cols"><div>${model.context}</div><div class="context-copy"><h3>${lang==='zh'?'研究背景':'Research background'}</h3><p>${esc(model.background)}</p><h3>${esc(model.taskHeading)}</h3><strong>${esc(model.taskQuestion)}</strong><p>${esc(model.taskDescription)}</p></div></div>${card(model.initialObservation.heading,`<p>${esc(model.initialObservation.hint)}</p>${ruled()}`)}`);
   add('A',card(model.hypothesis.heading,`<h3>${esc(model.hypothesis.instruction)}</h3><p class="circle-sentence">${circleSentence(model.hypothesis.sentence,[model.hypothesis.liquid,model.hypothesis.outcome])}</p>${hint(s('circle'))}<p>${esc(model.hypothesis.reasonLabel)}</p>${ruled()}`)+card(model.variables.heading,hint(s('multi'))+model.variables.groups.map(g=>`<h3>${esc(g.label)} <span class="hint">${esc(g.definition)}</span></h3>${choices(model.variables.choices,true,'variable')}`).join('')));
-  add('A',card(model.assumptions.heading,`<h3>${esc(model.assumptions.question)}</h3><p>${esc(model.assumptions.hint)}</p>${choices(['time','more','volume','mixing'].map(id=>model.assumptions.choices.find(o=>o.id===id)),true)}`)+card(model.control.heading,`<h3>${esc(model.control.question)}</h3>${hint(model.control.hint)}${ruled()}`)+hint(s('original')));
-  add('A',card(model.design.heading,`<h3>${esc(model.design.question)}</h3><p>${esc(model.design.instruction)}</p>${hint(model.design.hint)}${model.design.materials}<div class="drawbox"></div><p>${esc(model.design.writtenLabel)}</p>${ruled()}`)+hint(s('original')));
+  add('A',card(model.assumptions.heading,`<h3>${esc(model.assumptions.question)}</h3>${hint(model.assumptions.reminder)}<p>${esc(model.assumptions.hint)}</p>${choices(['time','more','volume','mixing'].map(id=>model.assumptions.choices.find(o=>o.id===id)),true)}`)+card(model.control.heading,`<h3>${esc(model.control.question)}</h3>${hint(model.control.hint)}${ruled()}`)+hint(s('original')));
+  add('A',card(model.design.heading,`<h3>${esc(model.design.question)}</h3><p>${esc(model.design.instruction)}</p>${hint(model.design.hint)}${model.design.materials}${hint(model.design.reminder)}<div class="drawbox"></div><p>${esc(model.design.writtenLabel)}</p>${ruled()}`)+hint(s('original')));
   const results=trials=>`<div class="two-cols">${trials.map(trial=>`<section class="card result-card" data-trial="${trial.key}"><div class="result-label">${esc(trial.label)}</div><div class="test-tube ${trial.outcome}"><div class="tube-liquid"><div class="result-oil"></div></div></div></section>`).join('')}</div>`;
   const table=(trials,options)=>`<table><thead><tr><th>${lang==='zh'?'實驗裝置':'Experiment setup'}</th><th>${s('first')} · ${s('record')}</th></tr></thead><tbody>${trials.map(trial=>`<tr><td>${esc(trial.label)}</td><td class="answer">${options.map(o=>`<span class="choice"><span class="checkbox"></span>${esc(o.text)}</span>`).join('<br>')}</td></tr>`).join('')}</tbody></table>`;
   const basic=model.trials.filter(t=>t.key.endsWith('-none')),heat=model.trials.filter(t=>!t.key.endsWith('-none'));
@@ -52,6 +52,10 @@ function generate(model,lang){
   if(rubric.length!==rubricEn.length)throw new Error('Shared rubric changed: update its English translation before building.');
   const columns=lang==='zh'?labels.headingRubric:labels.headingRubricEn;
   for(let i=0;i<rubric.length;i+=5)add('D',`<div class="teacher-only">${s('teacher')}</div><h1>${lang==='zh'?'評分準則':'Scoring guide'}</h1>${hint(s('draft'))}<table class="rubric"><thead><tr>${columns.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${rubric.slice(i,i+5).map(row=>`<tr>${row.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>${hint(s('pending'))}`);
+  // Keep every question and option while combining the requested old pages.
+  pages.A.splice(2,2,`<div class="merged-design">${pages.A[2]}${pages.A[3]}</div>`);
+  pages.B.splice(0,4,`<div class="merged-basic">${pages.B[0]}${pages.B[1]}</div>`,`<div class="merged-analysis">${pages.B[2]}${pages.B[3]}</div>`);
+  pages.C.splice(0,2,`<div class="merged-learning">${hint(s('learning'))}<h1>${esc(model.learning.heading)}</h1><h3>${esc(model.learning.intro)}</h3><div class="learning-top">${model.learning.points}${model.learning.physical}</div>${model.learning.chemical}${card(lang==='zh'?'證據界限':'What the evidence can tell us',`<p>${esc(model.learning.limit)}</p>`)}</div>`);
   return {pages,title,s};
 }
 function documentHTML(parts,generated,lang,base,model){
