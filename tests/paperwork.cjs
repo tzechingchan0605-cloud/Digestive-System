@@ -55,9 +55,9 @@ const sha=data=>crypto.createHash('sha256').update(data).digest('hex');
   await page.route('**/paperwork/generated/manifest.json',r=>r.fulfill({json:{...manifest,sourceDigest:'0'.repeat(64)}}));
   assert.equal(await page.evaluate(()=>VL1Paperwork.open()),false);assert(await page.locator('[data-paper-download="A"]').isDisabled());assert.equal(await page.evaluate(()=>VL1Paperwork.download('A')),false);
   await page.unroute('**/paperwork/generated/manifest.json');assert.equal(await page.evaluate(()=>VL1Paperwork.open()),true);
-  await page.route('**/paperwork/generated/VL1_A_en_v1.pdf',r=>r.fulfill({contentType:'application/pdf',body:'broken PDF'}));
+  await page.route('**/'+manifest.languages.en.files.A.path,r=>r.fulfill({contentType:'application/pdf',body:'broken PDF'}));
   assert.equal(await page.evaluate(()=>VL1Paperwork.download('A')),false);assert.match(await page.locator('#paperStatus').textContent(),/download failed/i);
-  await page.unroute('**/paperwork/generated/VL1_A_en_v1.pdf');
+  await page.unroute('**/'+manifest.languages.en.files.A.path);
   // Teacher demonstration does not have to be completed before material access.
   await page.click('#closePaperwork');await page.click('#teacherDemo');await page.fill('#initialObservation','Oil and water');await page.click('[data-next="2"]');await page.fill('#reason','Demo idea');
   const demoBefore=await snapshot();await page.click('#teacherButton');await page.click('#openPaperwork');await page.waitForFunction(()=>!document.querySelector('[data-paper-download="A"]').disabled);

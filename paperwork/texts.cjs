@@ -3,6 +3,7 @@ const labels={
   names:{zh:{A:'情境與原始探究設計',B:'實驗資料、分析與結論',C:'學習重點及反思',D:'教師指引、參考答案與評分準則',all:'完整教師列印套裝'},en:{A:'Context and original design',B:'Data, analysis and conclusions',C:'Key learning points and reflection',D:'Teacher guide, answers and scoring guide',all:'Complete teacher print pack'}},
   identity:['姓名：________________　班別及學號：________________','Name: ____________________   Class and student number: ____________________'],
   answer:['在方格內選擇答案。','Mark your answer in the boxes.'],multi:['可選多於一項。','You may choose more than one.'],single:['只選一項。','Choose one.'],
+  circle:['請圈出句子括號內的答案，每組只選一項。','Circle one answer in each set of brackets in the sentence.'],
   choices:['選項','Choices'],record:['你記錄的外觀','Your recorded appearance'],first:['第一次確認','First confirmed answer'],revision:['如有修訂，保留原答案並另記於此。','If you revise an answer, keep the first answer and write the change here.'],
   original:['教師保存這份原始設計後，才派發 B 冊；學生保留副本供反思參閱。','The teacher saves this original design before giving out Part B. Keep a copy to refer to during reflection.'],
   data:['觀察靜態圖，選擇並記錄外觀；圖像是本 VL 的預設結果。','Observe the static images, choose and record the appearances. The images show the preset results of this VL.'],

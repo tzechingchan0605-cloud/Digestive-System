@@ -13,6 +13,20 @@ for lang in ['zh', 'en']:
         doc = fitz.open(path)
         assert len(doc) == file['pages'], (lang, part, len(doc), file['pages'])
         text = unicodedata.normalize('NFKC', '\n'.join(page.get_text() for page in doc))
+        for index,page in enumerate(doc):
+            page_text=unicodedata.normalize('NFKC',page.get_text())
+            layout=file['layout'][index]
+            expected_identity=layout['part'] in ['A','C'] and layout['page']==1
+            assert bool(re.search(r'姓名\s*:|Name\s*:',page_text))==expected_identity,(lang,part,index+1,'identity')
+            assert all(lines==2 for lines in layout['writingLines'])
+            assert all(width>=1 for width in layout['clearSurfaceBorders'])
+            if layout['part']=='A' and layout['page']==2:
+                assert layout['circles']==2
+                assert '__________' not in page_text
+                assert ('請圈出' if lang=='zh' else 'Circle one answer') in page_text
+            if layout['part']=='B' and layout['page'] in [3,4]:
+                assert layout['circles']==(3 if layout['page']==3 else 1)
+                assert '__________' not in page_text
         assert '\ufffd' not in text
         assert all(abs(page.rect.width-595.28)<1 and abs(page.rect.height-841.89)<1 for page in doc)
         if part in ['A','B','C']:
@@ -49,4 +63,4 @@ doc=fitz.open(root / manifest['languages']['zh']['files']['B']['path'])
 page=doc[0]
 gray=page.get_pixmap(matrix=fitz.Matrix(1.5,1.5),colorspace=fitz.csGRAY)
 gray.save(output / 'zh-B-1-grayscale.png')
-print('PASS: ten valid A4 PDFs, page counts, selectable bilingual text, approved-only Chinese support, embedded fonts, student/teacher and stage separation; rendered PDF review pages and grayscale data sheet.')
+print('PASS: ten valid A4 PDFs, A/C first-page identities only, two writing lines, inline circle choices, clear liquid surfaces, selectable bilingual text, approved-only Chinese support, fonts and stage separation; actual PDF and grayscale review pages rendered.')
