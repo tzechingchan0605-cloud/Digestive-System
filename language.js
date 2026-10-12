@@ -13,9 +13,9 @@
     'assets/glycerol-structure.svg':'assets/glycerol-structure-en.svg?v=3',
     'assets/fatty-acids-structure.svg':'assets/fatty-acids-structure-en.svg?v=3'
   };
-  function text(value) {
+  function text(value, language=current) {
     const source = String(value ?? '');
-    if (current === 'zh') return source;
+    if (language === 'zh') return source;
     const [,before,content,after] = source.match(/^(\s*)([\s\S]*?)(\s*)$/);
     if (!content) return source;
     const catalog = window.VL1_TRANSLATIONS;
@@ -28,7 +28,7 @@
     }
     // Lists generated from canonical choices; free responses are excluded above.
     if (translated === undefined && /[、；]/.test(content)) {
-      const parts = content.split(/[、；]/), rendered = parts.map(part=>text(part));
+      const parts = content.split(/[、；]/), rendered = parts.map(part=>text(part,language));
       if (parts.every((part,i)=>rendered[i]!==part)) translated=rendered.join(content.includes('；')?'; ':', ');
     }
     return before + (translated ?? content) + after;

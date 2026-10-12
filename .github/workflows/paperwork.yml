@@ -1,0 +1,40 @@
+name: Paper worksheet consistency
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: sudo apt-get update && sudo apt-get install -y fonts-noto-cjk
+      - run: pip install PyMuPDF==1.26.6
+      - name: Check published source and PDF fingerprints
+        run: npm run paper:check
+      - name: Verify actual PDF contents
+        run: python tests/paperwork_pdf.py
+      - name: Teacher downloads and storage isolation
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 > /tmp/vl1-paper-server.log 2>&1 &
+          node tests/paperwork.cjs http://127.0.0.1:8000
+      - name: Regenerate PDFs from shared live questions
+        run: npm run paper:build
+      - name: Verify regenerated PDF contents
+        run: python tests/paperwork_pdf.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VL1-paper-materials
+          path: paperwork/generated/

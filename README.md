@@ -1,6 +1,6 @@
 # 未知消化液虛擬實驗室（VL1）
 
-四階段 IBL：了解情境 → 設計探究 → 四組基本實驗及兩組熱處理 → 結論、學習重點及反思。預設使用繁體中文，可切換至附部分中文詞彙支援的英文介面。使用 HTML、CSS、JavaScript，無需建置。學生不需 Google 登入；跨裝置收集使用 Google 試算表及 Apps Script 後端。
+四階段 IBL：了解情境 → 設計探究 → 四組基本實驗及兩組熱處理 → 結論、學習重點及反思。預設使用繁體中文，可切換至附部分中文詞彙支援的英文介面。網站使用 HTML、CSS、JavaScript；日常開啟無需建置，紙本材料更新時另有自動 PDF 產生步驟。學生不需 Google 登入；跨裝置收集使用 Google 試算表及 Apps Script 後端。
 
 ## 啟動
 
@@ -37,6 +37,12 @@ Excel 包含七張工作表：學生探究答案、六組觀察紀錄、教師�
 
 六項 SPS 各 4 分（24），反思新知識四項各 2 分（8），整體 32。十個人工欄有整數範圍驗證，總分公式另外檢查範圍；空白為待評，填 0 才是零分。學生完成反思且必要評分完整才顯示整體分數。評分準則是待研究者校準的活動 rubric 初稿，並非已驗證 SPSAI／CKT 量表。人工分數只存在教師保存的 Excel；重新匯出不會讀取之前填分，請另存已評檔案。
 
+## 紙本對照組工作紙
+
+教師儀表板新增「下載紙本對照組工作紙 PDF」，可直接預覽／下載繁中、英文的 A（情境與設計）、B（資料與結論）、C（學習與反思）、D（教師指引及答案）及完整套裝。學生材料 A–C 共 11 頁，D 另 7 頁；先保存原始設計，再派資料，原探究提交後才派學習與反思，教師答案不派學生。與現行 VL 共用題目、選項、提示與六組預設外觀；不寫入學生紀錄或 Excel。
+
+生成、列印頁碼、測試及研究安排見 [紙本材料說明](paperwork/README.md)。更新題目後執行 `npm run paper:build`，提交更新 PDF；`npm run paper:check` 及教師下載入口都會拒絕過期／不一致材料。
+
 ## 重要限制與舊版相容
 
 跨裝置收集設定見 [雲端收集設定](cloud/SETUP.md)。`cloud-config.js` 的 `endpoint` 未設定時只使用本機備份，介面會明確提示。Apps Script 第 2 版使用嵌入頁及 Google RPC 連線，避免直接跨來源讀取失敗；舊部署需依設定文件更新至新版本。設定後學生紀錄自動上傳，教師憑指定電郵及額外密碼讀取全班紀錄；匯出 Excel 前會重新載入雲端資料，失敗不下載部分紀錄。舊手機紀錄須在原瀏覽器重新開啟網站補傳；本機儲存已清除的答案不能復原。
@@ -63,6 +69,9 @@ node tests/layout.cjs
 node tests/learning.cjs
 node tests/language.cjs http://127.0.0.1:8000
 node tests/setup_save.cjs http://127.0.0.1:8000
+node tests/paperwork.cjs http://127.0.0.1:8000
+python3 tests/paperwork_pdf.py
+npm run paper:check
 python3 tests/excel_scores.py
 ```
 

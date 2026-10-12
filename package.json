@@ -1,0 +1,10 @@
+{
+  "name": "vl1-digestive-system",
+  "private": true,
+  "scripts": {
+    "paper:build": "node paperwork/build.cjs",
+    "paper:check": "node paperwork/build.cjs --check"
+  },
+  "devDependencies": {"playwright": "1.62.1"},
+  "engines": {"node": ">=20"}
+}

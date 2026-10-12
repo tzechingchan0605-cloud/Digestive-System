@@ -243,6 +243,7 @@ function submitInvestigation() {
 }
 function resetSession(profile=null) {
   cancelAnimations();clearTimeout(saveTimer);clearTimeout(toastTimer);sessionGeneration++;
+  window.VL1Paperwork?.close();
   state=freshState(profile);activeSince=Date.now();timingVisible=!document.hidden;previewRecord=null;
   FIELDS.forEach(id=>{const el=$('#'+id);el.value='';el.disabled=false;});
   $$('.phase button,.phase input,.phase select').forEach(el=>el.disabled=false);
@@ -294,6 +295,14 @@ async function printRecord(r) {
 }
 function restorePrint() {document.title=uiText(PAGE_TITLE);document.body.classList.remove('print-record');}
 window.addEventListener('afterprint',restorePrint);
+// Read-only curriculum content. Blank paper materials never read student state.
+window.VL1InquiryContent = () => copy({
+  moduleId:MODULE_ID,version:'VL1-ui3-paper1',fields:FIELDS,variableNames,variableGroups,expectedVariables,
+  assumptions,experiments,outcomeLabels,trialKeys,conclusionAnswers,
+  controlReference:CONTROL_REFERENCE,designReference:DESIGN_REFERENCE,limitReference:LIMIT_REFERENCE,
+  trials:trialKeys.map(key=>({key,label:trialLabel(key),outcome:experiments[key][0]})),
+  rubric:scoringWorkbook([]).rubric.rows.map(row=>row.map(cell=>typeof cell==='object'?cell.value:cell))
+});
 let dashboardGeneration=0;
 const cloudSync=createCloudSync({endpoint:window.VL1_CLOUD_CONFIG?.endpoint||'',transport:window.VL1_CLOUD_CONFIG?.transport||'auto',storage:localStorage,records:readLocalRecords,
   status:(kind,message)=>{for(const id of ['cloudStatus','loginCloudStatus']){$('#'+id).textContent=message;$('#'+id).dataset.state=kind;}for(const id of ['retryCloud','loginRetryCloud'])$('#'+id).hidden=!cloudSync.enabled||!['error','pending'].includes(kind);}});

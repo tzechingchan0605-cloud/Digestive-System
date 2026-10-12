@@ -1,0 +1,1022 @@
+{
+  "zh": {
+    "language": "zh",
+    "moduleId": "VL_BIO_DIGESTION_OPTION_A",
+    "version": "VL1-ui3-paper1",
+    "questionIds": [
+      "initialObservation",
+      "hypothesisLiquid",
+      "hypothesisOutcome",
+      "reason",
+      "controlPlan",
+      "setupDescription",
+      "q1",
+      "q2",
+      "q3",
+      "limitations",
+      "reflection"
+    ],
+    "title": "未知消化液 X 與 Y 對脂質的作用",
+    "context": "<div class=\"context-diagram\" role=\"img\" aria-label=\"人體消化系統提供兩種來源位置未明的未知消化液 X 和未知消化液 Y，兩者將加入油水試管測試\">\n              <div class=\"digestive-source\"><span class=\"diagram-label\">人體消化系統</span><img src=\"assets/digestive-system.png\" alt=\"人體消化系統\"></div>\n              <div class=\"source-flow\" aria-hidden=\"true\"><span></span><i>↓</i><span></span></div>\n              <div class=\"mystery-juices\"><figure><img src=\"assets/digestive-juice-x.png\" alt=\"盛有綠色未知消化液 X 的試管\"><figcaption>未知消化液 X</figcaption></figure><figure><img src=\"assets/digestive-juice-y.png\" alt=\"盛有粉紅色未知消化液 Y 的試管\"><figcaption>未知消化液 Y</figcaption></figure></div>\n              <div class=\"merge-arrows\" aria-hidden=\"true\"><span>↘</span><b>加入</b><span>↙</span></div>\n              <figure class=\"mystery-target\"><img src=\"assets/oil-water-tube.png\" alt=\"油層浮在水層上方的油水試管\"><figcaption>油 + 水試管　<strong>？</strong><br><small>加入消化液 X 和／或消化液 Y 後會怎樣？</small></figcaption></figure>\n            </div>",
+    "background": "我們日常飲食所攝取的脂質，分子結構龐大，無法直接穿過消化道壁細胞被人體吸收。",
+    "taskHeading": "研究任務",
+    "taskQuestion": "消化液 X 與 Y 如何影響油水混合物的外觀？",
+    "taskDescription": "研究員從消化道收集到消化液 X 和消化液 Y。試透過此虛擬實驗平台設計公平測試，找出它們的功能吧！",
+    "initialObservation": {
+      "id": "initialObservation",
+      "heading": "你的初步觀察",
+      "hint": "只描述圖中油+水試管的可見現象（暫不猜測 X、Y 的身分或實驗結果）。"
+    },
+    "hypothesis": {
+      "heading": "01 · 假說建立器",
+      "instruction": "完成你的預測",
+      "sentence": "若在油和水中加入 <span>__________</span>，試管中溶液的外觀將會 <span>__________</span>。",
+      "liquid": [
+        {
+          "id": "X",
+          "text": "消化液 X"
+        },
+        {
+          "id": "XY",
+          "text": "消化液 X + 消化液 Y"
+        },
+        {
+          "id": "Y",
+          "text": "消化液 Y"
+        }
+      ],
+      "outcome": [
+        {
+          "id": "clear",
+          "text": "變得清澈"
+        },
+        {
+          "id": "cloudy",
+          "text": "變得混濁"
+        },
+        {
+          "id": "separated",
+          "text": "無明顯變化"
+        }
+      ],
+      "reasonLabel": "我的理由（必答；沒有固定答案）"
+    },
+    "variables": {
+      "heading": "02 · 公平測試設計",
+      "groups": [
+        {
+          "id": "iv",
+          "label": "獨立變量",
+          "definition": "（主動改變的因素）"
+        },
+        {
+          "id": "dv",
+          "label": "因變量",
+          "definition": "（量度或觀察的結果）"
+        },
+        {
+          "id": "cv",
+          "label": "控制變量",
+          "definition": "（保持不變的因素）"
+        }
+      ],
+      "choices": [
+        {
+          "id": "油和水總體積",
+          "text": "油和水總體積"
+        },
+        {
+          "id": "反應溫度",
+          "text": "反應溫度"
+        },
+        {
+          "id": "反應時間",
+          "text": "反應時間"
+        },
+        {
+          "id": "加液總量",
+          "text": "加液總量"
+        },
+        {
+          "id": "搖勻方式",
+          "text": "搖勻方式"
+        },
+        {
+          "id": "混合物外觀",
+          "text": "混合物外觀"
+        },
+        {
+          "id": "消化液組合",
+          "text": "消化液組合"
+        }
+      ]
+    },
+    "assumptions": {
+      "heading": "03 · 實驗前提",
+      "question": "此探究的假設是什麼？",
+      "hint": "請選出所有適用的假設，可選多於一項。",
+      "choices": [
+        {
+          "id": "time",
+          "text": "各裝置在相同反應時間後觀察。"
+        },
+        {
+          "id": "volume",
+          "text": "各裝置起始油水量及加入液體的總量相同。"
+        },
+        {
+          "id": "mixing",
+          "text": "各裝置使用相同搖勻方式。"
+        },
+        {
+          "id": "more",
+          "text": "X＋Y 組可加入較多總液量，以便與其他組比較。"
+        }
+      ]
+    },
+    "control": {
+      "id": "controlPlan",
+      "heading": "04 · 探究的對照組",
+      "question": "你認為此實驗需要對照組嗎？如需要，你會如何設計比較裝置？",
+      "hint": "（提示：對照組主要功能是作為比較的基準，用來確認實驗中的改變是由獨立變量所引起，而非其他外在因素的干擾，因此對照組不包含獨立變量的處理條件）"
+    },
+    "design": {
+      "id": "setupDescription",
+      "heading": "05 · 實驗裝置設計",
+      "question": "繪畫並標示你的實驗裝置",
+      "instruction": "試參考實驗變量，繪畫並標示你的實驗裝置。",
+      "hint": "（提示：此實驗需要多少個裝置？實驗組和對照組分別是什麼？）",
+      "materials": "<div class=\"equipment-bank\"><figure class=\"equipment\"><img src=\"assets/oil-water-tube.png\" alt=\"油水試管\"><figcaption>油水試管 ×4</figcaption></figure><figure class=\"equipment\"><img src=\"assets/digestive-juice-x.png\" alt=\"消化液 X\"><figcaption>消化液 X ×1</figcaption></figure><figure class=\"equipment\"><img src=\"assets/digestive-juice-y.png\" alt=\"消化液 Y\"><figcaption>消化液 Y ×1</figcaption></figure><figure class=\"equipment\"><img src=\"assets/dropper.png\" alt=\"滴管\"><figcaption>滴管 ×4</figcaption></figure><figure class=\"equipment bath-equipment\"><img src=\"assets/water-bath-37c.png\" alt=\"37°C 水浴\"><figcaption>37°C 水浴 ×1</figcaption></figure></div>",
+      "writtenLabel": "文字設計（可代替繪圖）：描述四個裝置、加液量及固定條件。"
+    },
+    "basic": {
+      "heading": "進行探究與收集數據",
+      "instruction": "每次只改變一項因素；先建立未加熱的比較基準。",
+      "fair": "✦公平測試：油、水、溫度和時間已固定；本次只改變消化液組合。",
+      "observationPrompt": "根據你看到的現象，選擇外觀：",
+      "options": [
+        {
+          "id": "separated",
+          "text": "油水分層（沒有明顯可觀察變化）"
+        },
+        {
+          "id": "thin-oil",
+          "text": "油水分層（油層變薄）"
+        },
+        {
+          "id": "cloudy",
+          "text": "變得混濁"
+        },
+        {
+          "id": "clear",
+          "text": "變得清澈"
+        }
+      ],
+      "tableHeadings": [
+        "測試",
+        "實驗裝置",
+        "你記錄的外觀"
+      ]
+    },
+    "trials": [
+      {
+        "key": "none-none",
+        "label": "對照：加入 2 mL 水",
+        "outcome": "separated"
+      },
+      {
+        "key": "X-none",
+        "label": "加入 2 mL 消化液 X",
+        "outcome": "cloudy"
+      },
+      {
+        "key": "Y-none",
+        "label": "加入 2 mL 消化液 Y",
+        "outcome": "thin-oil"
+      },
+      {
+        "key": "XY-none",
+        "label": "加入各 1 mL 消化液 X、Y",
+        "outcome": "clear"
+      },
+      {
+        "key": "XY-X",
+        "label": "加入各 1 mL 消化液 X、Y（煮沸 X 後冷卻）",
+        "outcome": "clear"
+      },
+      {
+        "key": "XY-Y",
+        "label": "加入各 1 mL 消化液 X、Y（煮沸 Y 後冷卻）",
+        "outcome": "cloudy"
+      }
+    ],
+    "conclusions": {
+      "heading": "03 · 數據與推論",
+      "instruction": "根據你的數據完成結論",
+      "questions": [
+        {
+          "id": "q1",
+          "heading": "1. 消化液 X 有甚麼作用？",
+          "sentence": "消化液 X 最主要使脂質變成 <span class=\"paper-fill\">__________</span>。",
+          "options": [
+            {
+              "id": "clear",
+              "text": "清澈溶液"
+            },
+            {
+              "id": "cloudy",
+              "text": "混濁乳狀液"
+            }
+          ]
+        },
+        {
+          "id": "q3",
+          "heading": "2. 消化液 X 如何有助消化液 Y 作用？",
+          "sentence": "消化液 X 先把大油滴分散成小油滴，令總表面積 <span class=\"paper-fill\">__________</span>，有助消化液 Y 作用。",
+          "options": [
+            {
+              "id": "decrease",
+              "text": "減少"
+            },
+            {
+              "id": "increase",
+              "text": "增加"
+            }
+          ]
+        },
+        {
+          "id": "limitations",
+          "heading": "3. 本實驗能告訴我們甚麼？",
+          "sentence": "我們只觀察油層、混濁或清澈的外觀，沒有檢測消化產物。以下哪個說法最恰當？<span class=\"paper-fill\">__________</span>",
+          "options": [
+            {
+              "id": "indirect",
+              "text": "外觀可提供消化液作用的線索，但不能單獨證明已產生甘油和脂肪酸。"
+            },
+            {
+              "id": "proof",
+              "text": "只要混合物清澈，就已完全證明脂質分解成甘油和脂肪酸。"
+            }
+          ]
+        }
+      ]
+    },
+    "extension": {
+      "heading": "延伸探究：加熱對消化液的影響",
+      "question": "哪一種消化液受高溫影響？",
+      "instruction": "以「加入各 1 mL 消化液 X、消化液 Y」為比較基準，每次只煮沸其中一種消化液。完成兩項測試並記錄觀察。",
+      "options": [
+        {
+          "id": "cloudy",
+          "text": "變得混濁"
+        },
+        {
+          "id": "clear",
+          "text": "變得清澈"
+        }
+      ],
+      "tableHeadings": [
+        "測試",
+        "熱處理裝置",
+        "你記錄的外觀"
+      ],
+      "conclusion": {
+        "id": "q2",
+        "heading": "",
+        "sentence": "延伸結論：被煮沸後失去作用的消化液是<span class=\"paper-fill\">__________</span>。",
+        "options": [
+          {
+            "id": "X",
+            "text": "消化液 X"
+          },
+          {
+            "id": "Y",
+            "text": "消化液 Y"
+          }
+        ]
+      }
+    },
+    "learning": {
+      "heading": "學習重點",
+      "intro": "恭喜你！你已認識消化液 X、消化液 Y 的作用。",
+      "points": "<ol class=\"learning-points\"><li><strong>消化液 X 是<span class=\"learning-keyword\">膽汁</span>。</strong>它由肝臟製造並儲存於膽囊。膽汁不含任何消化酶，其作用是透過<span class=\"learning-keyword\">物理消化</span>把<span class=\"learning-keyword\">脂質乳化</span>成<span class=\"learning-keyword\">小油滴</span>，增加表面積提升後續化學消化的效率。</li><li><strong>消化液 Y 是<span class=\"learning-keyword\">脂肪酶</span>。</strong>它負責催化脂質進行<span class=\"learning-keyword\">化學消化</span>，將其<span class=\"learning-keyword\">分解為</span>分子更小的<span class=\"learning-keyword\">甘油</span>與<span class=\"learning-keyword\">脂肪酸</span>，以助吸收。而脂肪酶是蛋白質，高溫會使其<span class=\"learning-keyword\">變性</span>，失去功能。</li></ol>",
+      "physical": "<figure class=\"digestion-diagram physical-diagram\"><h4>01 · 物理消化：乳化，分子結構不變</h4><picture><img src=\"assets/emulsification.svg\" alt=\"膽汁把一個大油滴分散成九個小油滴；前後各有九個相同脂質分子符號，分子結構不變。\"></picture><figcaption>只改變油滴大小與分散程度，沒有把脂質分子分解；小油滴增加總表面積。圖示不按實際比例。</figcaption></figure>",
+      "chemical": "<figure class=\"digestion-diagram chemical-diagram\"><h4>02 · 化學消化：水解，形成不同的分子</h4>\n    <div class=\"chemical-flow\">\n      <div class=\"molecule-card reactant\"><strong>脂質：甘油三酯</strong><img src=\"assets/triglyceride-structure.svg\" alt=\"甘油骨架以三個酯鍵連接三條脂肪酸烴鏈，橙色標出水解的鍵。\"><span class=\"bond-key\">橙色鍵：水解的位置</span><span class=\"reaction-water\">＋ 3H₂O（水）</span></div>\n      <div class=\"reaction-step\"><strong>脂肪酶</strong><span class=\"reaction-arrow\" aria-hidden=\"true\"><svg viewBox=\"0 0 80 24\" aria-hidden=\"true\"><path d=\"M2 12H75m-12-9 12 9-12 9\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></svg></span><span>水解作用</span></div>\n      <div class=\"reaction-products\"><div class=\"molecule-card\"><strong>甘油</strong><img src=\"assets/glycerol-structure.svg\" alt=\"甘油 CH₂OH—CHOH—CH₂OH，有三個羥基。\"></div><span class=\"product-plus\" aria-hidden=\"true\">＋</span><div class=\"molecule-card\"><strong>3 個脂肪酸</strong><img src=\"assets/fatty-acids-structure.svg\" alt=\"三個分開的脂肪酸分子，分別為 R₁、R₂、R₃ 連接羧基 COOH。\"></div></div>\n    </div>\n    <p class=\"digestion-equation\">甘油三酯 ＋ 3H₂O <span class=\"equation-arrow\" role=\"img\" aria-label=\"經脂肪酶催化水解\"><svg viewBox=\"0 0 80 24\" aria-hidden=\"true\"><path d=\"M2 12H75m-12-9 12 9-12 9\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></svg></span> 甘油 ＋ 3 個脂肪酸</p>\n    <figcaption>R₁、R₂、R₃ 代表脂肪酸的烴鏈。水解改變化學鍵，形成甘油和脂肪酸；脂肪酶是催化劑，不會在反應中被消耗。本圖採課程常用的完全水解簡化模型。</figcaption>\n  </figure>",
+      "limit": "證據界限：本模擬以預設外觀呈現乳化與酶作用；清澈不等同直接檢出甘油或脂肪酸，也不能量化消化速度。實際實驗需其他化學檢測及重複測試。熱處理比較假定試劑煮沸後冷卻至相同反應溫度再使用。"
+    },
+    "reflection": {
+      "id": "reflection",
+      "question": "你的原始假說是否獲觀察結果支持？請引用具體比較，並運用學習重點修訂或完善解釋。",
+      "heading": "學習反思"
+    },
+    "reference": {
+      "variables": {
+        "iv": [
+          "消化液組合"
+        ],
+        "dv": [
+          "混合物外觀"
+        ],
+        "cv": [
+          "油和水總體積",
+          "反應溫度",
+          "反應時間",
+          "加液總量",
+          "搖勻方式"
+        ]
+      },
+      "assumptions": [
+        "time",
+        "volume",
+        "mixing"
+      ],
+      "conclusions": {
+        "q1": "cloudy",
+        "q3": "increase",
+        "limitations": "indirect",
+        "q2": "Y"
+      },
+      "control": "以油水＋2 mL 水作對照，與油水＋2 mL X、油水＋2 mL Y、油水＋各 1 mL X 和 Y 比較。保持起始油水量、加液總量、反應溫度、反應時間及搖勻方式相同。",
+      "design": "四個標示清楚的基本裝置，分別是對照、X、Y、X＋Y；熱處理另比較煮沸 X 或 Y 後冷卻至 37°C 的組合，每次只改變一項因素。",
+      "limit": "油層、混濁或清澈只提供外觀線索，不能單獨證明產生甘油和脂肪酸；需其他化學檢測。此模擬使用預設教學結果，沒有量度反應速度。",
+      "outcomes": {
+        "cloudy": "變得混濁",
+        "clear": "變得清澈",
+        "separated": "油水分層（沒有明顯變化）",
+        "thin-oil": "油水分層（油層變薄）"
+      },
+      "rubric": [
+        [
+          "類別／題目",
+          "最高分",
+          "評分方式",
+          "滿分準則",
+          "部分得分準則",
+          "零分／缺漏處理"
+        ],
+        [
+          "活動 rubric 初稿：待研究者校準",
+          32,
+          "研究說明",
+          "六項 SPS 各 4 分；新知識四項各 2 分。總分 32。",
+          "跨 VL 的題目、難度、機會與評分者一致性需校準。",
+          "不是已驗證量表；與 SPSAI／CKT 分開。紙本需提供相同問題與靜態資料。"
+        ],
+        [
+          "初步觀察",
+          2,
+          "人工",
+          "2：準確描述可見油水層及圖像細節，區分觀察與猜測。",
+          "1：有具體但不完整的描述。",
+          "0：無有效觀察；缺少舊版欄位保留待評，不捏造。"
+        ],
+        [
+          "六組外觀",
+          2,
+          "自動",
+          "六組均有確認答案；按符合預設外觀的組數／6×2，四捨五入至兩位小數。",
+          "部分符合參考外觀按比例得分。",
+          "已答但均不符合為 0；缺少組別顯示未提供，不以完成率當能力分數。"
+        ],
+        [
+          "獨立變量",
+          1,
+          "自動",
+          "只選消化液組合。",
+          "無部分分數。",
+          "有答案但不符為 0；未提供不補 0。"
+        ],
+        [
+          "因變量",
+          1,
+          "自動",
+          "只選混合物外觀。",
+          "無部分分數。",
+          "有答案但不符為 0；未提供不補 0。"
+        ],
+        [
+          "控制變量",
+          2,
+          "自動",
+          "五項固定條件全選，且無選錯。",
+          "選中正確控制變量數／5×2；選錯類別為 0。",
+          "舊版只問三項；不能以缺少新選項推斷原能力。跨版比較需另行校準。"
+        ],
+        [
+          "原始可測試假說與理由",
+          2,
+          "人工",
+          "2：具可比較條件、可觀察預測及合理理由。",
+          "1：可測試但理由或條件不完整。",
+          "0：不可測試或沒有合理內容；合理假說不因猜錯而扣分。沒有原始快照時待評。"
+        ],
+        [
+          "實驗前提",
+          1,
+          "自動",
+          "現版只選時間、起始油水及加液總量、搖勻方式三項；不選增加總加液量。",
+          "無部分分數。",
+          "有答案但不符為 0；舊版沒有此題為未提供。"
+        ],
+        [
+          "對照組",
+          1,
+          "人工",
+          "1：合理說明需要對照組的比較用途，提出不加消化液的比較裝置並保持條件相同。",
+          "此欄只填整數 0 或 1。",
+          "0：無有效對照用途說明或理由不合理；沒有此題則待評。"
+        ],
+        [
+          "裝置品質",
+          2,
+          "人工",
+          "2：圖／相片／文字清晰、四組標示、用量合理。",
+          "1：方案可操作但標示或用量不完整。",
+          "0：無可操作方案；不能因使用文字而扣分。"
+        ],
+        [
+          "固定條件與實驗安排",
+          2,
+          "人工",
+          "2：依設計與操作證據保持公平比較，熱處理冷卻後使用，每次只改變一因素。",
+          "1：基本合理但條件或熱處理安排不完整。",
+          "0：安排不能有效比較。六組完整性只作證據，不以完成率、點擊或用時直接換分。"
+        ],
+        [
+          "結論、比較及界限",
+          4,
+          "自動",
+          "現版三項推論（外觀、表面積、證據界限）及延伸結論各 1，共 4；歷史版按原六題權重（0.5、0.5、0.5、0.75、0.75、1）。",
+          "只按各題明確參考答案得分。",
+          "按紀錄版本檢查當時的全部題目；不要求現版回答已刪除題目，歷史缺題不補答案。"
+        ],
+        [
+          "資料與主張",
+          4,
+          "人工",
+          "4：清楚組織資料，引用至少兩組具體觀察，連結主張並說明界限。",
+          "3：完整比較但界限稍弱；2：有效比較但連結不足；1：僅單一相關描述。",
+          "0：無有效溝通。現版依假說理由、對照說明、裝置標示、數據表及反思的表達評分；歷史版另可用具體比較說明。評溝通清晰度，不重複評新知識。"
+        ],
+        [
+          "膽汁乳化與表面積",
+          2,
+          "人工：只看學習後反思",
+          "2：膽汁不含消化酶，乳化是物理作用，小油滴增加總表面積。",
+          "1：概念部分正確但解釋不完整。",
+          "0：沒有運用或概念錯誤；未提交反思不能當作零分。"
+        ],
+        [
+          "脂肪酶化學消化及產物",
+          2,
+          "人工：只看學習後反思",
+          "2：脂肪酶催化化學消化，形成甘油和脂肪酸。",
+          "1：酶作用或產物部分正確。",
+          "0：沒有運用或概念錯誤；不是關鍵字計分。"
+        ],
+        [
+          "高溫造成酶變性",
+          2,
+          "人工：只看學習後反思",
+          "2：把煮沸 Y 的觀察連結酶蛋白質變性及失去功能。",
+          "1：知道高溫影響但欠機理解釋。",
+          "0：沒有運用或概念錯誤。"
+        ],
+        [
+          "修訂原始解釋與數據",
+          2,
+          "人工：只看學習後反思",
+          "2：回應原始假說是否受支持，引用具體比較，運用概念修訂／完善並注意外觀界限。",
+          "1：有比較或修訂但連結不完整。",
+          "0：沒有有效修訂或數據連結。"
+        ],
+        [
+          "SPS、新知識及整體分數",
+          32,
+          "公式",
+          "六項 SPS=24；四項新知識=8。學生已提交反思且所有必要評分完整才顯示整體。",
+          "空白顯示待評；填 0 才是零分。教師欄只接受範圍內整數。",
+          "貼上超範圍或非整數也不會得到有效總分；評分欄沒有內容時勿填 0 代替待評。"
+        ],
+        [
+          "色彩、紀錄及人工分數保存",
+          0,
+          "說明",
+          "綠字正確／滿分、紅字錯誤／零分、橙字部分分數；底色區分題目與 SPS 類別。",
+          "原始、首次觀察、最後答案與完整事件分表；時間是可見頁面有效秒數。",
+          "人工分數只在此 Excel；另存檔保留，重新匯出不會帶入。學生 PDF 無分數。"
+        ]
+      ]
+    }
+  },
+  "en": {
+    "language": "en",
+    "moduleId": "VL_BIO_DIGESTION_OPTION_A",
+    "version": "VL1-ui3-paper1",
+    "questionIds": [
+      "initialObservation",
+      "hypothesisLiquid",
+      "hypothesisOutcome",
+      "reason",
+      "controlPlan",
+      "setupDescription",
+      "q1",
+      "q2",
+      "q3",
+      "limitations",
+      "reflection"
+    ],
+    "title": "Unknown Digestive Juices X and Y Their effects on lipids",
+    "context": "<div class=\"context-diagram\" role=\"img\" aria-label=\"Two unknown digestive juices, X and Y, come from unknown places in the human digestive system. They will be tested in oil–water test tubes.\">\n              <div class=\"digestive-source\"><span class=\"diagram-label\">Human digestive system</span><img src=\"assets/digestive-system.png\" alt=\"Human digestive system\"></div>\n              <div class=\"source-flow\" aria-hidden=\"true\"><span></span><i>↓</i><span></span></div>\n              <div class=\"mystery-juices\"><figure><img src=\"assets/digestive-juice-x.png\" alt=\"A test tube containing green unknown digestive juice X\"><figcaption>Unknown digestive juice X</figcaption></figure><figure><img src=\"assets/digestive-juice-y.png\" alt=\"A test tube containing pink unknown digestive juice Y\"><figcaption>Unknown digestive juice Y</figcaption></figure></div>\n              <div class=\"merge-arrows\" aria-hidden=\"true\"><span>↘</span><b>Add</b><span>↙</span></div>\n              <figure class=\"mystery-target\"><img src=\"assets/oil-water-tube.png\" alt=\"An oil–water test tube with an oil layer floating above the water layer\"><figcaption>Oil + water test tube　<strong>？</strong><br><small>What will happen after adding digestive juice X and/or Y?</small></figcaption></figure>\n            </div>",
+    "background": "Lipids in our food have large molecular structures. They cannot pass directly through the cells lining the digestive tract (消化道) to be absorbed.",
+    "taskHeading": "Research task",
+    "taskQuestion": "How do digestive juices X and Y affect the appearance of an oil–water mixture?",
+    "taskDescription": "Researchers have collected digestive juices X and Y from the digestive tract (消化道). Design a fair test in this virtual lab to discover their functions.",
+    "initialObservation": {
+      "id": "initialObservation",
+      "heading": "Your first observation",
+      "hint": "Describe only what you can see in the oil + water test tube (do not yet guess what X and Y are or what the results will be)."
+    },
+    "hypothesis": {
+      "heading": "01 · Write an idea to test",
+      "instruction": "Complete your prediction",
+      "sentence": "If I add <span>__________</span>to the oil and water, the mixture in the test tube will <span>__________</span>. ",
+      "liquid": [
+        {
+          "id": "X",
+          "text": "Digestive juice X"
+        },
+        {
+          "id": "XY",
+          "text": "Digestive juice X + digestive juice Y"
+        },
+        {
+          "id": "Y",
+          "text": "Digestive juice Y"
+        }
+      ],
+      "outcome": [
+        {
+          "id": "clear",
+          "text": "become clear"
+        },
+        {
+          "id": "cloudy",
+          "text": "become cloudy"
+        },
+        {
+          "id": "separated",
+          "text": "show no obvious change"
+        }
+      ],
+      "reasonLabel": "My reason (required; there is no single correct answer)"
+    },
+    "variables": {
+      "heading": "02 · Fair test design",
+      "groups": [
+        {
+          "id": "iv",
+          "label": "Independent variable",
+          "definition": "(the factor changed on purpose)"
+        },
+        {
+          "id": "dv",
+          "label": "Dependent variable",
+          "definition": "(the result you measure or observe)"
+        },
+        {
+          "id": "cv",
+          "label": "Controlled variables",
+          "definition": "(the factors kept the same)"
+        }
+      ],
+      "choices": [
+        {
+          "id": "油和水總體積",
+          "text": "Total volume of oil and water"
+        },
+        {
+          "id": "反應溫度",
+          "text": "Reaction temperature"
+        },
+        {
+          "id": "反應時間",
+          "text": "Reaction time"
+        },
+        {
+          "id": "加液總量",
+          "text": "Total volume of liquid added"
+        },
+        {
+          "id": "搖勻方式",
+          "text": "Method of shaking"
+        },
+        {
+          "id": "混合物外觀",
+          "text": "Appearance of the mixture"
+        },
+        {
+          "id": "消化液組合",
+          "text": "Combination of digestive juices"
+        }
+      ]
+    },
+    "assumptions": {
+      "heading": "03 · Conditions for a fair test",
+      "question": "Which conditions does this fair test need?",
+      "hint": "Choose all the conditions that apply. You may choose more than one.",
+      "choices": [
+        {
+          "id": "time",
+          "text": "Observe all setups after the same reaction time."
+        },
+        {
+          "id": "volume",
+          "text": "Use the same starting amounts of oil and water and the same total volume of added liquid in each setup."
+        },
+        {
+          "id": "mixing",
+          "text": "Use the same method of shaking for every setup."
+        },
+        {
+          "id": "more",
+          "text": "The X + Y group can have more liquid in total to compare it with the other groups."
+        }
+      ]
+    },
+    "control": {
+      "id": "controlPlan",
+      "heading": "04 · Control group",
+      "question": "Does this experiment need a control group? If so, how would you design the setups to compare?",
+      "hint": "(Hint: A control group provides a starting point for comparison. It helps you check that changes are caused by the independent variable, rather than other outside factors. The control group therefore does not receive the treatment being tested.)"
+    },
+    "design": {
+      "id": "setupDescription",
+      "heading": "05 · Experiment setup design",
+      "question": "Draw and label your setup",
+      "instruction": "Use your experimental variables to help you draw and label your setup.",
+      "hint": "(Hint: How many setups do you need? Which groups will you test and which is the control group?)",
+      "materials": "<div class=\"equipment-bank\"><figure class=\"equipment\"><img src=\"assets/oil-water-tube.png\" alt=\"Oil–water test tube\"><figcaption>Oil–water test tubes ×4</figcaption></figure><figure class=\"equipment\"><img src=\"assets/digestive-juice-x.png\" alt=\"Digestive juice X\"><figcaption>Digestive juice X ×1</figcaption></figure><figure class=\"equipment\"><img src=\"assets/digestive-juice-y.png\" alt=\"Digestive juice Y\"><figcaption>Digestive juice Y ×1</figcaption></figure><figure class=\"equipment\"><img src=\"assets/dropper.png\" alt=\"Dropper\"><figcaption>Droppers ×4</figcaption></figure><figure class=\"equipment bath-equipment\"><img src=\"assets/water-bath-37c.png\" alt=\"37°C water bath\"><figcaption>37°C water bath ×1</figcaption></figure></div>",
+      "writtenLabel": "Written design (can replace a drawing): describe the four setups, how much liquid you add and which conditions you keep the same."
+    },
+    "basic": {
+      "heading": "Carry out the investigation and collect data",
+      "instruction": "Change one factor at a time. First set up a group without heating to use for comparison.",
+      "fair": "✦Fair test: oil, water, temperature and time are fixed. Only the combination of digestive juices changes.",
+      "observationPrompt": "Select the appearance based on what you observe:",
+      "options": [
+        {
+          "id": "separated",
+          "text": "Separate oil and water layers (no clear change you can see)"
+        },
+        {
+          "id": "thin-oil",
+          "text": "Separate oil and water layers (thinner oil layer)"
+        },
+        {
+          "id": "cloudy",
+          "text": "become cloudy"
+        },
+        {
+          "id": "clear",
+          "text": "become clear"
+        }
+      ],
+      "tableHeadings": [
+        "Test",
+        "Setup",
+        "Appearance you recorded"
+      ]
+    },
+    "trials": [
+      {
+        "key": "none-none",
+        "label": "Control group: add 2 mL of water",
+        "outcome": "separated"
+      },
+      {
+        "key": "X-none",
+        "label": "Add 2 mL of digestive juice X",
+        "outcome": "cloudy"
+      },
+      {
+        "key": "Y-none",
+        "label": "Add 2 mL of digestive juice Y",
+        "outcome": "thin-oil"
+      },
+      {
+        "key": "XY-none",
+        "label": "Add 1 mL each of digestive juices X and Y",
+        "outcome": "clear"
+      },
+      {
+        "key": "XY-X",
+        "label": "Add 1 mL each of digestive juices X and Y (boil X, then cool)",
+        "outcome": "clear"
+      },
+      {
+        "key": "XY-Y",
+        "label": "Add 1 mL each of digestive juices X and Y (boil Y, then cool)",
+        "outcome": "cloudy"
+      }
+    ],
+    "conclusions": {
+      "heading": "03 · Data and explanations",
+      "instruction": "Complete the conclusions using your data",
+      "questions": [
+        {
+          "id": "q1",
+          "heading": "1. What does digestive juice X do?",
+          "sentence": "Digestive juice X mainly causes lipids to form <span class=\"paper-fill\">__________</span>. ",
+          "options": [
+            {
+              "id": "clear",
+              "text": "a clear solution"
+            },
+            {
+              "id": "cloudy",
+              "text": "a cloudy emulsion (乳狀液)"
+            }
+          ]
+        },
+        {
+          "id": "q3",
+          "heading": "2. How does digestive juice X help digestive juice Y act?",
+          "sentence": "Digestive juice X first breaks up large oil droplets into small droplets, causing their total surface area to <span class=\"paper-fill\">__________</span>, which helps digestive juice Y act.",
+          "options": [
+            {
+              "id": "decrease",
+              "text": "decrease"
+            },
+            {
+              "id": "increase",
+              "text": "increase"
+            }
+          ]
+        },
+        {
+          "id": "limitations",
+          "heading": "3. What can this experiment tell us?",
+          "sentence": "We only observed the oil layer and whether the mixture was cloudy or clear. We did not test for digestion products. Which statement fits best?<span class=\"paper-fill\">__________</span>",
+          "options": [
+            {
+              "id": "indirect",
+              "text": "Appearance provides clues about the effects of digestive juices, but alone cannot prove that glycerol (甘油) and fatty acids (脂肪酸) have formed."
+            },
+            {
+              "id": "proof",
+              "text": "A clear mixture completely proves that lipids have broken down into glycerol (甘油) and fatty acids (脂肪酸)."
+            }
+          ]
+        }
+      ]
+    },
+    "extension": {
+      "heading": "Extension: the effects of heating on digestive juices",
+      "question": "Which digestive juice is affected by high temperature?",
+      "instruction": "Use “add 1 mL each of digestive juices X and Y” as the group for comparison. Boil only one digestive juice at a time. Complete both tests and record your observations.",
+      "options": [
+        {
+          "id": "cloudy",
+          "text": "become cloudy"
+        },
+        {
+          "id": "clear",
+          "text": "become clear"
+        }
+      ],
+      "tableHeadings": [
+        "Test",
+        "Heat-treatment setup",
+        "Appearance you recorded"
+      ],
+      "conclusion": {
+        "id": "q2",
+        "heading": "",
+        "sentence": "Extension conclusion: the digestive juice that loses its function after boiling is<span class=\"paper-fill\">__________</span>. ",
+        "options": [
+          {
+            "id": "X",
+            "text": "Digestive juice X"
+          },
+          {
+            "id": "Y",
+            "text": "Digestive juice Y"
+          }
+        ]
+      }
+    },
+    "learning": {
+      "heading": "Key learning points",
+      "intro": "You have now explored the functions of digestive juices X and Y.",
+      "points": "<ol class=\"learning-points\"><li><strong>Digestive juice X is <span class=\"learning-keyword\">bile (膽汁)</span>. </strong>It is produced in the liver and stored in the gall bladder (膽囊). Bile (膽汁) contains no digestive enzymes. Through <span class=\"learning-keyword\">physical digestion (物理消化)</span>, it <span class=\"learning-keyword\">emulsifies lipids (乳化脂質)</span> into <span class=\"learning-keyword\">small oil droplets</span>, increasing their surface area so chemical digestion (化學消化) can work more efficiently.</li><li><strong>Digestive juice Y is <span class=\"learning-keyword\">lipase (脂肪酶)</span>. </strong>It catalyses the <span class=\"learning-keyword\">chemical digestion (化學消化)</span> of lipids, <span class=\"learning-keyword\">breaking them down into </span>smaller molecules of <span class=\"learning-keyword\">glycerol (甘油)</span> and <span class=\"learning-keyword\">fatty acids (脂肪酸)</span> to aid absorption. Lipase (脂肪酶) is a protein; high temperature causes <span class=\"learning-keyword\">denaturation</span>, so it loses its function.</li></ol>",
+      "physical": "<figure class=\"digestion-diagram physical-diagram\"><h4>01 · Physical digestion (物理消化): emulsification (乳化作用), with no change in molecular structure</h4><picture><img src=\"assets/emulsification-en.svg\" alt=\"Bile (膽汁) breaks up one large oil droplet into nine small droplets. The nine lipid symbols are the same before and after: their molecular structure does not change.\"></picture><figcaption>Only the size of the oil droplets and how spread out they are change; lipid molecules are not broken down. Small droplets increase the total surface area. The diagram does not show the real sizes.</figcaption></figure>",
+      "chemical": "<figure class=\"digestion-diagram chemical-diagram\"><h4>02 · Chemical digestion (化學消化): hydrolysis forms different molecules</h4>\n    <div class=\"chemical-flow\">\n      <div class=\"molecule-card reactant\"><strong>Lipid: triglyceride (甘油三酯)</strong><img src=\"assets/triglyceride-structure-en.svg\" alt=\"A glycerol (甘油) backbone joins three fatty-acid (脂肪酸) hydrocarbon chains through three ester bonds. Orange shows the bonds broken by hydrolysis.\"><span class=\"bond-key\">Orange bonds: where hydrolysis happens</span><span class=\"reaction-water\">+ 3H₂O (water)</span></div>\n      <div class=\"reaction-step\"><strong>lipase (脂肪酶)</strong><span class=\"reaction-arrow\" aria-hidden=\"true\"><svg viewBox=\"0 0 80 24\" aria-hidden=\"true\"><path d=\"M2 12H75m-12-9 12 9-12 9\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></svg></span><span>Hydrolysis</span></div>\n      <div class=\"reaction-products\"><div class=\"molecule-card\"><strong>glycerol (甘油)</strong><img src=\"assets/glycerol-structure-en.svg\" alt=\"Glycerol (甘油), CH₂OH—CHOH—CH₂OH, has three hydroxyl groups.\"></div><span class=\"product-plus\" aria-hidden=\"true\">＋</span><div class=\"molecule-card\"><strong>3 fatty acids (脂肪酸)</strong><img src=\"assets/fatty-acids-structure-en.svg\" alt=\"Three separate fatty-acid (脂肪酸) molecules: R₁, R₂ and R₃ each join a carboxyl group, COOH.\"></div></div>\n    </div>\n    <p class=\"digestion-equation\">Triglyceride (甘油三酯) + 3H₂O <span class=\"equation-arrow\" role=\"img\" aria-label=\"Hydrolysis catalysed by lipase (脂肪酶)\"><svg viewBox=\"0 0 80 24\" aria-hidden=\"true\"><path d=\"M2 12H75m-12-9 12 9-12 9\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></svg></span> Glycerol (甘油) + 3 fatty acids (脂肪酸)</p>\n    <figcaption>R₁, R₂ and R₃ show the hydrocarbon chains of fatty acids (脂肪酸). Hydrolysis changes chemical bonds to form glycerol (甘油) and fatty acids (脂肪酸). Lipase (脂肪酶) is a catalyst and is not used up in the reaction. This diagram uses the simple complete-hydrolysis model commonly taught in this course.</figcaption>\n  </figure>",
+      "limit": "What the evidence can tell us: this simulation uses set appearances to show emulsification (乳化作用) and enzyme action. A clear mixture does not directly show that glycerol (甘油) or fatty acids (脂肪酸) have formed, or measure digestion speed. Real experiments need other chemical tests and repeated tests. In the heating comparison, we assume that boiled liquids are cooled to the same reaction temperature before use."
+    },
+    "reflection": {
+      "id": "reflection",
+      "question": "Do your observations support your first idea to test? Name the groups you compared and what you saw. Use the key learning points to improve your explanation.",
+      "heading": "Learning reflection"
+    },
+    "reference": {
+      "variables": {
+        "iv": [
+          "消化液組合"
+        ],
+        "dv": [
+          "混合物外觀"
+        ],
+        "cv": [
+          "油和水總體積",
+          "反應溫度",
+          "反應時間",
+          "加液總量",
+          "搖勻方式"
+        ]
+      },
+      "assumptions": [
+        "time",
+        "volume",
+        "mixing"
+      ],
+      "conclusions": {
+        "q1": "cloudy",
+        "q3": "increase",
+        "limitations": "indirect",
+        "q2": "Y"
+      },
+      "control": "Use oil–water + 2 mL of water as the control group. Compare it with oil–water + 2 mL of X, + 2 mL of Y, and + 1 mL each of X and Y. Keep the initial amounts of oil and water, total added volume, reaction temperature, reaction time and shaking method the same.",
+      "design": "Clearly label the four basic setups: control, X, Y and X + Y. For heat treatment, compare combinations in which X or Y is boiled and then cooled to 37°C. Change one factor at a time.",
+      "limit": "An oil layer, a cloudy mixture or a clear mixture only gives clues about appearance. This alone cannot prove that glycerol (甘油) and fatty acids (脂肪酸) have formed; other chemical tests are needed. This simulation uses set teaching results and does not measure reaction speed.",
+      "outcomes": {
+        "cloudy": "become cloudy",
+        "clear": "become clear",
+        "separated": "Separate oil and water layers (no obvious change)",
+        "thin-oil": "Separate oil and water layers (thinner oil layer)"
+      },
+      "rubric": [
+        [
+          "類別／題目",
+          "最高分",
+          "評分方式",
+          "滿分準則",
+          "部分得分準則",
+          "零分／缺漏處理"
+        ],
+        [
+          "活動 rubric 初稿：待研究者校準",
+          32,
+          "研究說明",
+          "六項 SPS 各 4 分；新知識四項各 2 分。總分 32。",
+          "跨 VL 的題目、難度、機會與評分者一致性需校準。",
+          "不是已驗證量表；與 SPSAI／CKT 分開。紙本需提供相同問題與靜態資料。"
+        ],
+        [
+          "初步觀察",
+          2,
+          "人工",
+          "2：準確描述可見油水層及圖像細節，區分觀察與猜測。",
+          "1：有具體但不完整的描述。",
+          "0：無有效觀察；缺少舊版欄位保留待評，不捏造。"
+        ],
+        [
+          "六組外觀",
+          2,
+          "自動",
+          "六組均有確認答案；按符合預設外觀的組數／6×2，四捨五入至兩位小數。",
+          "部分符合參考外觀按比例得分。",
+          "已答但均不符合為 0；缺少組別顯示未提供，不以完成率當能力分數。"
+        ],
+        [
+          "獨立變量",
+          1,
+          "自動",
+          "只選消化液組合。",
+          "無部分分數。",
+          "有答案但不符為 0；未提供不補 0。"
+        ],
+        [
+          "因變量",
+          1,
+          "自動",
+          "只選混合物外觀。",
+          "無部分分數。",
+          "有答案但不符為 0；未提供不補 0。"
+        ],
+        [
+          "控制變量",
+          2,
+          "自動",
+          "五項固定條件全選，且無選錯。",
+          "選中正確控制變量數／5×2；選錯類別為 0。",
+          "舊版只問三項；不能以缺少新選項推斷原能力。跨版比較需另行校準。"
+        ],
+        [
+          "原始可測試假說與理由",
+          2,
+          "人工",
+          "2：具可比較條件、可觀察預測及合理理由。",
+          "1：可測試但理由或條件不完整。",
+          "0：不可測試或沒有合理內容；合理假說不因猜錯而扣分。沒有原始快照時待評。"
+        ],
+        [
+          "實驗前提",
+          1,
+          "自動",
+          "現版只選時間、起始油水及加液總量、搖勻方式三項；不選增加總加液量。",
+          "無部分分數。",
+          "有答案但不符為 0；舊版沒有此題為未提供。"
+        ],
+        [
+          "對照組",
+          1,
+          "人工",
+          "1：合理說明需要對照組的比較用途，提出不加消化液的比較裝置並保持條件相同。",
+          "此欄只填整數 0 或 1。",
+          "0：無有效對照用途說明或理由不合理；沒有此題則待評。"
+        ],
+        [
+          "裝置品質",
+          2,
+          "人工",
+          "2：圖／相片／文字清晰、四組標示、用量合理。",
+          "1：方案可操作但標示或用量不完整。",
+          "0：無可操作方案；不能因使用文字而扣分。"
+        ],
+        [
+          "固定條件與實驗安排",
+          2,
+          "人工",
+          "2：依設計與操作證據保持公平比較，熱處理冷卻後使用，每次只改變一因素。",
+          "1：基本合理但條件或熱處理安排不完整。",
+          "0：安排不能有效比較。六組完整性只作證據，不以完成率、點擊或用時直接換分。"
+        ],
+        [
+          "結論、比較及界限",
+          4,
+          "自動",
+          "現版三項推論（外觀、表面積、證據界限）及延伸結論各 1，共 4；歷史版按原六題權重（0.5、0.5、0.5、0.75、0.75、1）。",
+          "只按各題明確參考答案得分。",
+          "按紀錄版本檢查當時的全部題目；不要求現版回答已刪除題目，歷史缺題不補答案。"
+        ],
+        [
+          "資料與主張",
+          4,
+          "人工",
+          "4：清楚組織資料，引用至少兩組具體觀察，連結主張並說明界限。",
+          "3：完整比較但界限稍弱；2：有效比較但連結不足；1：僅單一相關描述。",
+          "0：無有效溝通。現版依假說理由、對照說明、裝置標示、數據表及反思的表達評分；歷史版另可用具體比較說明。評溝通清晰度，不重複評新知識。"
+        ],
+        [
+          "膽汁乳化與表面積",
+          2,
+          "人工：只看學習後反思",
+          "2：膽汁不含消化酶，乳化是物理作用，小油滴增加總表面積。",
+          "1：概念部分正確但解釋不完整。",
+          "0：沒有運用或概念錯誤；未提交反思不能當作零分。"
+        ],
+        [
+          "脂肪酶化學消化及產物",
+          2,
+          "人工：只看學習後反思",
+          "2：脂肪酶催化化學消化，形成甘油和脂肪酸。",
+          "1：酶作用或產物部分正確。",
+          "0：沒有運用或概念錯誤；不是關鍵字計分。"
+        ],
+        [
+          "高溫造成酶變性",
+          2,
+          "人工：只看學習後反思",
+          "2：把煮沸 Y 的觀察連結酶蛋白質變性及失去功能。",
+          "1：知道高溫影響但欠機理解釋。",
+          "0：沒有運用或概念錯誤。"
+        ],
+        [
+          "修訂原始解釋與數據",
+          2,
+          "人工：只看學習後反思",
+          "2：回應原始假說是否受支持，引用具體比較，運用概念修訂／完善並注意外觀界限。",
+          "1：有比較或修訂但連結不完整。",
+          "0：沒有有效修訂或數據連結。"
+        ],
+        [
+          "SPS、新知識及整體分數",
+          32,
+          "公式",
+          "六項 SPS=24；四項新知識=8。學生已提交反思且所有必要評分完整才顯示整體。",
+          "空白顯示待評；填 0 才是零分。教師欄只接受範圍內整數。",
+          "貼上超範圍或非整數也不會得到有效總分；評分欄沒有內容時勿填 0 代替待評。"
+        ],
+        [
+          "色彩、紀錄及人工分數保存",
+          0,
+          "說明",
+          "綠字正確／滿分、紅字錯誤／零分、橙字部分分數；底色區分題目與 SPS 類別。",
+          "原始、首次觀察、最後答案與完整事件分表；時間是可見頁面有效秒數。",
+          "人工分數只在此 Excel；另存檔保留，重新匯出不會帶入。學生 PDF 無分數。"
+        ]
+      ]
+    }
+  }
+}

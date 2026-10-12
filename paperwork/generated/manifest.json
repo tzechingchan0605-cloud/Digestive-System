@@ -1,0 +1,178 @@
+{
+  "module": "VL1",
+  "version": "VL1-ui3-paper1",
+  "materialVersion": 1,
+  "optionOrder": {
+    "assumptions": [
+      "time",
+      "more",
+      "volume",
+      "mixing"
+    ],
+    "conclusions": {
+      "q1": [
+        "clear",
+        "cloudy"
+      ],
+      "q3": [
+        "decrease",
+        "increase"
+      ],
+      "limitations": [
+        "indirect",
+        "proof"
+      ],
+      "q2": [
+        "X",
+        "Y"
+      ]
+    }
+  },
+  "sourceDigest": "47d8ed14a566a91e879f7a775ed34e47720b88bcadc9b024bc0dc5d70ce893e9",
+  "inputs": {
+    "app.js": "10560daf85bf62256454bac11e0545f365f310149236bb8f7f1a6c28d2a1bf55",
+    "assets/digestive-juice-x.png": "788dfe6a61aee4ab17cfbf72b187997097d4cfef572cf80e29e68a209f5e2e83",
+    "assets/digestive-juice-y.png": "71a0aa9d85f04b894681579cd820cf76505e5785786946b1532a6b2c4dd518a7",
+    "assets/digestive-system.png": "260ea92f580c0e1e11fad438f8621e49ed6397b792d2fce36cb8adb9f4d41732",
+    "assets/dropper.png": "12689d800e2be8c288967565e26df10cb036c094c7d8364cb7270a3ce48638f5",
+    "assets/emulsification-en.svg": "5ecb53be21121eaa15370336456b891cfeebf075922f775cf844022868e0c91e",
+    "assets/emulsification-mobile-en.svg": "40ac64f2f25f05f020d4ee7abfbba87597326dba28740977ee6ce6bd57c712c2",
+    "assets/emulsification-mobile.svg": "61aaa701371f515fa7c37529299a048438ba6c90fee289f0102fe58d5ec23040",
+    "assets/emulsification.svg": "5d7ead71d45f92ab53933f5b45d20335214ff78eaf43f8f174b47669224c1539",
+    "assets/fatty-acids-structure-en.svg": "8bbbff676cabaf94563c5cd505456373857db819e4210918ae0d40d30fe46d1c",
+    "assets/fatty-acids-structure.svg": "27c7a7aba9be0825ffd8469d0521fb007f82fff01c2fc90e31e43e5ebc961d76",
+    "assets/glycerol-structure-en.svg": "744a0d25c9a6698f7bc2708b5d0fdcab2f2ae3c1499aa54bfcb20f3fe0ecfdcb",
+    "assets/glycerol-structure.svg": "fc5fdf2f694cb10d3a43cac7dfa96b6ccd67e96ca5c3ddf525a7695b49c88213",
+    "assets/oil-water-tube.png": "9e43c77dc7f5c010f0ab9d1bf1a6bd90ba5f00b782045b039dff4785e87fca0c",
+    "assets/triglyceride-structure-en.svg": "58040a1537ef9988bfd1d5aa067764279d279fff78ebc097ad2f403b72bf2e78",
+    "assets/triglyceride-structure.svg": "088f4df5b388b0fd39a75997fb394791d18b3682364ecbe5a9154c4f6d8389b8",
+    "assets/water-bath-37c.png": "34d144f74a45b442924b5b17b91b22a1a5c558126b10ebf8c1817fcae35a9585",
+    "index.html": "49b15325bd5dceabe545d3acbca38510c78f532b17132ce09455a412c5b61497",
+    "language-dictionary.js": "b0db85513bdc2de4ce8cb1d5f29df6c1739d52141c45e30a5d936c4ebd3939bc",
+    "language.js": "94d6673411880ffa7891b4ca2ce67a9a37e0ccc51a68aeaa4da4e323df97dcad",
+    "package-lock.json": "2e3aec6c61939243a7a2835464ba0c0a9deab7cc11880fe54cba7ad4a35964e7",
+    "package.json": "d8c314d2fea2777e595944074154b21e7e5ce8f5fb595c7a729a909c8f86287f",
+    "paperwork/build.cjs": "317b8d3d52762d5f0025f80e243910246ba164e3bd29c90899008d8b1dd3d994",
+    "paperwork/fonts/NotoSansHK-paper.otf": "3c8efc3cc8230e83db791a705b99f49118fa2fdd39250fbbf7298bc418b714fe",
+    "paperwork/print.css": "c74f3ecbe6c4deade91e9da9a87f78af564b06f0aad3a78c5625a250a4e20560",
+    "paperwork/source.js": "9f8a82703c6f4743c66d3115202dfabdaf334c30d56aa439e69a85c75cbe306f",
+    "paperwork/texts.cjs": "7d2a5ed7a344c0833ef5c98c6dd8c270cbad449ecddcf9f53ab1c5fc980d0dcd",
+    "styles.css": "f145c04136d25d5020eef3add0af950cc73934bf39aeeab37933adf475ef6eaa"
+  },
+  "languages": {
+    "zh": {
+      "files": {
+        "A": {
+          "path": "paperwork/generated/VL1_A_zh_v1.pdf",
+          "name": "VL1_紙本對照組_A_情境與原始探究設計_繁中_v1.pdf",
+          "pages": 4,
+          "bytes": 754254,
+          "sha256": "eeff897c03f6dc8488498553390656f563c54e0859bb123e8134c9b5058e8ad5"
+        },
+        "B": {
+          "path": "paperwork/generated/VL1_B_zh_v1.pdf",
+          "name": "VL1_紙本對照組_B_實驗資料、分析與結論_繁中_v1.pdf",
+          "pages": 4,
+          "bytes": 286128,
+          "sha256": "83de12f4dc5b5eb2f3b9b37bebaeeb391516f656eca29e01d22434bc8c8cff6f"
+        },
+        "C": {
+          "path": "paperwork/generated/VL1_C_zh_v1.pdf",
+          "name": "VL1_紙本對照組_C_學習重點及反思_繁中_v1.pdf",
+          "pages": 3,
+          "bytes": 325013,
+          "sha256": "bc85561a28eb924a44aa00342d4ae961a970715a7e4ce1a63610d19dc12f832c"
+        },
+        "D": {
+          "path": "paperwork/generated/VL1_D_zh_v1.pdf",
+          "name": "VL1_紙本對照組_D_教師指引、參考答案與評分準則_繁中_v1.pdf",
+          "pages": 7,
+          "bytes": 262954,
+          "sha256": "553389ffda34ffdc23bf8ae51dd7f4bf0ee60cdf139b898be0ea938ddd820a0e"
+        },
+        "all": {
+          "path": "paperwork/generated/VL1_all_zh_v1.pdf",
+          "name": "VL1_紙本對照組_完整教師列印套裝_繁中_v1.pdf",
+          "pages": 18,
+          "bytes": 1269696,
+          "sha256": "3958fc58c5d05e5905bd968a7e0045cea2cdd03d24b3bd56c8d2bcb5092eb57f"
+        }
+      },
+      "ranges": {
+        "A": [
+          1,
+          4
+        ],
+        "B": [
+          5,
+          8
+        ],
+        "C": [
+          9,
+          11
+        ],
+        "D": [
+          12,
+          18
+        ]
+      }
+    },
+    "en": {
+      "files": {
+        "A": {
+          "path": "paperwork/generated/VL1_A_en_v1.pdf",
+          "name": "VL1_ControlGroup_A_EN_v1.pdf",
+          "pages": 4,
+          "bytes": 641351,
+          "sha256": "b6de643d651ae05e4167e9b936a55699288abc2cc8633a2efd7215266e028b3b"
+        },
+        "B": {
+          "path": "paperwork/generated/VL1_B_en_v1.pdf",
+          "name": "VL1_ControlGroup_B_EN_v1.pdf",
+          "pages": 4,
+          "bytes": 195385,
+          "sha256": "b775607dcdeb33c4fe85b6a38fbd35d6f190b35bdffc043073d71254578abc73"
+        },
+        "C": {
+          "path": "paperwork/generated/VL1_C_en_v1.pdf",
+          "name": "VL1_ControlGroup_C_EN_v1.pdf",
+          "pages": 3,
+          "bytes": 106389,
+          "sha256": "5bce5fea2bfb8711b43d105257b87089d0803b244b2d7b58d019101b6d44340b"
+        },
+        "D": {
+          "path": "paperwork/generated/VL1_D_en_v1.pdf",
+          "name": "VL1_ControlGroup_D_EN_v1.pdf",
+          "pages": 7,
+          "bytes": 78542,
+          "sha256": "f8df9b93d7366a719195368b93be67c88abd85599a711ad421cc0650cc448421"
+        },
+        "all": {
+          "path": "paperwork/generated/VL1_all_en_v1.pdf",
+          "name": "VL1_ControlGroup_CompleteTeacherPack_EN_v1.pdf",
+          "pages": 18,
+          "bytes": 927108,
+          "sha256": "253697f816c27cc7b06303a7caa6b918c99ab79fd8fdd69eeb3c5a8c5a7b3560"
+        }
+      },
+      "ranges": {
+        "A": [
+          1,
+          4
+        ],
+        "B": [
+          5,
+          8
+        ],
+        "C": [
+          9,
+          11
+        ],
+        "D": [
+          12,
+          18
+        ]
+      }
+    }
+  }
+}
