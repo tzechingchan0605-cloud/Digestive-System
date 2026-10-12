@@ -1,7 +1,7 @@
 {
   "module": "VL1",
   "version": "VL1-ui3-paper2",
-  "materialVersion": 3,
+  "materialVersion": 4,
   "optionOrder": {
     "assumptions": [
       "time",
@@ -52,9 +52,9 @@
     "language.js": "94d6673411880ffa7891b4ca2ce67a9a37e0ccc51a68aeaa4da4e323df97dcad",
     "package-lock.json": "2e3aec6c61939243a7a2835464ba0c0a9deab7cc11880fe54cba7ad4a35964e7",
     "package.json": "d8c314d2fea2777e595944074154b21e7e5ce8f5fb595c7a729a909c8f86287f",
-    "paperwork/build.cjs": "b287cc950a99bdf8659886cbc50555950023dc9d133f531a762a2f426791e1db",
+    "paperwork/build.cjs": "8b2342b7921f9954b1ce74ab71555fb821482696b0f1942c8e2ddedb3e7111c0",
     "paperwork/fonts/NotoSansHK-paper.otf": "a975387b0be89fbb635adf71fe2638c23d37dbf45209b3bcd9fec02659c8b7ce",
-    "paperwork/print.css": "1203bc1faf4594c198745d3e39a3eed08e297d092b6056c335607dad9155aae4",
+    "paperwork/print.css": "00db49386f19c4ed8fe356a26140287d0c23ae6583ac38f056c0c49413883a02",
     "paperwork/source.js": "0af17ba54dc9f1b68a7280caf8e1ddd6c298f5069926336d4b4070b7c3703f59",
     "paperwork/texts.cjs": "a3c8208074055dec09908b404af6bd6a65ae5bd9f91878529b07aca0916acf55",
     "styles.css": "f145c04136d25d5020eef3add0af950cc73934bf39aeeab37933adf475ef6eaa"
@@ -63,20 +63,21 @@
     "zh": {
       "files": {
         "A": {
-          "path": "paperwork/generated/VL1_A_zh_v3.pdf",
-          "name": "VL1_紙本對照組_A_情境與原始探究設計_繁中_v3.pdf",
+          "path": "paperwork/generated/VL1_A_zh_v4.pdf",
+          "name": "VL1_紙本對照組_A_情境與原始探究設計_繁中_v4.pdf",
           "pages": 3,
-          "bytes": 763652,
-          "sha256": "d47ae86c17844fa819d03a032ae3055562d999870deb89de2fae6b95bcf2ed92",
+          "bytes": 764037,
+          "sha256": "8f3505821ed96a2830cd39d2fcc8233a17b3af23e3c87978a1b83d915f822ff8",
           "layout": [
             {
               "part": "A",
               "page": 1,
               "identity": 1,
               "writingLines": [
+                2,
                 2
               ],
-              "circles": 0,
+              "circles": 2,
               "clearSurfaceBorders": []
             },
             {
@@ -86,7 +87,7 @@
               "writingLines": [
                 2
               ],
-              "circles": 2,
+              "circles": 0,
               "clearSurfaceBorders": []
             },
             {
@@ -94,7 +95,6 @@
               "page": 3,
               "identity": 0,
               "writingLines": [
-                2,
                 2
               ],
               "circles": 0,
@@ -103,11 +103,11 @@
           ]
         },
         "B": {
-          "path": "paperwork/generated/VL1_B_zh_v3.pdf",
-          "name": "VL1_紙本對照組_B_實驗資料、分析與結論_繁中_v3.pdf",
+          "path": "paperwork/generated/VL1_B_zh_v4.pdf",
+          "name": "VL1_紙本對照組_B_實驗資料、分析與結論_繁中_v4.pdf",
           "pages": 2,
-          "bytes": 207379,
-          "sha256": "7e9cda9074b7304d24a65f81d2c96711f70cbed73dd0fb2b20348e15f1278da5",
+          "bytes": 207617,
+          "sha256": "149892008ed55df76a3ed3029e9aeb1dc60f9c51053ffca47f088225362dfbec",
           "layout": [
             {
               "part": "B",
@@ -137,11 +137,11 @@
           ]
         },
         "C": {
-          "path": "paperwork/generated/VL1_C_zh_v3.pdf",
-          "name": "VL1_紙本對照組_C_學習重點及反思_繁中_v3.pdf",
+          "path": "paperwork/generated/VL1_C_zh_v4.pdf",
+          "name": "VL1_紙本對照組_C_學習重點及反思_繁中_v4.pdf",
           "pages": 2,
-          "bytes": 317372,
-          "sha256": "69982a1b3cac934e346d7f95d4a1dd08b90200f57b0c0c83727d2c7738eefa93",
+          "bytes": 317610,
+          "sha256": "6fae437542c9be86b40644a1e17b41c7c85bf9f142611f96764b0e05d205c80c",
           "layout": [
             {
               "part": "C",
@@ -164,11 +164,11 @@
           ]
         },
         "D": {
-          "path": "paperwork/generated/VL1_D_zh_v3.pdf",
-          "name": "VL1_紙本對照組_D_教師指引、參考答案與評分準則_繁中_v3.pdf",
+          "path": "paperwork/generated/VL1_D_zh_v4.pdf",
+          "name": "VL1_紙本對照組_D_教師指引、參考答案與評分準則_繁中_v4.pdf",
           "pages": 7,
-          "bytes": 263132,
-          "sha256": "8fe8b2830e39c92e8ceb163b39c95e80d89fc09a7067e74fe9f88806ed80b873",
+          "bytes": 263137,
+          "sha256": "50df3d7d6097b8e47207275da47b6654b180b77be09e3168c7c764f524dbf952",
           "layout": [
             {
               "part": "D",
@@ -229,20 +229,21 @@
           ]
         },
         "all": {
-          "path": "paperwork/generated/VL1_all_zh_v3.pdf",
-          "name": "VL1_紙本對照組_完整教師列印套裝_繁中_v3.pdf",
+          "path": "paperwork/generated/VL1_all_zh_v4.pdf",
+          "name": "VL1_紙本對照組_完整教師列印套裝_繁中_v4.pdf",
           "pages": 14,
-          "bytes": 1188048,
-          "sha256": "c6278e913cd42cd7dd6065039ff4869ee25dc522e0edc256e0adea062b8ca1e6",
+          "bytes": 1188437,
+          "sha256": "d61c498408ab219e60e7f12ac72172a1276954ed500b57e8d1fc98057954ec5e",
           "layout": [
             {
               "part": "A",
               "page": 1,
               "identity": 1,
               "writingLines": [
+                2,
                 2
               ],
-              "circles": 0,
+              "circles": 2,
               "clearSurfaceBorders": []
             },
             {
@@ -252,7 +253,7 @@
               "writingLines": [
                 2
               ],
-              "circles": 2,
+              "circles": 0,
               "clearSurfaceBorders": []
             },
             {
@@ -260,7 +261,6 @@
               "page": 3,
               "identity": 0,
               "writingLines": [
-                2,
                 2
               ],
               "circles": 0,
@@ -390,20 +390,21 @@
     "en": {
       "files": {
         "A": {
-          "path": "paperwork/generated/VL1_A_en_v3.pdf",
-          "name": "VL1_ControlGroup_A_EN_v3.pdf",
+          "path": "paperwork/generated/VL1_A_en_v4.pdf",
+          "name": "VL1_ControlGroup_A_EN_v4.pdf",
           "pages": 3,
-          "bytes": 638428,
-          "sha256": "f14093803eb03c8a5d852ac920412b9aa0888a0d87a389eff0fd601881c84c02",
+          "bytes": 639364,
+          "sha256": "5864e1573e26dd732ef5c39895825ccd17598d4c639bc533e20a49480f253dbe",
           "layout": [
             {
               "part": "A",
               "page": 1,
               "identity": 1,
               "writingLines": [
+                2,
                 2
               ],
-              "circles": 0,
+              "circles": 2,
               "clearSurfaceBorders": []
             },
             {
@@ -413,7 +414,7 @@
               "writingLines": [
                 2
               ],
-              "circles": 2,
+              "circles": 0,
               "clearSurfaceBorders": []
             },
             {
@@ -421,7 +422,6 @@
               "page": 3,
               "identity": 0,
               "writingLines": [
-                2,
                 2
               ],
               "circles": 0,
@@ -430,11 +430,11 @@
           ]
         },
         "B": {
-          "path": "paperwork/generated/VL1_B_en_v3.pdf",
-          "name": "VL1_ControlGroup_B_EN_v3.pdf",
+          "path": "paperwork/generated/VL1_B_en_v4.pdf",
+          "name": "VL1_ControlGroup_B_EN_v4.pdf",
           "pages": 2,
-          "bytes": 114774,
-          "sha256": "bf9ab4c71368b8ef7dd493cd47b09ecb11b7956b16e0ca8e4b53fab86bea9223",
+          "bytes": 115018,
+          "sha256": "f507cdbfc229c06d5c9094bbac02142e81a09b6ec11b7ee9c0573dceedceb831",
           "layout": [
             {
               "part": "B",
@@ -464,11 +464,11 @@
           ]
         },
         "C": {
-          "path": "paperwork/generated/VL1_C_en_v3.pdf",
-          "name": "VL1_ControlGroup_C_EN_v3.pdf",
+          "path": "paperwork/generated/VL1_C_en_v4.pdf",
+          "name": "VL1_ControlGroup_C_EN_v4.pdf",
           "pages": 2,
-          "bytes": 97387,
-          "sha256": "2f8b71b5199de36a5f9e90e162305abd07203832e767711d15ed108943afd215",
+          "bytes": 97641,
+          "sha256": "42415da97b6ce9cfb83784c88d7ae4085265c68d5fa65c44b869e9c1b6ad6453",
           "layout": [
             {
               "part": "C",
@@ -491,11 +491,11 @@
           ]
         },
         "D": {
-          "path": "paperwork/generated/VL1_D_en_v3.pdf",
-          "name": "VL1_ControlGroup_D_EN_v3.pdf",
+          "path": "paperwork/generated/VL1_D_en_v4.pdf",
+          "name": "VL1_ControlGroup_D_EN_v4.pdf",
           "pages": 7,
-          "bytes": 78853,
-          "sha256": "929accc84adc8c8b1af13f3f3463adf7ac3d373abfb8197c4955004fe2d8739e",
+          "bytes": 78857,
+          "sha256": "ac1390c90befc1e9db0e6bca05bebcc8c2cf89c79bd741bf43b1af892747c5ef",
           "layout": [
             {
               "part": "D",
@@ -556,20 +556,21 @@
           ]
         },
         "all": {
-          "path": "paperwork/generated/VL1_all_en_v3.pdf",
-          "name": "VL1_ControlGroup_CompleteTeacherPack_EN_v3.pdf",
+          "path": "paperwork/generated/VL1_all_en_v4.pdf",
+          "name": "VL1_ControlGroup_CompleteTeacherPack_EN_v4.pdf",
           "pages": 14,
-          "bytes": 835522,
-          "sha256": "878d8d2e70da6c9cd14c2b6dd2bf087e9fed776a9c8c1be48c5194962f7bab3a",
+          "bytes": 836461,
+          "sha256": "735fa1084a9515c8938c3c06b98fcc7902043e76a41ef259201f25209ecb9714",
           "layout": [
             {
               "part": "A",
               "page": 1,
               "identity": 1,
               "writingLines": [
+                2,
                 2
               ],
-              "circles": 0,
+              "circles": 2,
               "clearSurfaceBorders": []
             },
             {
@@ -579,7 +580,7 @@
               "writingLines": [
                 2
               ],
-              "circles": 2,
+              "circles": 0,
               "clearSurfaceBorders": []
             },
             {
@@ -587,7 +588,6 @@
               "page": 3,
               "identity": 0,
               "writingLines": [
-                2,
                 2
               ],
               "circles": 0,

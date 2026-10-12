@@ -5,7 +5,7 @@ const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),
 const {chromium}=require('playwright');
 const {labels,rubricEn}=require('./texts.cjs');
 const root=path.resolve(__dirname,'..'),out=path.join(__dirname,'generated');
-const MATERIAL_VERSION=3;
+const MATERIAL_VERSION=4;
 const inputs=['package.json','package-lock.json','index.html','app.js','language.js','language-dictionary.js','styles.css','paperwork/fonts/NotoSansHK-paper.otf','paperwork/source.js','paperwork/print.css','paperwork/texts.cjs','paperwork/build.cjs',...fs.readdirSync(path.join(root,'assets')).filter(n=>/\.(svg|png)$/.test(n)).map(n=>'assets/'+n)].sort();
 const sha=data=>crypto.createHash('sha256').update(data).digest('hex');
 const fingerprints=()=>Object.fromEntries(inputs.map(name=>[name,sha(fs.readFileSync(path.join(root,name)))]));
@@ -27,8 +27,8 @@ function generate(model,lang){
   const choices=(items,multi=false,extra='')=>`${extra==='variable'?'':`<p class="hint">${s(multi?'multi':'single')}</p>`}<div class="choices ${extra}">${items.map(o=>`<span class="choice"><span class="checkbox"></span><span>${esc(o.text)}</span></span>`).join('')}</div>`;
   const question=q=>`<section class="question" data-question="${q.id}">${q.heading?`<h3>${esc(q.heading)}</h3>`:''}<p>${circleSentence(q.sentence,[q.options])}</p>${hint(s('circle'))}</section>`;
   const pages={A:[],B:[],C:[],D:[]},add=(part,body)=>pages[part].push(body);
-  add('A',`<h1>${esc(model.title)}</h1><div class="two-cols"><div>${model.context}</div><div class="context-copy"><h3>${lang==='zh'?'研究背景':'Research background'}</h3><p>${esc(model.background)}</p><h3>${esc(model.taskHeading)}</h3><strong>${esc(model.taskQuestion)}</strong><p>${esc(model.taskDescription)}</p></div></div>${card(model.initialObservation.heading,`<p>${esc(model.initialObservation.hint)}</p>${ruled()}`)}`);
-  add('A',card(model.hypothesis.heading,`<h3>${esc(model.hypothesis.instruction)}</h3><p class="circle-sentence">${circleSentence(model.hypothesis.sentence,[model.hypothesis.liquid,model.hypothesis.outcome])}</p>${hint(s('circle'))}<p>${esc(model.hypothesis.reasonLabel)}</p>${ruled()}`)+card(model.variables.heading,hint(s('multi'))+model.variables.groups.map(g=>`<h3>${esc(g.label)} <span class="hint">${esc(g.definition)}</span></h3>${choices(model.variables.choices,true,'variable')}`).join('')));
+  add('A',`<h1>${esc(model.title)}</h1><div class="two-cols"><div>${model.context}</div><div class="context-copy"><h3>${lang==='zh'?'研究背景':'Research background'}</h3><p>${esc(model.background)}</p><h3>${esc(model.taskHeading)}</h3><strong>${esc(model.taskQuestion)}</strong><p>${esc(model.taskDescription)}</p>${card(model.initialObservation.heading,`<p>${esc(model.initialObservation.hint)}</p>${ruled()}`)}</div></div>`);
+  add('A',card(model.hypothesis.heading,`<h3>${esc(model.hypothesis.instruction)}</h3><p class="circle-sentence">${circleSentence(model.hypothesis.sentence,[model.hypothesis.liquid,model.hypothesis.outcome])}</p>${hint(s('circle'))}<p>${esc(model.hypothesis.reasonLabel)}</p>${ruled()}`)+card(model.variables.heading,hint(s('multi'))+`<div class="variable-groups">${model.variables.groups.map(g=>`<section><h3>${esc(g.label)} <span class="hint">${esc(g.definition)}</span></h3>${choices(model.variables.choices,true,'variable')}</section>`).join('')}</div>`));
   add('A',card(model.assumptions.heading,`<h3>${esc(model.assumptions.question)}</h3>${hint(model.assumptions.reminder)}<p>${esc(model.assumptions.hint)}</p>${choices(['time','more','volume','mixing'].map(id=>model.assumptions.choices.find(o=>o.id===id)),true)}`)+card(model.control.heading,`<h3>${esc(model.control.question)}</h3>${hint(model.control.hint)}${ruled()}`)+hint(s('original')));
   add('A',card(model.design.heading,`<h3>${esc(model.design.question)}</h3><p>${esc(model.design.instruction)}</p>${hint(model.design.hint)}${model.design.materials}${hint(model.design.reminder)}<div class="drawbox"></div><p>${esc(model.design.writtenLabel)}</p>${ruled()}`)+hint(s('original')));
   const results=trials=>`<div class="two-cols">${trials.map(trial=>`<section class="card result-card" data-trial="${trial.key}"><div class="result-label">${esc(trial.label)}</div><div class="test-tube ${trial.outcome}"><div class="tube-liquid"><div class="result-oil"></div></div></div></section>`).join('')}</div>`;
@@ -53,7 +53,8 @@ function generate(model,lang){
   const columns=lang==='zh'?labels.headingRubric:labels.headingRubricEn;
   for(let i=0;i<rubric.length;i+=5)add('D',`<div class="teacher-only">${s('teacher')}</div><h1>${lang==='zh'?'評分準則':'Scoring guide'}</h1>${hint(s('draft'))}<table class="rubric"><thead><tr>${columns.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${rubric.slice(i,i+5).map(row=>`<tr>${row.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>${hint(s('pending'))}`);
   // Keep every question and option while combining the requested old pages.
-  pages.A.splice(2,2,`<div class="merged-design">${pages.A[2]}${pages.A[3]}</div>`);
+  pages.A.splice(0,2,`<div class="merged-intro">${pages.A[0]}${pages.A[1]}</div>`);
+  pages.A[2]=`<div class="drawing-page">${pages.A[2]}</div>`;
   pages.B.splice(0,4,`<div class="merged-basic">${pages.B[0]}${pages.B[1]}</div>`,`<div class="merged-analysis">${pages.B[2]}${pages.B[3]}</div>`);
   pages.C.splice(0,2,`<div class="merged-learning">${hint(s('learning'))}<h1>${esc(model.learning.heading)}</h1><h3>${esc(model.learning.intro)}</h3><div class="learning-top">${model.learning.points}${model.learning.physical}</div>${model.learning.chemical}${card(lang==='zh'?'證據界限':'What the evidence can tell us',`<p>${esc(model.learning.limit)}</p>`)}</div>`);
   return {pages,title,s};
@@ -96,7 +97,9 @@ async function main(){
         const parts=part==='all'?['A','B','C','D']:[part];
         const html=documentHTML(parts,generated,lang,base,model);
         await page.setContent(html);await page.evaluate(()=>document.fonts.ready);await page.waitForFunction(()=>[...document.images].every(i=>i.complete&&i.naturalWidth>0));
-        const overflow=await page.locator('.sheet-body').evaluateAll(els=>els.map((el,i)=>({page:i+1,height:el.scrollHeight,limit:el.clientHeight,width:el.scrollWidth,allowedWidth:el.clientWidth})).filter(p=>p.height>p.limit+2||p.width>p.allowedWidth+2));
+        const overflow=await page.locator('.sheet-body').evaluateAll(els=>els.map((el,i)=>({page:i+1,height:el.scrollHeight,limit:el.clientHeight,width:el.scrollWidth,allowedWidth:el.clientWidth,
+          bottom:Math.max(...[...el.querySelectorAll('*')].map(child=>child.getBoundingClientRect().bottom)),footer:el.closest('.sheet').querySelector('.page-footer').getBoundingClientRect().top
+        })).filter(p=>p.height>p.limit+2||p.width>p.allowedWidth+2||p.bottom>p.footer-4));
         if(overflow.length)throw new Error(`${lang}/${part} page overflow: ${JSON.stringify(overflow)}`);
         const layout=await page.locator('.sheet').evaluateAll(sheets=>sheets.map(sheet=>({part:sheet.dataset.part,page:Number(sheet.dataset.page),identity:sheet.querySelectorAll('.identity').length,writingLines:[...sheet.querySelectorAll('.ruled')].map(el=>el.querySelectorAll('.writing-line').length),circles:sheet.querySelectorAll('.circle-options').length,clearSurfaceBorders:[...sheet.querySelectorAll('.test-tube.clear .tube-liquid')].map(el=>parseFloat(getComputedStyle(el).borderTopWidth))})));
         if(layout.some(p=>p.identity!==(p.page===1&&['A','C'].includes(p.part)?1:0)||p.writingLines.some(n=>n!==2)))throw new Error('Identity or two-line layout rule failed');

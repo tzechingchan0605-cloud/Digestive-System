@@ -32,13 +32,35 @@ for lang in ['zh', 'en']:
             assert all(lines==2 for lines in layout['writingLines'])
             assert all(width>=1 for width in layout['clearSurfaceBorders'])
             context=(lang,part,index+1)
-            if layout['part']=='A' and layout['page']==3:
-                require_text(page_text, [model['assumptions']['heading'],model['assumptions']['question'],model['assumptions']['reminder'],
-                    model['control']['heading'],model['control']['question'],model['control']['hint'],
-                    model['design']['heading'],model['design']['question'],model['design']['instruction'],
-                    model['design']['hint'],model['design']['reminder'],model['design']['writtenLabel']]
-                    +[o['text'] for o in model['assumptions']['choices']], context)
+            if layout['part']=='A' and layout['page']==1:
+                require_text(page_text, [model['title'],model['background'],model['taskHeading'],model['taskQuestion'],model['taskDescription'],
+                    model['initialObservation']['heading'],model['initialObservation']['hint'],model['hypothesis']['heading'],
+                    model['hypothesis']['instruction'],model['hypothesis']['reasonLabel'],model['variables']['heading']]
+                    +[o['text'] for o in model['hypothesis']['liquid']+model['hypothesis']['outcome']]
+                    +[g[key] for g in model['variables']['groups'] for key in ['label','definition']]
+                    +[o['text'] for o in model['variables']['choices']]
+                    +re.findall(r'<figcaption[^>]*>(.*?)</figcaption>',model['context'],re.S), context)
+                for option in model['variables']['choices']:
+                    assert compact(page_text).count(compact(option['text']))==3,(*context,'missing repeated variable option',option['id'])
                 assert layout['writingLines']==[2,2]
+                assert layout['circles']==2
+                assert len(re.findall(r'_{10,}',page_text))==2, (*context,'only identity fields may use underscores')
+                assert ('請圈出' if lang=='zh' else 'Circle one answer') in page_text
+            if layout['part']=='A' and layout['page']==2:
+                require_text(page_text, [model['assumptions']['heading'],model['assumptions']['question'],model['assumptions']['reminder'],
+                    model['control']['heading'],model['control']['question'],model['control']['hint']]
+                    +[o['text'] for o in model['assumptions']['choices']], context)
+                assert layout['writingLines']==[2]
+            if layout['part']=='A' and layout['page']==3:
+                require_text(page_text, [model['design']['heading'],model['design']['question'],model['design']['instruction'],
+                    model['design']['hint'],model['design']['reminder'],model['design']['writtenLabel']]
+                    +re.findall(r'<figcaption[^>]*>(.*?)</figcaption>',model['design']['materials'],re.S), context)
+                assert layout['writingLines']==[2]
+                # Inspect the real PDF vector rectangle, not just template CSS.
+                assert any(d['type']=='s' and len(d['items'])==1 and d['items'][0][0]=='re'
+                    and d['rect'].width>=160*72/25.4 and d['rect'].height>=130*72/25.4
+                    for d in page.get_drawings()), (*context,'drawing box must be at least 160 × 130 mm')
+                assert model['assumptions']['heading'] not in page_text and model['control']['heading'] not in page_text
             if layout['part']=='B' and layout['page']==1:
                 require_text(page_text, [model['basic']['heading'],model['basic']['instruction'],model['basic']['fair'],model['basic']['observationPrompt']]
                     +[t['label'] for t in model['trials'] if t['key'].endswith('-none')]
@@ -58,10 +80,6 @@ for lang in ['zh', 'en']:
             if layout['part']=='C' and layout['page']==2:
                 require_text(page_text,[model['reflection']['heading'],model['reflection']['question']], context)
                 assert layout['writingLines']==[2]
-            if layout['part']=='A' and layout['page']==2:
-                assert layout['circles']==2
-                assert '__________' not in page_text
-                assert ('請圈出' if lang=='zh' else 'Circle one answer') in page_text
             if layout['part']=='B' and layout['page']==2:
                 assert layout['circles']==4
                 assert '__________' not in page_text
@@ -103,4 +121,4 @@ doc=fitz.open(root / manifest['languages']['zh']['files']['B']['path'])
 page=doc[0]
 gray=page.get_pixmap(matrix=fitz.Matrix(1.5,1.5),colorspace=fitz.csGRAY)
 gray.save(output / 'zh-B-1-grayscale.png')
-print('PASS: ten valid A4 PDFs (A3/B2/C2/D7, full pack14), all merged questions/options/hints/data preserved, A/C first-page identities only, two writing lines, inline circle choices, clear liquid surfaces, selectable bilingual text, approved-only Chinese support, fonts and stage separation; actual PDF and grayscale review pages rendered.')
+print('PASS: ten valid A4 PDFs (A3/B2/C2/D7, full pack14), merged context/hypothesis/all 21 variable choices on A1, separate assumptions/control A2 and large drawing A3, all questions/options/hints/data preserved, A/C first-page identities only, two writing lines, inline circle choices, clear liquid surfaces, selectable bilingual text, approved-only Chinese support, fonts and stage separation; actual PDF and grayscale review pages rendered.')
