@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@400;500;600;700;800&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=6" />
+    <link rel="stylesheet" href="styles.css?v=7" />
   </head>
   <body>
     <button type="button" id="languageSwitch" class="language-switch" data-language-switch>切換至英文</button>
@@ -101,7 +101,7 @@
     <div class="chemical-flow">
       <div class="molecule-card reactant"><strong>脂質：甘油三酯</strong><img src="assets/triglyceride-structure.svg" alt="甘油骨架以三個酯鍵連接三條脂肪酸烴鏈，橙色標出水解的鍵。"><span class="bond-key">橙色鍵：水解的位置</span><span class="reaction-water">＋ 3H₂O（水）</span></div>
       <div class="reaction-step"><strong>脂肪酶</strong><span class="reaction-arrow" aria-hidden="true"><svg viewBox="0 0 80 24" aria-hidden="true"><path d="M2 12H75m-12-9 12 9-12 9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>水解作用</span></div>
-      <div class="reaction-products"><div class="molecule-card"><strong>甘油</strong><img src="assets/glycerol-structure.svg" alt="甘油 CH₂OH—CHOH—CH₂OH，有三個羥基。"></div><span class="product-plus" aria-hidden="true">＋</span><div class="molecule-card"><strong>3 個脂肪酸</strong><img src="assets/fatty-acids-structure.svg" alt="三個分開的脂肪酸分子，分別為 R₁、R₂、R₃ 連接羧基 COOH。"></div></div>
+      <div class="reaction-products"><div class="molecule-card"><strong>甘油</strong><img src="assets/glycerol-structure.svg?v=2" alt="甘油 CH₂OH—CHOH—CH₂OH，有三個羥基。"></div><span class="product-plus" aria-hidden="true">＋</span><div class="molecule-card fatty-acids"><strong>3 個脂肪酸</strong><img src="assets/fatty-acids-structure.svg?v=2" alt="三個分開的脂肪酸分子，分別為 R₁、R₂、R₃ 連接羧基 COOH。"></div></div>
     </div>
     <p class="digestion-equation">甘油三酯 ＋ 3H₂O <span class="equation-arrow" role="img" aria-label="經脂肪酶催化水解"><svg viewBox="0 0 80 24" aria-hidden="true"><path d="M2 12H75m-12-9 12 9-12 9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span> 甘油 ＋ 3 個脂肪酸</p>
     <figcaption>R₁、R₂、R₃ 代表脂肪酸的烴鏈。水解改變化學鍵，形成甘油和脂肪酸；脂肪酶是催化劑，不會在反應中被消耗。本圖採課程常用的完全水解簡化模型。</figcaption>
@@ -119,9 +119,9 @@
     <script src="cloud-bridge.js?v=3"></script>
     <script src="cloud-sync.js?v=3"></script>
     <script src="language-dictionary.js?v=7"></script>
-    <script src="language.js?v=4"></script>
+    <script src="language.js?v=5"></script>
     <script src="app.js?v=8"></script>
-    <script src="paperwork/source.js?v=2"></script>
+    <script src="paperwork/source.js?v=3"></script>
     <script src="paperwork/client.js?v=1"></script>
   </body>
 </html>

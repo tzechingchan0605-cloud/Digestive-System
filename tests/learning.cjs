@@ -10,8 +10,8 @@ const assert=require('node:assert/strict');
  await page.route('https://fonts.googleapis.com/**',r=>r.abort());await page.route('https://fonts.gstatic.com/**',r=>r.abort());await page.goto(process.argv[2]||'http://127.0.0.1:8000');
  await page.fill('#profileName','圖解測試');await page.fill('#profileClass','S4');await page.fill('#profileEmail','learning@example.com');await page.click('#profileForm button');
  await page.fill('#initialObservation','油水分層。');await page.click('[data-next="2"]');
- const hint=await page.locator('#controlPlan').locator('..').locator('.scaffold-hint').evaluate(el=>({size:parseFloat(getComputedStyle(el).fontSize),colour:getComputedStyle(el).color,strong:getComputedStyle(el.querySelector('strong')).color}));
- assert.equal(hint.size,12);assert.equal(hint.colour,'rgb(101, 128, 135)');assert.equal(hint.strong,hint.colour);
+ const hint=await page.locator('#controlPlan').locator('..').locator('.scaffold-hint').evaluate(el=>({size:parseFloat(getComputedStyle(el).fontSize),colour:getComputedStyle(el).color,emphasis:[...el.querySelectorAll('strong')].map(node=>getComputedStyle(node).color)}));
+ assert.equal(hint.size,12);assert.equal(hint.colour,'rgb(101, 128, 135)');hint.emphasis.forEach(colour=>assert.equal(colour,hint.colour));
  assert((await page.locator('#controlPlan').locator('..').innerText()).includes('你認為此實驗需要對照組嗎？如需要，你會如何設計比較裝置？'));
  await page.locator('#controlPlan').locator('..').screenshot({path:'/tmp/vl1-control-hint.png'});
  const order=await page.evaluate(()=>({saved:state.optionOrder,actual:[...document.querySelectorAll('#assumptionChoices input')].map(el=>el.value),all: Object.fromEntries(Object.keys(conclusionAnswers).map(id=>[id,[...document.querySelector('#'+id).options].map(o=>o.value).filter(Boolean)]))}));
@@ -25,12 +25,23 @@ const assert=require('node:assert/strict');
  await page.evaluate(()=>{state.unlocked=4;setPhase(4);state.submitted=true;applyLock();});
  assert.equal(await page.locator('#conceptReveal figure.digestion-diagram').count(),2);assert.equal(await page.locator('#conceptReveal .reactant .reaction-water').innerText(),'＋ 3H₂O（水）');assert.equal(await page.locator('#conceptReveal .equation-arrow svg').count(),1);assert.equal(await page.locator('#conceptReveal .reaction-arrow svg').count(),1);
  await page.waitForFunction(()=>[...document.querySelectorAll('#conceptReveal .learning-diagrams img')].every(img=>img.complete&&img.naturalWidth>0));
+ // The SVG must contain three visibly separate, complete carboxylic-acid structures.
+ for(const url of ['assets/fatty-acids-structure.svg','assets/fatty-acids-structure-en.svg']){
+  const molecules=await page.evaluate(async url=>{
+   const xml=new DOMParser().parseFromString(await (await fetch(url)).text(),'image/svg+xml');
+   return [...xml.querySelectorAll('g.fatty-acid-molecule')].map(g=>({position:g.getAttribute('transform'),outline:g.querySelectorAll('rect.molecule-outline').length,labels:[...g.querySelectorAll('text')].map(t=>t.textContent),doubleBonds:g.querySelectorAll('.carbonyl').length}));
+  },url);
+  assert.equal(molecules.length,3);assert.equal(new Set(molecules.map(m=>m.position)).size,3);
+  molecules.forEach((m,i)=>{assert.equal(m.outline,1);assert.deepEqual(m.labels,['R'+['₁','₂','₃'][i],'C','O','OH']);assert.equal(m.doubleBonds,2);});
+ }
+ const step=await page.locator('#conceptReveal .reaction-step').evaluate(el=>{const box=node=>{const r=node.getBoundingClientRect();return {top:r.top,bottom:r.bottom,centre:r.x+r.width/2};};return {enzyme:box(el.querySelector('strong')),arrow:box(el.querySelector('.reaction-arrow')),label:box(el.lastElementChild)};});
+ assert(step.enzyme.bottom<=step.arrow.top+1);assert(step.arrow.bottom<=step.label.top+1);assert(Math.abs(step.enzyme.centre-step.arrow.centre)<2);assert(Math.abs(step.label.centre-step.arrow.centre)<2);
  await page.locator('#conceptReveal').screenshot({path:'/tmp/vl1-learning-desktop.png'});
  await page.evaluate(()=>renderPrint(buildRecord()));assert.equal(await page.locator('#printReport figure.digestion-diagram').count(),2);
  await page.waitForFunction(()=>[...document.querySelectorAll('#printReport .learning-diagrams img')].every(img=>img.complete&&img.naturalWidth>0));
  await page.evaluate(()=>document.body.classList.add('print-record'));await page.pdf({path:'/tmp/vl1-learning.pdf',format:'A4',printBackground:true});await page.evaluate(()=>document.body.classList.remove('print-record'));
  for(const width of [390,320]){await page.setViewportSize({width,height:844});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));const boxes=await page.locator('#conceptReveal .molecule-card img').evaluateAll(imgs=>imgs.map(img=>img.getBoundingClientRect().width));assert(boxes.every(width=>width>=145));}
  await page.locator('#conceptReveal').screenshot({path:'/tmp/vl1-learning-mobile.png'});
- assert.equal(errors.length,0,errors.join('\n'));console.log('PASS: small grey hints, revised control prompt, varied/stable option positions, saved order, value-based grading, gated diagrams, desktop/mobile legibility and PDF diagrams.');
+ assert.equal(errors.length,0,errors.join('\n'));console.log('PASS: small grey hints, revised control prompt, varied/stable option positions, saved order, value-based grading, gated diagrams, three separate fatty-acid molecules, centred arrow labels, desktop/mobile legibility and PDF diagrams.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

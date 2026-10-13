@@ -168,7 +168,7 @@ function assertApprovedChinese(entries,label){
   await assertPlaceholders('en');await assertEnglishSystemText();
   assert.equal(await page.locator('#conceptReveal .physical-diagram picture img').getAttribute('src'),'assets/emulsification-en.svg?v=3');
   assert.equal(await page.locator('#conceptReveal .physical-diagram picture source').getAttribute('srcset'),'assets/emulsification-mobile-en.svg?v=3');
-  assert.deepEqual(await page.locator('#conceptReveal .chemical-diagram img').evaluateAll(imgs=>imgs.map(img=>img.getAttribute('src'))),['assets/triglyceride-structure-en.svg?v=3','assets/glycerol-structure-en.svg?v=3','assets/fatty-acids-structure-en.svg?v=3']);
+  assert.deepEqual(await page.locator('#conceptReveal .chemical-diagram img').evaluateAll(imgs=>imgs.map(img=>img.getAttribute('src'))),['assets/triglyceride-structure-en.svg?v=3','assets/glycerol-structure-en.svg?v=4','assets/fatty-acids-structure-en.svg?v=4']);
   await page.evaluate(()=>renderPrint(window.__languageSubmitted));
   assert.match(await page.locator('#printReport h1').innerText(),/digestive|digestion/i);
   assert.match(await page.locator('#printReport .report-stage h2').first().innerText(),/context|scenario|task|background/i);
@@ -184,7 +184,7 @@ function assertApprovedChinese(entries,label){
   await assertPlaceholders('zh');
   assert.equal(await page.locator('#conceptReveal .physical-diagram picture img').getAttribute('src'),'assets/emulsification.svg');
   assert.equal(await page.locator('#conceptReveal .physical-diagram picture source').getAttribute('srcset'),'assets/emulsification-mobile.svg');
-  assert.deepEqual(await page.locator('#conceptReveal .chemical-diagram img').evaluateAll(imgs=>imgs.map(img=>img.getAttribute('src'))),['assets/triglyceride-structure.svg','assets/glycerol-structure.svg','assets/fatty-acids-structure.svg']);
+  assert.deepEqual(await page.locator('#conceptReveal .chemical-diagram img').evaluateAll(imgs=>imgs.map(img=>img.getAttribute('src'))),['assets/triglyceride-structure.svg','assets/glycerol-structure.svg?v=2','assets/fatty-acids-structure.svg?v=2']);
   await page.evaluate(()=>renderPrint(window.__languageSubmitted));assert.equal(await page.locator('#printReport h1').innerText(),'未知消化液 X 與 Y');
   const chineseParagraphs=await page.locator('#printReport .report-answer p').allTextContents();for(const answer of ['變得混濁','開始實驗','探究的對照組','實驗裝置','學習重點'])assert(chineseParagraphs.includes(answer));
   assert.equal(await page.locator('#printReport .physical-diagram picture img').getAttribute('src'),'assets/emulsification.svg');

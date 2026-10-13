@@ -5,8 +5,8 @@
   const imageMap={
     'assets/emulsification.svg':'assets/emulsification-en.svg',
     'assets/triglyceride-structure.svg':'assets/triglyceride-structure-en.svg',
-    'assets/glycerol-structure.svg':'assets/glycerol-structure-en.svg',
-    'assets/fatty-acids-structure.svg':'assets/fatty-acids-structure-en.svg'
+    'assets/glycerol-structure.svg?v=2':'assets/glycerol-structure-en.svg?v=4',
+    'assets/fatty-acids-structure.svg?v=2':'assets/fatty-acids-structure-en.svg?v=4'
   };
   function clone(element){
     const template=document.createElement('template');

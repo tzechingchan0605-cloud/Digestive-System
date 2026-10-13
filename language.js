@@ -10,8 +10,8 @@
     'assets/emulsification.svg':'assets/emulsification-en.svg?v=3',
     'assets/emulsification-mobile.svg':'assets/emulsification-mobile-en.svg?v=3',
     'assets/triglyceride-structure.svg':'assets/triglyceride-structure-en.svg?v=3',
-    'assets/glycerol-structure.svg':'assets/glycerol-structure-en.svg?v=3',
-    'assets/fatty-acids-structure.svg':'assets/fatty-acids-structure-en.svg?v=3'
+    'assets/glycerol-structure.svg?v=2':'assets/glycerol-structure-en.svg?v=4',
+    'assets/fatty-acids-structure.svg?v=2':'assets/fatty-acids-structure-en.svg?v=4'
   };
   function text(value, language=current) {
     const source = String(value ?? '');

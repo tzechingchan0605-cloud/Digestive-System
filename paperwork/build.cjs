@@ -5,7 +5,7 @@ const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),
 const {chromium}=require('playwright');
 const {labels,rubricEn}=require('./texts.cjs');
 const root=path.resolve(__dirname,'..'),out=path.join(__dirname,'generated');
-const MATERIAL_VERSION=4;
+const MATERIAL_VERSION=5;
 const inputs=['package.json','package-lock.json','index.html','app.js','language.js','language-dictionary.js','styles.css','paperwork/fonts/NotoSansHK-paper.otf','paperwork/source.js','paperwork/print.css','paperwork/texts.cjs','paperwork/build.cjs',...fs.readdirSync(path.join(root,'assets')).filter(n=>/\.(svg|png)$/.test(n)).map(n=>'assets/'+n)].sort();
 const sha=data=>crypto.createHash('sha256').update(data).digest('hex');
 const fingerprints=()=>Object.fromEntries(inputs.map(name=>[name,sha(fs.readFileSync(path.join(root,name)))]));
@@ -56,7 +56,7 @@ function generate(model,lang){
   pages.A.splice(0,2,`<div class="merged-intro">${pages.A[0]}${pages.A[1]}</div>`);
   pages.A[2]=`<div class="drawing-page">${pages.A[2]}</div>`;
   pages.B.splice(0,4,`<div class="merged-basic">${pages.B[0]}${pages.B[1]}</div>`,`<div class="merged-analysis">${pages.B[2]}${pages.B[3]}</div>`);
-  pages.C.splice(0,2,`<div class="merged-learning">${hint(s('learning'))}<h1>${esc(model.learning.heading)}</h1><h3>${esc(model.learning.intro)}</h3><div class="learning-top">${model.learning.points}${model.learning.physical}</div>${model.learning.chemical}${card(lang==='zh'?'證據界限':'What the evidence can tell us',`<p>${esc(model.learning.limit)}</p>`)}</div>`);
+  pages.C.splice(0,3,`<div class="merged-learning">${hint(s('learning'))}<h1>${esc(model.learning.heading)}</h1><h3>${esc(model.learning.intro)}</h3><div class="learning-top">${model.learning.points}${model.learning.physical}</div>${model.learning.chemical}${card(lang==='zh'?'證據界限':'What the evidence can tell us',`<p>${esc(model.learning.limit)}</p>`)}${card(model.reflection.heading,`<p>${esc(model.reflection.question)}</p>${hint(s('reflect'))}${ruled()}`)}</div>`);
   return {pages,title,s};
 }
 function documentHTML(parts,generated,lang,base,model){
@@ -101,6 +101,12 @@ async function main(){
           bottom:Math.max(...[...el.querySelectorAll('*')].map(child=>child.getBoundingClientRect().bottom)),footer:el.closest('.sheet').querySelector('.page-footer').getBoundingClientRect().top
         })).filter(p=>p.height>p.limit+2||p.width>p.allowedWidth+2||p.bottom>p.footer-4));
         if(overflow.length)throw new Error(`${lang}/${part} page overflow: ${JSON.stringify(overflow)}`);
+        const reactionMisalignment=await page.locator('.reaction-step').evaluateAll(steps=>steps.some(el=>{
+          const enzyme=el.querySelector('strong').getBoundingClientRect(),arrow=el.querySelector('.reaction-arrow').getBoundingClientRect(),label=el.lastElementChild.getBoundingClientRect();
+          const centre=rect=>rect.x+rect.width/2;
+          return enzyme.bottom>arrow.top+1||arrow.bottom>label.top+1||Math.abs(centre(enzyme)-centre(arrow))>2||Math.abs(centre(label)-centre(arrow))>2;
+        }));
+        if(reactionMisalignment)throw new Error(`${lang}/${part}: hydrolysis labels overlap or are not centred around the arrow`);
         const layout=await page.locator('.sheet').evaluateAll(sheets=>sheets.map(sheet=>({part:sheet.dataset.part,page:Number(sheet.dataset.page),identity:sheet.querySelectorAll('.identity').length,writingLines:[...sheet.querySelectorAll('.ruled')].map(el=>el.querySelectorAll('.writing-line').length),circles:sheet.querySelectorAll('.circle-options').length,clearSurfaceBorders:[...sheet.querySelectorAll('.test-tube.clear .tube-liquid')].map(el=>parseFloat(getComputedStyle(el).borderTopWidth))})));
         if(layout.some(p=>p.identity!==(p.page===1&&['A','C'].includes(p.part)?1:0)||p.writingLines.some(n=>n!==2)))throw new Error('Identity or two-line layout rule failed');
         if(layout.some(p=>p.clearSurfaceBorders.some(width=>width<1)))throw new Error('Clear test-tube liquid surface is missing');

@@ -15,7 +15,7 @@ def require_text(page_text, values, context):
         plain = html.unescape(re.sub(r'<[^>]+>', '', value))
         assert compact(plain) in compact(page_text), (*context, 'missing merged content', plain)
 
-expected_pages = {'A':3, 'B':2, 'C':2, 'D':7, 'all':14}
+expected_pages = {'A':3, 'B':2, 'C':1, 'D':7, 'all':13}
 for lang in ['zh', 'en']:
     model = sources[lang]
     for part, file in manifest['languages'][lang]['files'].items():
@@ -76,10 +76,18 @@ for lang in ['zh', 'en']:
                 assert layout['writingLines']==[2,2]
             if layout['part']=='C' and layout['page']==1:
                 require_text(page_text,[model['learning']['heading'],model['learning']['intro'],model['learning']['limit']]
-                    +re.findall(r'<li[^>]*>(.*?)</li>',model['learning']['points'],re.S), context)
-            if layout['part']=='C' and layout['page']==2:
+                    +re.findall(r'<li[^>]*>(.*?)</li>',model['learning']['points'],re.S)
+                    +re.findall(r'<figcaption[^>]*>(.*?)</figcaption>',model['learning']['physical']+model['learning']['chemical'],re.S), context)
                 require_text(page_text,[model['reflection']['heading'],model['reflection']['question']], context)
                 assert layout['writingLines']==[2]
+                # Three equal, non-touching vector outlines must be printed side by side.
+                molecules=[d['rect'] for d in page.get_drawings() if d.get('color') and
+                    all(abs(a-b)<.005 for a,b in zip(d['color'],[195/255,212/255,206/255]))]
+                assert len(molecules)==3, (*context,'three distinct fatty-acid outlines')
+                molecules.sort(key=lambda r:r.x0)
+                assert all(molecules[i].x1<molecules[i+1].x0 for i in [0,1])
+                assert max(r.y0 for r in molecules)-min(r.y0 for r in molecules)<1
+                assert min(r.width for r in molecules)>=20*72/25.4
             if layout['part']=='B' and layout['page']==2:
                 assert layout['circles']==4
                 assert '__________' not in page_text
@@ -112,7 +120,7 @@ for lang in ['zh', 'en']:
 # Render core sheets for review; this is actual PDF content, not an HTML mockup.
 output = Path('/tmp/vl1-paper-review'); output.mkdir(exist_ok=True)
 for lang in ['zh','en']:
-    for part,index in [('A',0),('A',1),('A',2),('B',0),('B',1),('C',0),('C',1),('D',3)]:
+    for part,index in [('A',0),('A',1),('A',2),('B',0),('B',1),('C',0),('D',3)]:
         doc=fitz.open(root / manifest['languages'][lang]['files'][part]['path'])
         page=doc[index]
         page.get_pixmap(matrix=fitz.Matrix(1.4,1.4)).save(output / f'{lang}-{part}-{index+1}.png')
@@ -121,4 +129,4 @@ doc=fitz.open(root / manifest['languages']['zh']['files']['B']['path'])
 page=doc[0]
 gray=page.get_pixmap(matrix=fitz.Matrix(1.5,1.5),colorspace=fitz.csGRAY)
 gray.save(output / 'zh-B-1-grayscale.png')
-print('PASS: ten valid A4 PDFs (A3/B2/C2/D7, full pack14), merged context/hypothesis/all 21 variable choices on A1, separate assumptions/control A2 and large drawing A3, all questions/options/hints/data preserved, A/C first-page identities only, two writing lines, inline circle choices, clear liquid surfaces, selectable bilingual text, approved-only Chinese support, fonts and stage separation; actual PDF and grayscale review pages rendered.')
+print('PASS: ten valid A4 PDFs (A3/B2/C1/D7, full pack13), reflection and all learning content on one C page with three separate fatty-acid vector outlines, merged context/hypothesis/all 21 variable choices on A1, separate assumptions/control A2 and large drawing A3, all questions/options/hints/data preserved, A/C first-page identities only, two writing lines, inline circle choices, clear liquid surfaces, selectable bilingual text, approved-only Chinese support, fonts and stage separation; actual PDF and grayscale review pages rendered.')
