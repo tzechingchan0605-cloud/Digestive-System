@@ -1,5 +1,5 @@
 'use strict';
-// Shared DOM + curriculum constants are the question source for both media.
+// Read-only VL questions, model and diagrams support a paper-specific self-study adaptation.
 // This module never reads form values, session state, storage or cloud queues.
 (() => {
   const imageMap={
@@ -41,7 +41,7 @@
     const titleRoot=fragment(q('.hero h1'),lang);titleRoot.querySelectorAll('br').forEach(el=>el.replaceWith(' '));
     const physical=fragment(q('.physical-diagram'),lang);physical.querySelectorAll('source').forEach(el=>el.remove());
     const chemical=fragment(q('.chemical-diagram'),lang);
-    return {
+    const vl={
       language:lang,moduleId:core.moduleId,version:core.version,questionIds:core.fields,
       title:titleRoot.textContent.trim(),
       context:scene.outerHTML,background:tx('.prompt-card > p'),taskHeading:tx('.task-label'),
@@ -62,5 +62,7 @@
       reflection:{id:'reflection',question:t(clone(q('#reflectionReveal')).querySelector('.card-kicker').nextElementSibling.textContent),heading:tx('#reflectionReveal .card-kicker')},
       reference:{variables:core.expectedVariables,assumptions:core.assumptions.filter(x=>x[2]).map(x=>x[0]),conclusions:core.conclusionAnswers,control:t(core.controlReference),design:t(core.designReference),limit:t(core.limitReference),outcomes:Object.fromEntries(Object.entries(core.outcomeLabels).map(([id,label])=>[id,t(label)])),rubric:core.rubric}
     };
+    const paper=window.VL1ComparisonWorksheet.create(vl,lang);
+    return {language:lang,moduleId:core.moduleId,vlVersion:core.version,vl,...paper};
   };
 })();

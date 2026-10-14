@@ -1,7 +1,9 @@
 {
   "module": "VL1",
-  "version": "VL1-ui3-paper2",
-  "materialVersion": 5,
+  "version": "VL1-WS-direct-1",
+  "materialVersion": 6,
+  "vlVersion": "VL1-ui3-paper2",
+  "approach": "explanation-example-guided-independent-check",
   "optionOrder": {
     "assumptions": [
       "time",
@@ -28,7 +30,7 @@
       ]
     }
   },
-  "sourceDigest": "0fc832cf106f8a3c466993fc3ca9ef66ae6ca40a7c2634870c7f2185431996f9",
+  "sourceDigest": "467741591ae62d03aa731071b631ace818bd6594ce3d4ae64898f12b6b241db0",
   "inputs": {
     "app.js": "461e2bfc7056a1f02361f9bb44ca98e70792c9a5ef8e5f6f107af3aa918f9cb8",
     "assets/digestive-juice-x.png": "788dfe6a61aee4ab17cfbf72b187997097d4cfef572cf80e29e68a209f5e2e83",
@@ -47,120 +49,181 @@
     "assets/triglyceride-structure-en.svg": "58040a1537ef9988bfd1d5aa067764279d279fff78ebc097ad2f403b72bf2e78",
     "assets/triglyceride-structure.svg": "088f4df5b388b0fd39a75997fb394791d18b3682364ecbe5a9154c4f6d8389b8",
     "assets/water-bath-37c.png": "34d144f74a45b442924b5b17b91b22a1a5c558126b10ebf8c1817fcae35a9585",
-    "index.html": "f935f93c1ae5461fbc231926d36dbf8a1a95603deb593f210fdb6ea71f99d37f",
-    "language-dictionary.js": "2c75480ddc54ab1505413f5a9105492772e2ab423cde20e229e222693c45f9cc",
+    "index.html": "c265b8b95e4957357c1e926a62c2fe3bcf19a8f01b13ede45ff45ba9315ed07b",
+    "language-dictionary.js": "0c78322d9516d2a96f9c5ce8378c260ad245f9c7da86f8d600df2ab0a5926d33",
     "language.js": "a5085a6cbdd4416f3056dde910e9f8a52c5a71e88eea3bde7f02ce40f13f11e7",
     "package-lock.json": "2e3aec6c61939243a7a2835464ba0c0a9deab7cc11880fe54cba7ad4a35964e7",
     "package.json": "d8c314d2fea2777e595944074154b21e7e5ce8f5fb595c7a729a909c8f86287f",
-    "paperwork/build.cjs": "e103f8aaee866633d89758c3e50e171810137942a57a2d48415df019f6306411",
-    "paperwork/fonts/NotoSansHK-paper.otf": "a975387b0be89fbb635adf71fe2638c23d37dbf45209b3bcd9fec02659c8b7ce",
-    "paperwork/print.css": "0aa5682715e9421867aeb4b1d6c40732f9af0ff1a7c9b0042629f96a75bc2a0b",
-    "paperwork/source.js": "c92daf287c2c476f1b5c0aa5b9768fef40ac1af147cca211dd08a08da29b1422",
-    "paperwork/texts.cjs": "a3c8208074055dec09908b404af6bd6a65ae5bd9f91878529b07aca0916acf55",
+    "paperwork/build.cjs": "87284455ea7cda5467938f64d997132733258ac92162dc42618bbc84bcadfd00",
+    "paperwork/curriculum.js": "a6685bccd0070744e3b934abbc020f7d8dc652d624bdf45974612875f3566cf1",
+    "paperwork/fonts/NotoSansHK-paper.otf": "057f5330231af6e4626001dd6951229a7f6bf87794872baafb2d769fbbd8d2bf",
+    "paperwork/print.css": "80c025ca0f88e103a35a14bad5952a80dc0c4f8255483c1d90e6e975fe7e6e7f",
+    "paperwork/render.cjs": "e805d4640625a2b4e3e73908d1187b1d7ce1f8d876aeb77f21e1d1b251fcdd70",
+    "paperwork/source.js": "3abb61a460226d3278e56976685461bd4e4e0d7a00d9a11edcb76b71c5096a26",
     "styles.css": "194d441aea95cc932341b96cbaf8bdfebde494682e433ba07e74e701415b1560"
   },
   "languages": {
     "zh": {
       "files": {
         "A": {
-          "path": "paperwork/generated/VL1_A_zh_v5.pdf",
-          "name": "VL1_紙本對照組_A_情境與原始探究設計_繁中_v5.pdf",
-          "pages": 3,
-          "bytes": 764034,
-          "sha256": "cbf6f8bf2095a69ca2893d7092228e536b82554c841532010e69cf0e17d81f89",
+          "path": "paperwork/generated/VL1_A_zh_v6.pdf",
+          "name": "VL1_紙本比較組_A_自學概念、圖像及示例_繁中_v6.pdf",
+          "pages": 2,
+          "bytes": 371890,
+          "sha256": "1ca8a78728960c7d105192d2027fdf3e407b9439e63843825324ad95cf1f33a2",
           "layout": [
             {
               "part": "A",
               "page": 1,
               "identity": 1,
-              "writingLines": [
-                2,
-                2
-              ],
-              "circles": 2,
+              "writingLines": [],
+              "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
               "part": "A",
               "page": 2,
               "identity": 0,
-              "writingLines": [
-                2
-              ],
+              "writingLines": [],
               "circles": 0,
-              "clearSurfaceBorders": []
-            },
-            {
-              "part": "A",
-              "page": 3,
-              "identity": 0,
-              "writingLines": [
-                2
-              ],
-              "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             }
           ]
         },
         "B": {
-          "path": "paperwork/generated/VL1_B_zh_v5.pdf",
-          "name": "VL1_紙本對照組_B_實驗資料、分析與結論_繁中_v5.pdf",
-          "pages": 2,
-          "bytes": 207664,
-          "sha256": "0b13c7a4dbd6e141be41d132b19d6ead4967ea166f60a369f2090a10e3099d0d",
+          "path": "paperwork/generated/VL1_B_zh_v6.pdf",
+          "name": "VL1_紙本比較組_B_有提示練習及獨立應用_繁中_v6.pdf",
+          "pages": 4,
+          "bytes": 281802,
+          "sha256": "355cf000cbd6f0cd5f4848850b910a6837993aac1309a2d04f93eeee01d3b9dd",
           "layout": [
             {
               "part": "B",
               "page": 1,
               "identity": 0,
               "writingLines": [
+                2,
+                2
+              ],
+              "circles": 2,
+              "questionIds": [
+                "observation",
+                "prediction",
+                "variables",
+                "assumptions"
+              ],
+              "trialKeys": [
+                "initial"
+              ],
+              "clearSurfaceBorders": []
+            },
+            {
+              "part": "B",
+              "page": 2,
+              "identity": 0,
+              "writingLines": [
+                2,
+                2,
+                2,
+                2,
+                2,
                 2
               ],
               "circles": 0,
+              "questionIds": [
+                "control",
+                "labels",
+                "fairness"
+              ],
+              "trialKeys": [],
+              "clearSurfaceBorders": []
+            },
+            {
+              "part": "B",
+              "page": 3,
+              "identity": 0,
+              "writingLines": [
+                2,
+                2
+              ],
+              "circles": 2,
+              "questionIds": [
+                "mainObservations",
+                "xConclusion",
+                "surface"
+              ],
+              "trialKeys": [
+                "none-none",
+                "X-none",
+                "Y-none",
+                "XY-none"
+              ],
               "clearSurfaceBorders": [
                 1
               ]
             },
             {
               "part": "B",
-              "page": 2,
+              "page": 4,
               "identity": 0,
               "writingLines": [
                 2,
+                2,
+                2,
                 2
               ],
-              "circles": 4,
+              "circles": 2,
+              "questionIds": [
+                "limits",
+                "heatControl",
+                "heatObservations",
+                "heatConclusion",
+                "application"
+              ],
+              "trialKeys": [
+                "XY-none",
+                "XY-X",
+                "XY-Y"
+              ],
               "clearSurfaceBorders": [
+                1,
                 1
               ]
             }
           ]
         },
         "C": {
-          "path": "paperwork/generated/VL1_C_zh_v5.pdf",
-          "name": "VL1_紙本對照組_C_學習重點及反思_繁中_v5.pdf",
+          "path": "paperwork/generated/VL1_C_zh_v6.pdf",
+          "name": "VL1_紙本比較組_C_核對答案及修正_繁中_v6.pdf",
           "pages": 1,
-          "bytes": 318315,
-          "sha256": "c1134b1cbb93053e0d35bffa2dd3cdcb303897338e32dd0502d1c57c7cebc475",
+          "bytes": 146967,
+          "sha256": "47108a69dac930142f86fc4f33a71dfcb323ec68dc0106a8d667b048cea078a7",
           "layout": [
             {
               "part": "C",
               "page": 1,
               "identity": 1,
               "writingLines": [
+                2,
                 2
               ],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             }
           ]
         },
         "D": {
-          "path": "paperwork/generated/VL1_D_zh_v5.pdf",
-          "name": "VL1_紙本對照組_D_教師指引、參考答案與評分準則_繁中_v5.pdf",
-          "pages": 7,
-          "bytes": 263136,
-          "sha256": "87d5d73b9ab1e4003f7b61b2ade6626d0664b904a60be3c736b38a43b3897455",
+          "path": "paperwork/generated/VL1_D_zh_v6.pdf",
+          "name": "VL1_紙本比較組_D_教師指引、配對及評分_繁中_v6.pdf",
+          "pages": 8,
+          "bytes": 284595,
+          "sha256": "a751ace658a6dce2022a0baaea624c0e95a8895fc03eca6a63ce6806bbd29a3a",
           "layout": [
             {
               "part": "D",
@@ -168,6 +231,8 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -176,6 +241,8 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -184,6 +251,8 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -192,6 +261,8 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -200,6 +271,8 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -208,6 +281,8 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -216,46 +291,47 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
+              "clearSurfaceBorders": []
+            },
+            {
+              "part": "D",
+              "page": 8,
+              "identity": 0,
+              "writingLines": [],
+              "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             }
           ]
         },
         "all": {
-          "path": "paperwork/generated/VL1_all_zh_v5.pdf",
-          "name": "VL1_紙本對照組_完整教師列印套裝_繁中_v5.pdf",
-          "pages": 13,
-          "bytes": 1189053,
-          "sha256": "28109b20d46d27bfc71a02f331e0f1a547ad9227943aade43fcd35b2e471790a",
+          "path": "paperwork/generated/VL1_all_zh_v6.pdf",
+          "name": "VL1_紙本比較組_完整教師列印套裝_繁中_v6.pdf",
+          "pages": 15,
+          "bytes": 609720,
+          "sha256": "25303b9fff23a9855bae1a356b005cf14cd56c2bfaf9d74988b4107c76225104",
           "layout": [
             {
               "part": "A",
               "page": 1,
               "identity": 1,
-              "writingLines": [
-                2,
-                2
-              ],
-              "circles": 2,
+              "writingLines": [],
+              "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
               "part": "A",
               "page": 2,
               "identity": 0,
-              "writingLines": [
-                2
-              ],
+              "writingLines": [],
               "circles": 0,
-              "clearSurfaceBorders": []
-            },
-            {
-              "part": "A",
-              "page": 3,
-              "identity": 0,
-              "writingLines": [
-                2
-              ],
-              "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -263,23 +339,91 @@
               "page": 1,
               "identity": 0,
               "writingLines": [
+                2,
+                2
+              ],
+              "circles": 2,
+              "questionIds": [
+                "observation",
+                "prediction",
+                "variables",
+                "assumptions"
+              ],
+              "trialKeys": [
+                "initial"
+              ],
+              "clearSurfaceBorders": []
+            },
+            {
+              "part": "B",
+              "page": 2,
+              "identity": 0,
+              "writingLines": [
+                2,
+                2,
+                2,
+                2,
+                2,
                 2
               ],
               "circles": 0,
+              "questionIds": [
+                "control",
+                "labels",
+                "fairness"
+              ],
+              "trialKeys": [],
+              "clearSurfaceBorders": []
+            },
+            {
+              "part": "B",
+              "page": 3,
+              "identity": 0,
+              "writingLines": [
+                2,
+                2
+              ],
+              "circles": 2,
+              "questionIds": [
+                "mainObservations",
+                "xConclusion",
+                "surface"
+              ],
+              "trialKeys": [
+                "none-none",
+                "X-none",
+                "Y-none",
+                "XY-none"
+              ],
               "clearSurfaceBorders": [
                 1
               ]
             },
             {
               "part": "B",
-              "page": 2,
+              "page": 4,
               "identity": 0,
               "writingLines": [
                 2,
+                2,
+                2,
                 2
               ],
-              "circles": 4,
+              "circles": 2,
+              "questionIds": [
+                "limits",
+                "heatControl",
+                "heatObservations",
+                "heatConclusion",
+                "application"
+              ],
+              "trialKeys": [
+                "XY-none",
+                "XY-X",
+                "XY-Y"
+              ],
               "clearSurfaceBorders": [
+                1,
                 1
               ]
             },
@@ -288,9 +432,12 @@
               "page": 1,
               "identity": 1,
               "writingLines": [
+                2,
                 2
               ],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -299,6 +446,8 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -307,6 +456,8 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -315,6 +466,8 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -323,6 +476,8 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -331,6 +486,8 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -339,6 +496,8 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -347,6 +506,18 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
+              "clearSurfaceBorders": []
+            },
+            {
+              "part": "D",
+              "page": 8,
+              "identity": 0,
+              "writingLines": [],
+              "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             }
           ]
@@ -355,123 +526,183 @@
       "ranges": {
         "A": [
           1,
-          3
+          2
         ],
         "B": [
-          4,
-          5
-        ],
-        "C": [
-          6,
+          3,
           6
         ],
-        "D": [
+        "C": [
           7,
-          13
+          7
+        ],
+        "D": [
+          8,
+          15
         ]
       }
     },
     "en": {
       "files": {
         "A": {
-          "path": "paperwork/generated/VL1_A_en_v5.pdf",
-          "name": "VL1_ControlGroup_A_EN_v5.pdf",
-          "pages": 3,
-          "bytes": 639366,
-          "sha256": "a58e06f7451f6dd963a472c1cd50bdae60044340cc456e17c64f34304070a5b0",
+          "path": "paperwork/generated/VL1_A_en_v6.pdf",
+          "name": "VL1_ComparisonGroup_A_EN_v6.pdf",
+          "pages": 2,
+          "bytes": 111840,
+          "sha256": "66064589b9407653387497f4bc92e835dc583ae3936ebb258d108e44027058c6",
           "layout": [
             {
               "part": "A",
               "page": 1,
               "identity": 1,
-              "writingLines": [
-                2,
-                2
-              ],
-              "circles": 2,
+              "writingLines": [],
+              "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
               "part": "A",
               "page": 2,
               "identity": 0,
-              "writingLines": [
-                2
-              ],
+              "writingLines": [],
               "circles": 0,
-              "clearSurfaceBorders": []
-            },
-            {
-              "part": "A",
-              "page": 3,
-              "identity": 0,
-              "writingLines": [
-                2
-              ],
-              "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             }
           ]
         },
         "B": {
-          "path": "paperwork/generated/VL1_B_en_v5.pdf",
-          "name": "VL1_ControlGroup_B_EN_v5.pdf",
-          "pages": 2,
-          "bytes": 115061,
-          "sha256": "ac28c68b509d509c78c75beae3005f4a5ea157145a63333c65e1c46d01ca4a94",
+          "path": "paperwork/generated/VL1_B_en_v6.pdf",
+          "name": "VL1_ComparisonGroup_B_EN_v6.pdf",
+          "pages": 4,
+          "bytes": 143251,
+          "sha256": "a4655df4474ab508d8fca81d9bfbcc1f7c87d713edf88842bed5d59cad23ca2c",
           "layout": [
             {
               "part": "B",
               "page": 1,
               "identity": 0,
               "writingLines": [
+                2,
+                2
+              ],
+              "circles": 2,
+              "questionIds": [
+                "observation",
+                "prediction",
+                "variables",
+                "assumptions"
+              ],
+              "trialKeys": [
+                "initial"
+              ],
+              "clearSurfaceBorders": []
+            },
+            {
+              "part": "B",
+              "page": 2,
+              "identity": 0,
+              "writingLines": [
+                2,
+                2,
+                2,
+                2,
+                2,
                 2
               ],
               "circles": 0,
+              "questionIds": [
+                "control",
+                "labels",
+                "fairness"
+              ],
+              "trialKeys": [],
+              "clearSurfaceBorders": []
+            },
+            {
+              "part": "B",
+              "page": 3,
+              "identity": 0,
+              "writingLines": [
+                2,
+                2
+              ],
+              "circles": 2,
+              "questionIds": [
+                "mainObservations",
+                "xConclusion",
+                "surface"
+              ],
+              "trialKeys": [
+                "none-none",
+                "X-none",
+                "Y-none",
+                "XY-none"
+              ],
               "clearSurfaceBorders": [
                 1
               ]
             },
             {
               "part": "B",
-              "page": 2,
+              "page": 4,
               "identity": 0,
               "writingLines": [
                 2,
+                2,
+                2,
                 2
               ],
-              "circles": 4,
+              "circles": 2,
+              "questionIds": [
+                "limits",
+                "heatControl",
+                "heatObservations",
+                "heatConclusion",
+                "application"
+              ],
+              "trialKeys": [
+                "XY-none",
+                "XY-X",
+                "XY-Y"
+              ],
               "clearSurfaceBorders": [
+                1,
                 1
               ]
             }
           ]
         },
         "C": {
-          "path": "paperwork/generated/VL1_C_en_v5.pdf",
-          "name": "VL1_ControlGroup_C_EN_v5.pdf",
+          "path": "paperwork/generated/VL1_C_en_v6.pdf",
+          "name": "VL1_ComparisonGroup_C_EN_v6.pdf",
           "pages": 1,
-          "bytes": 97872,
-          "sha256": "a3cbf21e5584f4a34fd57a12c64179b9d168626473e301d331f873e0102c04c0",
+          "bytes": 47445,
+          "sha256": "93f48038c2baa8f743e9842693068dd922c2b93520ab229ce4fd65a339c095e6",
           "layout": [
             {
               "part": "C",
               "page": 1,
               "identity": 1,
               "writingLines": [
+                2,
                 2
               ],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             }
           ]
         },
         "D": {
-          "path": "paperwork/generated/VL1_D_en_v5.pdf",
-          "name": "VL1_ControlGroup_D_EN_v5.pdf",
-          "pages": 7,
-          "bytes": 78855,
-          "sha256": "6b4a654fd71930cfc2f1d24c6681272c09db6b6333af33487d656fbbd775786c",
+          "path": "paperwork/generated/VL1_D_en_v6.pdf",
+          "name": "VL1_ComparisonGroup_D_EN_v6.pdf",
+          "pages": 8,
+          "bytes": 97313,
+          "sha256": "e5e6e32e249dd6c4fee4ebb31926a117e9eeb65fdee25b807353178744e4ff1f",
           "layout": [
             {
               "part": "D",
@@ -479,6 +710,8 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -487,6 +720,8 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -495,6 +730,8 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -503,6 +740,8 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -511,6 +750,8 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -519,6 +760,8 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -527,46 +770,47 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
+              "clearSurfaceBorders": []
+            },
+            {
+              "part": "D",
+              "page": 8,
+              "identity": 0,
+              "writingLines": [],
+              "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             }
           ]
         },
         "all": {
-          "path": "paperwork/generated/VL1_all_en_v5.pdf",
-          "name": "VL1_ControlGroup_CompleteTeacherPack_EN_v5.pdf",
-          "pages": 13,
-          "bytes": 836620,
-          "sha256": "4eaad4e14b153a9cf47d75629a5b65817b390f74c225b1817595ebe545938495",
+          "path": "paperwork/generated/VL1_all_en_v6.pdf",
+          "name": "VL1_ComparisonGroup_CompleteTeacherPack_EN_v6.pdf",
+          "pages": 15,
+          "bytes": 287381,
+          "sha256": "51517bb637b96b12a1af2e6848fe31445edb9d97b37c64402b4c00699ac93f52",
           "layout": [
             {
               "part": "A",
               "page": 1,
               "identity": 1,
-              "writingLines": [
-                2,
-                2
-              ],
-              "circles": 2,
+              "writingLines": [],
+              "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
               "part": "A",
               "page": 2,
               "identity": 0,
-              "writingLines": [
-                2
-              ],
+              "writingLines": [],
               "circles": 0,
-              "clearSurfaceBorders": []
-            },
-            {
-              "part": "A",
-              "page": 3,
-              "identity": 0,
-              "writingLines": [
-                2
-              ],
-              "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -574,23 +818,91 @@
               "page": 1,
               "identity": 0,
               "writingLines": [
+                2,
+                2
+              ],
+              "circles": 2,
+              "questionIds": [
+                "observation",
+                "prediction",
+                "variables",
+                "assumptions"
+              ],
+              "trialKeys": [
+                "initial"
+              ],
+              "clearSurfaceBorders": []
+            },
+            {
+              "part": "B",
+              "page": 2,
+              "identity": 0,
+              "writingLines": [
+                2,
+                2,
+                2,
+                2,
+                2,
                 2
               ],
               "circles": 0,
+              "questionIds": [
+                "control",
+                "labels",
+                "fairness"
+              ],
+              "trialKeys": [],
+              "clearSurfaceBorders": []
+            },
+            {
+              "part": "B",
+              "page": 3,
+              "identity": 0,
+              "writingLines": [
+                2,
+                2
+              ],
+              "circles": 2,
+              "questionIds": [
+                "mainObservations",
+                "xConclusion",
+                "surface"
+              ],
+              "trialKeys": [
+                "none-none",
+                "X-none",
+                "Y-none",
+                "XY-none"
+              ],
               "clearSurfaceBorders": [
                 1
               ]
             },
             {
               "part": "B",
-              "page": 2,
+              "page": 4,
               "identity": 0,
               "writingLines": [
                 2,
+                2,
+                2,
                 2
               ],
-              "circles": 4,
+              "circles": 2,
+              "questionIds": [
+                "limits",
+                "heatControl",
+                "heatObservations",
+                "heatConclusion",
+                "application"
+              ],
+              "trialKeys": [
+                "XY-none",
+                "XY-X",
+                "XY-Y"
+              ],
               "clearSurfaceBorders": [
+                1,
                 1
               ]
             },
@@ -599,9 +911,12 @@
               "page": 1,
               "identity": 1,
               "writingLines": [
+                2,
                 2
               ],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -610,6 +925,8 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -618,6 +935,8 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -626,6 +945,8 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -634,6 +955,8 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -642,6 +965,8 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -650,6 +975,8 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
@@ -658,6 +985,18 @@
               "identity": 0,
               "writingLines": [],
               "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
+              "clearSurfaceBorders": []
+            },
+            {
+              "part": "D",
+              "page": 8,
+              "identity": 0,
+              "writingLines": [],
+              "circles": 0,
+              "questionIds": [],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             }
           ]
@@ -666,19 +1005,19 @@
       "ranges": {
         "A": [
           1,
-          3
+          2
         ],
         "B": [
-          4,
-          5
-        ],
-        "C": [
-          6,
+          3,
           6
         ],
-        "D": [
+        "C": [
           7,
-          13
+          7
+        ],
+        "D": [
+          8,
+          15
         ]
       }
     }

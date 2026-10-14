@@ -10,7 +10,7 @@
   function render(){
     if(!manifest)return;
     const lang=byId('paperLanguage').value,entry=manifest.languages[lang];
-    byId('paperContentVersion').textContent=manifest.version;byId('paperMaterialVersion').textContent='v'+manifest.materialVersion;
+    byId('paperContentVersion').textContent=manifest.version;byId('paperMaterialVersion').textContent='v'+manifest.materialVersion;byId('paperVLVersion').textContent=manifest.vlVersion;
     for(const part of ['A','B','C','D','all']){
       const file=entry.files[part],range=entry.ranges[part];
       byId('paperPages'+part).textContent=range?`${file.pages} 頁 · 套裝第 ${range[0]}–${range[1]} 頁`:`${file.pages} 頁`;
@@ -27,7 +27,7 @@
       const response=await fetch('paperwork/generated/manifest.json',{cache:'no-store'});if(!response.ok)throw new Error('manifest');
       const data=await response.json();
       const source={zh:getVL1PaperSource('zh'),en:getVL1PaperSource('en')};
-      if(data.module!=='VL1'||data.version!==source.zh.version||await digest(new TextEncoder().encode(JSON.stringify(source)))!==data.sourceDigest)throw new Error('stale');
+      if(data.module!=='VL1'||data.version!==source.zh.version||data.materialVersion!==source.zh.materialVersion||data.approach!==source.zh.approach||data.vlVersion!==source.zh.vlVersion||await digest(new TextEncoder().encode(JSON.stringify(source)))!==data.sourceDigest)throw new Error('stale');
       for(const lang of ['zh','en'])for(const part of ['A','B','C','D','all']){
         const file=data.languages?.[lang]?.files?.[part];
         if(!file||!/^paperwork\/generated\/VL1_(A|B|C|D|all)_(zh|en)_v\d+\.pdf$/.test(file.path)||!file.name.endsWith('.pdf')||!Number.isInteger(file.pages)||file.pages<1)throw new Error('invalid');
@@ -41,7 +41,7 @@
   async function fileBlob(part){
     if(!authorised()||!manifest||!['A','B','C','D','all'].includes(part))return null;
     const token=request,file=manifest.languages[byId('paperLanguage').value].files[part];
-    const response=await fetch(file.path,{cache:'no-cache'});if(!response.ok)throw new Error('file');
+    const response=await fetch(file.path,{cache:'no-store'});if(!response.ok)throw new Error('file');
     const bytes=await response.arrayBuffer();
     if(new TextDecoder().decode(bytes.slice(0,5))!=='%PDF-'||bytes.byteLength!==file.bytes||await digest(bytes)!==file.sha256)throw new Error('PDF checksum');
     if(!authorised()||request!==token)return null;

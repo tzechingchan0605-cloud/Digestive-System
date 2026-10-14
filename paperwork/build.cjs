@@ -3,65 +3,16 @@
 // node paperwork/build.cjs [--check]. Requires Playwright + Chromium + CJK fonts.
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),crypto=require('node:crypto');
 const {chromium}=require('playwright');
-const {labels,rubricEn}=require('./texts.cjs');
+const {generate}=require('./render.cjs');
 const root=path.resolve(__dirname,'..'),out=path.join(__dirname,'generated');
-const MATERIAL_VERSION=5;
-const inputs=['package.json','package-lock.json','index.html','app.js','language.js','language-dictionary.js','styles.css','paperwork/fonts/NotoSansHK-paper.otf','paperwork/source.js','paperwork/print.css','paperwork/texts.cjs','paperwork/build.cjs',...fs.readdirSync(path.join(root,'assets')).filter(n=>/\.(svg|png)$/.test(n)).map(n=>'assets/'+n)].sort();
+const MATERIAL_VERSION=6;
+const inputs=['package.json','package-lock.json','index.html','app.js','language.js','language-dictionary.js','styles.css','paperwork/fonts/NotoSansHK-paper.otf','paperwork/source.js','paperwork/print.css','paperwork/curriculum.js','paperwork/render.cjs','paperwork/build.cjs',...fs.readdirSync(path.join(root,'assets')).filter(n=>/\.(svg|png)$/.test(n)).map(n=>'assets/'+n)].sort();
 const sha=data=>crypto.createHash('sha256').update(data).digest('hex');
 const fingerprints=()=>Object.fromEntries(inputs.map(name=>[name,sha(fs.readFileSync(path.join(root,name)))]));
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function generate(model,lang){
-  const s=key=>labels[key][lang==='zh'?0:1],title=part=>labels.names[lang][part];
-  const card=(heading,body)=>`<section class="card"><h2>${esc(heading)}</h2>${body}</section>`;
-  const hint=text=>`<p class="hint">${esc(text)}</p>`;
-  const ruled=()=>'<div class="ruled"><div class="writing-line"></div><div class="writing-line"></div></div>';
-  const circleSentence=(sentence,sets)=>{
-    let index=0;
-    const result=sentence.replace(/__________/g,()=>{
-      const items=sets[index++];if(!items)throw new Error('Missing inline choice set');
-      return `<span class="circle-options">（${items.map(o=>`<span class="circle-choice${o.text.length>40?' long':''}">${esc(o.text)}</span>`).join(' ／ ')}）</span>`;
-    });
-    if(index!==sets.length)throw new Error('Inline choice count does not match the shared question');
-    return result;
-  };
-  const choices=(items,multi=false,extra='')=>`${extra==='variable'?'':`<p class="hint">${s(multi?'multi':'single')}</p>`}<div class="choices ${extra}">${items.map(o=>`<span class="choice"><span class="checkbox"></span><span>${esc(o.text)}</span></span>`).join('')}</div>`;
-  const question=q=>`<section class="question" data-question="${q.id}">${q.heading?`<h3>${esc(q.heading)}</h3>`:''}<p>${circleSentence(q.sentence,[q.options])}</p>${hint(s('circle'))}</section>`;
-  const pages={A:[],B:[],C:[],D:[]},add=(part,body)=>pages[part].push(body);
-  add('A',`<h1>${esc(model.title)}</h1><div class="two-cols"><div>${model.context}</div><div class="context-copy"><h3>${lang==='zh'?'研究背景':'Research background'}</h3><p>${esc(model.background)}</p><h3>${esc(model.taskHeading)}</h3><strong>${esc(model.taskQuestion)}</strong><p>${esc(model.taskDescription)}</p>${card(model.initialObservation.heading,`<p>${esc(model.initialObservation.hint)}</p>${ruled()}`)}</div></div>`);
-  add('A',card(model.hypothesis.heading,`<h3>${esc(model.hypothesis.instruction)}</h3><p class="circle-sentence">${circleSentence(model.hypothesis.sentence,[model.hypothesis.liquid,model.hypothesis.outcome])}</p>${hint(s('circle'))}<p>${esc(model.hypothesis.reasonLabel)}</p>${ruled()}`)+card(model.variables.heading,hint(s('multi'))+`<div class="variable-groups">${model.variables.groups.map(g=>`<section><h3>${esc(g.label)} <span class="hint">${esc(g.definition)}</span></h3>${choices(model.variables.choices,true,'variable')}</section>`).join('')}</div>`));
-  add('A',card(model.assumptions.heading,`<h3>${esc(model.assumptions.question)}</h3>${hint(model.assumptions.reminder)}<p>${esc(model.assumptions.hint)}</p>${choices(['time','more','volume','mixing'].map(id=>model.assumptions.choices.find(o=>o.id===id)),true)}`)+card(model.control.heading,`<h3>${esc(model.control.question)}</h3>${hint(model.control.hint)}${ruled()}`)+hint(s('original')));
-  add('A',card(model.design.heading,`<h3>${esc(model.design.question)}</h3><p>${esc(model.design.instruction)}</p>${hint(model.design.hint)}${model.design.materials}${hint(model.design.reminder)}<div class="drawbox"></div><p>${esc(model.design.writtenLabel)}</p>${ruled()}`)+hint(s('original')));
-  const results=trials=>`<div class="two-cols">${trials.map(trial=>`<section class="card result-card" data-trial="${trial.key}"><div class="result-label">${esc(trial.label)}</div><div class="test-tube ${trial.outcome}"><div class="tube-liquid"><div class="result-oil"></div></div></div></section>`).join('')}</div>`;
-  const table=(trials,options)=>`<table><thead><tr><th>${lang==='zh'?'實驗裝置':'Experiment setup'}</th><th>${s('first')} · ${s('record')}</th></tr></thead><tbody>${trials.map(trial=>`<tr><td>${esc(trial.label)}</td><td class="answer">${options.map(o=>`<span class="choice"><span class="checkbox"></span>${esc(o.text)}</span>`).join('<br>')}</td></tr>`).join('')}</tbody></table>`;
-  const basic=model.trials.filter(t=>t.key.endsWith('-none')),heat=model.trials.filter(t=>!t.key.endsWith('-none'));
-  add('B',`<h1>${esc(model.basic.heading)}</h1><p>${esc(model.basic.instruction)}</p><p>${esc(model.basic.fair)}</p>${hint(s('data'))}${results(basic)}`);
-  add('B',`<h1>${esc(model.basic.observationPrompt)}</h1>${table(basic,model.basic.options)}${hint(s('revision'))}${ruled()}`);
-  add('B',`<p class="kicker">${esc(model.conclusions.heading)}</p><h1>${esc(model.conclusions.instruction)}</h1>${model.conclusions.questions.map(question).join('')}${hint(s('revision'))}${ruled()}`);
-  add('B',`<p class="kicker">${esc(model.extension.heading)}</p><h1>${esc(model.extension.question)}</h1><p>${esc(model.extension.instruction)}</p>${hint(s('cool'))}${results(heat)}<h3>${esc(model.basic.observationPrompt)}</h3>${table(heat,model.extension.options)}${question(model.extension.conclusion)}${hint(s('revision'))}${ruled()}`);
-  add('C',`${hint(s('learning'))}<h1>${esc(model.learning.heading)}</h1><h3>${esc(model.learning.intro)}</h3>${model.learning.points}${model.learning.physical}`);
-  add('C',`${hint(s('learning'))}${model.learning.chemical}${card(lang==='zh'?'證據界限':'What the evidence can tell us',`<p>${esc(model.learning.limit)}</p>`)}`);
-  add('C',`<h1>${esc(model.reflection.heading)}</h1><p>${esc(model.reflection.question)}</p>${hint(s('reflect'))}${ruled()}`);
-  add('D',`<div class="teacher-only">${s('teacher')}</div><h1>${s('guideTitle')}</h1><ol class="guide-list">${labels.steps.map(pair=>`<li>${esc(pair[lang==='zh'?0:1])}</li>`).join('')}</ol><p>${s('admin')}</p>${hint(s('draft'))}${hint(s('pending'))}`);
-  const ref=model.reference;
-  const variableAnswers=model.variables.groups.map(g=>`<tr><td>${esc(g.label)}</td><td>${ref.variables[g.id].map(id=>esc(model.variables.choices.find(o=>o.id===id).text)).join(' / ')}</td></tr>`).join('');
-  const assumptionAnswers=ref.assumptions.map(id=>model.assumptions.choices.find(o=>o.id===id).text);
-  const conclusionAnswers=[...model.conclusions.questions,model.extension.conclusion].map(q=>`<tr><td>${esc(q.heading||q.sentence.replace(/<[^>]*>/g,''))}</td><td>${esc(q.options.find(o=>o.id===ref.conclusions[q.id]).text)}</td></tr>`).join('');
-  add('D',`<div class="teacher-only">${s('teacher')}</div><h1>${s('key')}</h1><table class="reference"><tbody>${variableAnswers}<tr><td>${esc(model.assumptions.heading)}</td><td>${assumptionAnswers.map(esc).join('<br>')}</td></tr>${conclusionAnswers}</tbody></table><table class="reference"><tbody>${model.trials.map(trial=>`<tr><td>${esc(trial.label)}</td><td>${esc(ref.outcomes[trial.outcome])}</td></tr>`).join('')}</tbody></table>`);
-  add('D',`<div class="teacher-only">${s('teacher')}</div><h1>${lang==='zh'?'開放題設計參考':'Reference for written designs'}</h1><h3>${esc(model.control.heading)}</h3><p>${esc(ref.control)}</p><h3>${esc(model.design.heading)}</h3><p>${esc(ref.design)}</p>${hint(ref.limit)}${hint(s('pending'))}`);
-  const rubric=lang==='zh'?ref.rubric.slice(1):rubricEn;
-  if(rubric.length!==rubricEn.length)throw new Error('Shared rubric changed: update its English translation before building.');
-  const columns=lang==='zh'?labels.headingRubric:labels.headingRubricEn;
-  for(let i=0;i<rubric.length;i+=5)add('D',`<div class="teacher-only">${s('teacher')}</div><h1>${lang==='zh'?'評分準則':'Scoring guide'}</h1>${hint(s('draft'))}<table class="rubric"><thead><tr>${columns.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${rubric.slice(i,i+5).map(row=>`<tr>${row.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>${hint(s('pending'))}`);
-  // Keep every question and option while combining the requested old pages.
-  pages.A.splice(0,2,`<div class="merged-intro">${pages.A[0]}${pages.A[1]}</div>`);
-  pages.A[2]=`<div class="drawing-page">${pages.A[2]}</div>`;
-  pages.B.splice(0,4,`<div class="merged-basic">${pages.B[0]}${pages.B[1]}</div>`,`<div class="merged-analysis">${pages.B[2]}${pages.B[3]}</div>`);
-  pages.C.splice(0,3,`<div class="merged-learning">${hint(s('learning'))}<h1>${esc(model.learning.heading)}</h1><h3>${esc(model.learning.intro)}</h3><div class="learning-top">${model.learning.points}${model.learning.physical}</div>${model.learning.chemical}${card(lang==='zh'?'證據界限':'What the evidence can tell us',`<p>${esc(model.learning.limit)}</p>`)}${card(model.reflection.heading,`<p>${esc(model.reflection.question)}</p>${hint(s('reflect'))}${ruled()}`)}</div>`);
-  return {pages,title,s};
-}
 function documentHTML(parts,generated,lang,base,model){
   let number=0,total=parts.reduce((n,part)=>n+generated.pages[part].length,0);
-  const body=parts.flatMap(part=>generated.pages[part].map((body,i)=>`<article class="sheet" data-part="${part}" data-page="${i+1}"><header class="page-head"><strong>VL1 · ${part} · ${esc(generated.title(part))}</strong><span>${lang==='zh'?'繁體中文':'English'}</span></header>${i===0&&['A','C'].includes(part)?`<div class="identity">${generated.s('identity')}</div>`:''}<div class="sheet-body">${body}</div><footer class="page-footer"><span>VL1 · ${model.version} · v${MATERIAL_VERSION}</span><span>${++number} / ${total} · ${part}-${i+1}</span></footer></article>`)).join('');
+  const body=parts.flatMap(part=>generated.pages[part].map((body,i)=>`<article class="sheet" data-part="${part}" data-page="${i+1}"><header class="page-head"><strong>${lang==='zh'?'課題 1':'Topic 1'} · ${part} · ${esc(generated.title(part))}</strong><span>${lang==='zh'?'繁體中文':'English'}</span></header>${i===0&&['A','C'].includes(part)?`<div class="identity">${generated.s('identity')}</div>`:''}<div class="sheet-body">${body}</div><footer class="page-footer"><span>VL1 · ${model.version} · v${MATERIAL_VERSION}</span><span>${++number} / ${total} · ${part}-${i+1}</span></footer></article>`)).join('');
   return `<!doctype html><html lang="${lang==='zh'?'zh-Hant-HK':'en-HK'}"><head><meta charset="utf-8"><base href="${base}/"><title>VL1 paper materials</title><link rel="stylesheet" href="paperwork/print.css"></head><body>${body}</body></html>`;
 }
 async function main(){
@@ -88,8 +39,8 @@ async function main(){
     await page.goto(base);await page.waitForFunction(()=>window.getVL1PaperSource&&window.VL1InquiryContent);
     const sources=await page.evaluate(()=>({zh:getVL1PaperSource('zh'),en:getVL1PaperSource('en')}));
     const supported=['initialObservation','hypothesisLiquid','hypothesisOutcome','reason','controlPlan','setupDescription','q1','q2','q3','limitations','reflection'];
-    if(JSON.stringify(sources.zh.questionIds)!==JSON.stringify(supported))throw new Error('Question fields changed: update paper layout and mapping before building.');
-    const manifest={module:'VL1',version:sources.zh.version,materialVersion:MATERIAL_VERSION,optionOrder:{assumptions:['time','more','volume','mixing'],conclusions:Object.fromEntries([...sources.zh.conclusions.questions,sources.zh.extension.conclusion].map(q=>[q.id,q.options.map(o=>o.id)]))},sourceDigest:sha(JSON.stringify(sources)),inputs:fingerprints(),languages:{}};
+    if(JSON.stringify(sources.zh.vl.questionIds)!==JSON.stringify(supported))throw new Error('Question fields changed: update paper layout and mapping before building.');
+    const manifest={module:'VL1',version:sources.zh.version,materialVersion:MATERIAL_VERSION,vlVersion:sources.zh.vlVersion,approach:sources.zh.approach,optionOrder:{assumptions:['time','more','volume','mixing'],conclusions:Object.fromEntries([...sources.zh.vl.conclusions.questions,sources.zh.vl.extension.conclusion].map(q=>[q.id,q.options.map(o=>o.id)]))},sourceDigest:sha(JSON.stringify(sources)),inputs:fingerprints(),languages:{}};
     fs.writeFileSync(path.join(out,'source.json'),JSON.stringify(sources,null,2)+'\n');
     for(const lang of ['zh','en']){
       const model=sources[lang],generated=generate(model,lang),files={};
@@ -107,13 +58,13 @@ async function main(){
           return enzyme.bottom>arrow.top+1||arrow.bottom>label.top+1||Math.abs(centre(enzyme)-centre(arrow))>2||Math.abs(centre(label)-centre(arrow))>2;
         }));
         if(reactionMisalignment)throw new Error(`${lang}/${part}: hydrolysis labels overlap or are not centred around the arrow`);
-        const layout=await page.locator('.sheet').evaluateAll(sheets=>sheets.map(sheet=>({part:sheet.dataset.part,page:Number(sheet.dataset.page),identity:sheet.querySelectorAll('.identity').length,writingLines:[...sheet.querySelectorAll('.ruled')].map(el=>el.querySelectorAll('.writing-line').length),circles:sheet.querySelectorAll('.circle-options').length,clearSurfaceBorders:[...sheet.querySelectorAll('.test-tube.clear .tube-liquid')].map(el=>parseFloat(getComputedStyle(el).borderTopWidth))})));
+        const layout=await page.locator('.sheet').evaluateAll(sheets=>sheets.map(sheet=>({part:sheet.dataset.part,page:Number(sheet.dataset.page),identity:sheet.querySelectorAll('.identity').length,writingLines:[...sheet.querySelectorAll('.ruled')].map(el=>el.querySelectorAll('.writing-line').length),circles:sheet.querySelectorAll('.circle-options').length,questionIds:[...sheet.querySelectorAll('[data-question-id]')].map(el=>el.dataset.questionId),trialKeys:[...sheet.querySelectorAll('[data-trial]')].map(el=>el.dataset.trial),clearSurfaceBorders:[...sheet.querySelectorAll('.test-tube.clear .tube-liquid')].map(el=>parseFloat(getComputedStyle(el).borderTopWidth))})));
         if(layout.some(p=>p.identity!==(p.page===1&&['A','C'].includes(p.part)?1:0)||p.writingLines.some(n=>n!==2)))throw new Error('Identity or two-line layout rule failed');
         if(layout.some(p=>p.clearSurfaceBorders.some(width=>width<1)))throw new Error('Clear test-tube liquid surface is missing');
         const filename=`VL1_${part}_${lang}_v${MATERIAL_VERSION}.pdf`,file=path.join(out,filename);
         await page.pdf({path:file,format:'A4',printBackground:true,preferCSSPageSize:true});
         const pages=parts.reduce((n,p)=>n+generated.pages[p].length,0);
-        const downloadName=lang==='zh'?`VL1_紙本對照組_${part==='all'?'完整教師列印套裝':part+'_'+labels.names.zh[part]}_繁中_v${MATERIAL_VERSION}.pdf`:`VL1_ControlGroup_${part==='all'?'CompleteTeacherPack':part}_EN_v${MATERIAL_VERSION}.pdf`;
+        const downloadName=lang==='zh'?`VL1_紙本比較組_${part==='all'?'完整教師列印套裝':part+'_'+model.names[part]}_繁中_v${MATERIAL_VERSION}.pdf`:`VL1_ComparisonGroup_${part==='all'?'CompleteTeacherPack':part}_EN_v${MATERIAL_VERSION}.pdf`;
         files[part]={path:'paperwork/generated/'+filename,name:downloadName,pages,bytes:fs.statSync(file).size,sha256:sha(fs.readFileSync(file)),layout};
         console.log(`Built ${lang}/${part}: ${pages} A4 pages`);
       }
@@ -121,6 +72,16 @@ async function main(){
       manifest.languages[lang]={files,ranges:Object.fromEntries(['A','B','C','D'].map(part=>{const range=[first,first+files[part].pages-1];first+=files[part].pages;return [part,range];}))};
     }
     fs.writeFileSync(path.join(out,'manifest.json'),JSON.stringify(manifest,null,2)+'\n');
+    const tableCell=value=>String(value).replace(/<[^>]*>/g,'').replace(/\|/g,'\\|').replace(/\s+/g,' ');
+    const mapping=['# VL1 紙本比較組逐題配對表',`題目版本：${manifest.version}；材料 v${MATERIAL_VERSION}；VL 來源：${manifest.vlVersion}。`];
+    for(const lang of ['zh','en']){
+      const model=sources[lang];
+      mapping.push('',lang==='zh'?'## 繁體中文':'## English','',
+        '| 題號 / Item | VL 原題 / Original | 處理 / Treatment | 新版題目 / Revised | 共同目標 / Goal | 理由 / Reason |',
+        '| --- | --- | --- | --- | --- | --- |');
+      for(const row of model.mapping)mapping.push('| '+[model.questions.find(q=>q.id===row.id).number,row.original,row.treatment,row.revised,row.goal,row.reason].map(tableCell).join(' | ')+' |');
+    }
+    fs.writeFileSync(path.join(out,'mapping.md'),mapping.join('\n')+'\n');
     const current=new Set(Object.values(manifest.languages).flatMap(entry=>Object.values(entry.files).map(file=>path.basename(file.path))));
     fs.readdirSync(out).filter(name=>/^VL1_(A|B|C|D|all)_(zh|en)_v\d+\.pdf$/.test(name)&&!current.has(name)).forEach(name=>fs.unlinkSync(path.join(out,name)));
   }finally{await browser.close();await new Promise(resolve=>server.close(resolve));}

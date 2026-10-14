@@ -30,7 +30,7 @@ jobs:
         run: |
           python3 -m http.server 8000 --bind 127.0.0.1 > /tmp/vl1-paper-server.log 2>&1 &
           node tests/paperwork.cjs http://127.0.0.1:8000
-      - name: Regenerate PDFs from shared live questions
+      - name: Regenerate direct self-study comparison PDFs
         run: npm run paper:build
       - name: Verify regenerated PDF contents
         run: python tests/paperwork_pdf.py
