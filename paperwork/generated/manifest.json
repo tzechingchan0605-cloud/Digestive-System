@@ -1,7 +1,7 @@
 {
   "module": "VL1",
-  "version": "VL1-WS-direct-2",
-  "materialVersion": 7,
+  "version": "VL1-WS-direct-3",
+  "materialVersion": 8,
   "vlVersion": "VL1-ui3-paper2",
   "approach": "explanation-example-guided-independent-check",
   "optionOrder": {
@@ -30,7 +30,7 @@
       ]
     }
   },
-  "sourceDigest": "92d8622e3d2f8ecdf7c9f4dffeb263ac5c6c401b34968d463df6738e1463c09f",
+  "sourceDigest": "f4f422341d8aad39befe7a64aa928cc81231283ea4edfefea0b2aeb08eae5bf2",
   "inputs": {
     "app.js": "461e2bfc7056a1f02361f9bb44ca98e70792c9a5ef8e5f6f107af3aa918f9cb8",
     "assets/digestive-juice-x.png": "788dfe6a61aee4ab17cfbf72b187997097d4cfef572cf80e29e68a209f5e2e83",
@@ -49,16 +49,16 @@
     "assets/triglyceride-structure-en.svg": "58040a1537ef9988bfd1d5aa067764279d279fff78ebc097ad2f403b72bf2e78",
     "assets/triglyceride-structure.svg": "088f4df5b388b0fd39a75997fb394791d18b3682364ecbe5a9154c4f6d8389b8",
     "assets/water-bath-37c.png": "34d144f74a45b442924b5b17b91b22a1a5c558126b10ebf8c1817fcae35a9585",
-    "index.html": "6b3d6afe98a9d2057aff1a05bf953bc158f99cf2e25cdf5bdcae0aef4055b054",
-    "language-dictionary.js": "327007e135fc4eaa0ad654e5630f73535aad1a2934baa97dab1ae5ab60c51e39",
+    "index.html": "b1eac89323f2c9a82ebb845b24147ed04fe7ec0e9dfd7a8b3bd1e073d1f4628d",
+    "language-dictionary.js": "f7d8466410cdb788a7006b58277f1bc83a4eb6b6b3abb272606271617b64708c",
     "language.js": "a5085a6cbdd4416f3056dde910e9f8a52c5a71e88eea3bde7f02ce40f13f11e7",
     "package-lock.json": "2e3aec6c61939243a7a2835464ba0c0a9deab7cc11880fe54cba7ad4a35964e7",
     "package.json": "d8c314d2fea2777e595944074154b21e7e5ce8f5fb595c7a729a909c8f86287f",
-    "paperwork/build.cjs": "c395f37b36deef767eb5012c0763ce3292bf1bcf17b707bc1aa3cff61c9a7ec3",
-    "paperwork/curriculum.js": "4946357ebd9702dfe6ec98d212649d514a8c6673b82527d3ef446a2217a9bf37",
-    "paperwork/fonts/NotoSansHK-paper.otf": "1c87f64ceae8023299f355be86a5e654c02a1483789bd6df4b0b5bf1f0cf8358",
-    "paperwork/print.css": "e86e9f1a06bdfe6daa2e9e60bced1b4bb7f50a1121f596738933c079106ffe5c",
-    "paperwork/render.cjs": "314540a010547ae2a6120227f8f4fb47156f22147a18ed3db6500bb4c840ca4b",
+    "paperwork/build.cjs": "143f803be353806742cb4bc9e154f6e382eb5075b428fe88e95fa0c263b57fda",
+    "paperwork/curriculum.js": "3e80a134df70f21581b0cf9445fca221b9afec338ae387e3968bba3cbd73aa1e",
+    "paperwork/fonts/NotoSansHK-paper.otf": "189f5154fd436b7c3712cb0e9116d441809c59bd1d7292b2c7eb7070bde25004",
+    "paperwork/print.css": "2aac2f0bac9ca3e2d3dd460634d1f31c9b171de792a807488de735527bad48e1",
+    "paperwork/render.cjs": "ee78ba7e6358a6b0cb65668ded602ac60c3c1f116887ea4a47c4a8173fffe6b3",
     "paperwork/source.js": "3abb61a460226d3278e56976685461bd4e4e0d7a00d9a11edcb76b71c5096a26",
     "styles.css": "194d441aea95cc932341b96cbaf8bdfebde494682e433ba07e74e701415b1560"
   },
@@ -66,16 +66,19 @@
     "zh": {
       "files": {
         "A": {
-          "path": "paperwork/generated/VL1_A_zh_v7.pdf",
-          "name": "VL1_紙本比較組_A_情境、補充資料與實驗圖_繁中_v7.pdf",
+          "path": "paperwork/generated/VL1_A_zh_v8.pdf",
+          "name": "VL1_紙本比較組_A_情境與補充資料_繁中_v8.pdf",
           "pages": 2,
-          "bytes": 413528,
-          "sha256": "e0da1537f71175a0d991b43fb864d4bcdfd8e99107aa5dea78d8c388690cf486",
+          "bytes": 566558,
+          "sha256": "d6d3b0c5931b020be3cf12efc00e77d3d492b7b012a705e338576e3160ddfe05",
           "layout": [
             {
               "part": "A",
               "page": 1,
               "identity": 1,
+              "keywordCount": 12,
+              "infoFor": [],
+              "equations": [],
               "introLines": 4,
               "writingLines": [],
               "circles": 0,
@@ -87,59 +90,62 @@
               "part": "A",
               "page": 2,
               "identity": 0,
+              "keywordCount": 29,
+              "infoFor": [],
+              "equations": [
+                "physical",
+                "chemical"
+              ],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
               "questionIds": [],
-              "trialKeys": [
-                "none-none",
-                "X-none",
-                "Y-none",
-                "XY-none",
-                "XY-none",
-                "XY-X",
-                "XY-Y"
-              ],
-              "clearSurfaceBorders": [
-                1,
-                1,
-                1
-              ]
+              "trialKeys": [],
+              "clearSurfaceBorders": []
             }
           ]
         },
         "B": {
-          "path": "paperwork/generated/VL1_B_zh_v7.pdf",
-          "name": "VL1_紙本比較組_B_有提示練習及獨立應用_繁中_v7.pdf",
+          "path": "paperwork/generated/VL1_B_zh_v8.pdf",
+          "name": "VL1_紙本比較組_B_有提示練習及獨立應用_繁中_v8.pdf",
           "pages": 4,
-          "bytes": 195545,
-          "sha256": "7656643cb7a08fc2dd40af36fcc3bb82d36cf23098b5c446aa673a8d97a9577c",
+          "bytes": 263001,
+          "sha256": "29a371441e0d87eeab4247760d6f5ae0b33fc1554b8a53ed0811a13660b402b3",
           "layout": [
             {
               "part": "B",
               "page": 1,
               "identity": 0,
-              "introLines": 0,
-              "writingLines": [
-                2,
-                2
-              ],
-              "circles": 2,
-              "questionIds": [
-                "observation",
+              "keywordCount": 18,
+              "infoFor": [
                 "prediction",
                 "variables",
                 "assumptions"
               ],
-              "trialKeys": [
-                "initial"
+              "equations": [],
+              "introLines": 0,
+              "writingLines": [
+                2
               ],
+              "circles": 0,
+              "questionIds": [
+                "prediction",
+                "variables",
+                "assumptions"
+              ],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
               "part": "B",
               "page": 2,
               "identity": 0,
+              "keywordCount": 19,
+              "infoFor": [
+                "control",
+                "limits"
+              ],
+              "equations": [],
               "introLines": 0,
               "writingLines": [
                 2,
@@ -147,13 +153,15 @@
                 2,
                 2,
                 2,
+                2,
                 2
               ],
-              "circles": 0,
+              "circles": 1,
               "questionIds": [
                 "control",
                 "labels",
-                "fairness"
+                "fairness",
+                "limits"
               ],
               "trialKeys": [],
               "clearSurfaceBorders": []
@@ -162,6 +170,13 @@
               "part": "B",
               "page": 3,
               "identity": 0,
+              "keywordCount": 25,
+              "infoFor": [
+                "mainObservations",
+                "xConclusion",
+                "surface"
+              ],
+              "equations": [],
               "introLines": 0,
               "writingLines": [
                 2,
@@ -173,44 +188,65 @@
                 "xConclusion",
                 "surface"
               ],
-              "trialKeys": [],
-              "clearSurfaceBorders": []
+              "trialKeys": [
+                "none-none",
+                "X-none",
+                "Y-none",
+                "XY-none"
+              ],
+              "clearSurfaceBorders": [
+                1
+              ]
             },
             {
               "part": "B",
               "page": 4,
               "identity": 0,
+              "keywordCount": 34,
+              "infoFor": [
+                "heatControl",
+                "application"
+              ],
+              "equations": [],
               "introLines": 0,
               "writingLines": [
                 2,
                 2,
-                2,
                 2
               ],
-              "circles": 2,
+              "circles": 1,
               "questionIds": [
-                "limits",
                 "heatControl",
                 "heatObservations",
                 "heatConclusion",
                 "application"
               ],
-              "trialKeys": [],
-              "clearSurfaceBorders": []
+              "trialKeys": [
+                "XY-none",
+                "XY-X",
+                "XY-Y"
+              ],
+              "clearSurfaceBorders": [
+                1,
+                1
+              ]
             }
           ]
         },
         "C": {
-          "path": "paperwork/generated/VL1_C_zh_v7.pdf",
-          "name": "VL1_紙本比較組_C_核對答案及修正_繁中_v7.pdf",
+          "path": "paperwork/generated/VL1_C_zh_v8.pdf",
+          "name": "VL1_紙本比較組_C_核對答案及修正_繁中_v8.pdf",
           "pages": 1,
-          "bytes": 146580,
-          "sha256": "d0c2f49dbb9fdba00766907907fb3788760b7e2d55c8c8c04288bac3089eaa2d",
+          "bytes": 147120,
+          "sha256": "66a08ed5651799d98778392f3fe3a9f6824dde5196f283a7ea5edb8f1c586a2f",
           "layout": [
             {
               "part": "C",
               "page": 1,
               "identity": 1,
+              "keywordCount": 57,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [
                 2,
@@ -224,16 +260,19 @@
           ]
         },
         "D": {
-          "path": "paperwork/generated/VL1_D_zh_v7.pdf",
-          "name": "VL1_紙本比較組_D_教師指引、配對及評分_繁中_v7.pdf",
+          "path": "paperwork/generated/VL1_D_zh_v8.pdf",
+          "name": "VL1_紙本比較組_D_教師指引、配對及評分_繁中_v8.pdf",
           "pages": 8,
-          "bytes": 285207,
-          "sha256": "97d38e505f841d91d1b195bff5fa5f1e835b4060752e3b765e5faae17a73a8a5",
+          "bytes": 285474,
+          "sha256": "789e00c82509858cb5734d480b70c78979a933e544431b9e713e7ac794e07ce4",
           "layout": [
             {
               "part": "D",
               "page": 1,
               "identity": 0,
+              "keywordCount": 0,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -245,6 +284,9 @@
               "part": "D",
               "page": 2,
               "identity": 0,
+              "keywordCount": 29,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -256,6 +298,9 @@
               "part": "D",
               "page": 3,
               "identity": 0,
+              "keywordCount": 46,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -267,6 +312,9 @@
               "part": "D",
               "page": 4,
               "identity": 0,
+              "keywordCount": 0,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -278,6 +326,9 @@
               "part": "D",
               "page": 5,
               "identity": 0,
+              "keywordCount": 0,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -289,6 +340,9 @@
               "part": "D",
               "page": 6,
               "identity": 0,
+              "keywordCount": 0,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -300,6 +354,9 @@
               "part": "D",
               "page": 7,
               "identity": 0,
+              "keywordCount": 1,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -311,6 +368,9 @@
               "part": "D",
               "page": 8,
               "identity": 0,
+              "keywordCount": 1,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -321,16 +381,19 @@
           ]
         },
         "all": {
-          "path": "paperwork/generated/VL1_all_zh_v7.pdf",
-          "name": "VL1_紙本比較組_完整教師列印套裝_繁中_v7.pdf",
+          "path": "paperwork/generated/VL1_all_zh_v8.pdf",
+          "name": "VL1_紙本比較組_完整教師列印套裝_繁中_v8.pdf",
           "pages": 15,
-          "bytes": 596391,
-          "sha256": "5700a190d991941e2d3586568bf92f5bb10ecf284f9d566573a8d73cf0ee4cea",
+          "bytes": 869292,
+          "sha256": "44b8e44cd48b83c4fd20aa13186d02a63affbfa20afcf195df3b12b1e896c74a",
           "layout": [
             {
               "part": "A",
               "page": 1,
               "identity": 1,
+              "keywordCount": 12,
+              "infoFor": [],
+              "equations": [],
               "introLines": 4,
               "writingLines": [],
               "circles": 0,
@@ -342,50 +405,53 @@
               "part": "A",
               "page": 2,
               "identity": 0,
+              "keywordCount": 29,
+              "infoFor": [],
+              "equations": [
+                "physical",
+                "chemical"
+              ],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
               "questionIds": [],
-              "trialKeys": [
-                "none-none",
-                "X-none",
-                "Y-none",
-                "XY-none",
-                "XY-none",
-                "XY-X",
-                "XY-Y"
-              ],
-              "clearSurfaceBorders": [
-                1,
-                1,
-                1
-              ]
+              "trialKeys": [],
+              "clearSurfaceBorders": []
             },
             {
               "part": "B",
               "page": 1,
               "identity": 0,
-              "introLines": 0,
-              "writingLines": [
-                2,
-                2
-              ],
-              "circles": 2,
-              "questionIds": [
-                "observation",
+              "keywordCount": 18,
+              "infoFor": [
                 "prediction",
                 "variables",
                 "assumptions"
               ],
-              "trialKeys": [
-                "initial"
+              "equations": [],
+              "introLines": 0,
+              "writingLines": [
+                2
               ],
+              "circles": 0,
+              "questionIds": [
+                "prediction",
+                "variables",
+                "assumptions"
+              ],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
               "part": "B",
               "page": 2,
               "identity": 0,
+              "keywordCount": 19,
+              "infoFor": [
+                "control",
+                "limits"
+              ],
+              "equations": [],
               "introLines": 0,
               "writingLines": [
                 2,
@@ -393,13 +459,15 @@
                 2,
                 2,
                 2,
+                2,
                 2
               ],
-              "circles": 0,
+              "circles": 1,
               "questionIds": [
                 "control",
                 "labels",
-                "fairness"
+                "fairness",
+                "limits"
               ],
               "trialKeys": [],
               "clearSurfaceBorders": []
@@ -408,6 +476,13 @@
               "part": "B",
               "page": 3,
               "identity": 0,
+              "keywordCount": 25,
+              "infoFor": [
+                "mainObservations",
+                "xConclusion",
+                "surface"
+              ],
+              "equations": [],
               "introLines": 0,
               "writingLines": [
                 2,
@@ -419,35 +494,56 @@
                 "xConclusion",
                 "surface"
               ],
-              "trialKeys": [],
-              "clearSurfaceBorders": []
+              "trialKeys": [
+                "none-none",
+                "X-none",
+                "Y-none",
+                "XY-none"
+              ],
+              "clearSurfaceBorders": [
+                1
+              ]
             },
             {
               "part": "B",
               "page": 4,
               "identity": 0,
+              "keywordCount": 34,
+              "infoFor": [
+                "heatControl",
+                "application"
+              ],
+              "equations": [],
               "introLines": 0,
               "writingLines": [
                 2,
                 2,
-                2,
                 2
               ],
-              "circles": 2,
+              "circles": 1,
               "questionIds": [
-                "limits",
                 "heatControl",
                 "heatObservations",
                 "heatConclusion",
                 "application"
               ],
-              "trialKeys": [],
-              "clearSurfaceBorders": []
+              "trialKeys": [
+                "XY-none",
+                "XY-X",
+                "XY-Y"
+              ],
+              "clearSurfaceBorders": [
+                1,
+                1
+              ]
             },
             {
               "part": "C",
               "page": 1,
               "identity": 1,
+              "keywordCount": 57,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [
                 2,
@@ -462,6 +558,9 @@
               "part": "D",
               "page": 1,
               "identity": 0,
+              "keywordCount": 0,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -473,6 +572,9 @@
               "part": "D",
               "page": 2,
               "identity": 0,
+              "keywordCount": 29,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -484,6 +586,9 @@
               "part": "D",
               "page": 3,
               "identity": 0,
+              "keywordCount": 46,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -495,6 +600,9 @@
               "part": "D",
               "page": 4,
               "identity": 0,
+              "keywordCount": 0,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -506,6 +614,9 @@
               "part": "D",
               "page": 5,
               "identity": 0,
+              "keywordCount": 0,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -517,6 +628,9 @@
               "part": "D",
               "page": 6,
               "identity": 0,
+              "keywordCount": 0,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -528,6 +642,9 @@
               "part": "D",
               "page": 7,
               "identity": 0,
+              "keywordCount": 1,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -539,6 +656,9 @@
               "part": "D",
               "page": 8,
               "identity": 0,
+              "keywordCount": 1,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -571,16 +691,19 @@
     "en": {
       "files": {
         "A": {
-          "path": "paperwork/generated/VL1_A_en_v7.pdf",
-          "name": "VL1_ComparisonGroup_A_EN_v7.pdf",
+          "path": "paperwork/generated/VL1_A_en_v8.pdf",
+          "name": "VL1_ComparisonGroup_A_EN_v8.pdf",
           "pages": 2,
-          "bytes": 176133,
-          "sha256": "d00bb8b732a44fdc38e1f356fc3ff3452069eeffe290781012454fafc87c37d5",
+          "bytes": 377291,
+          "sha256": "86e65de4c3df95127d60c3b7ab1de008234b2a6cd1524061dbd824e5a103365c",
           "layout": [
             {
               "part": "A",
               "page": 1,
               "identity": 1,
+              "keywordCount": 12,
+              "infoFor": [],
+              "equations": [],
               "introLines": 4,
               "writingLines": [],
               "circles": 0,
@@ -592,59 +715,62 @@
               "part": "A",
               "page": 2,
               "identity": 0,
+              "keywordCount": 43,
+              "infoFor": [],
+              "equations": [
+                "physical",
+                "chemical"
+              ],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
               "questionIds": [],
-              "trialKeys": [
-                "none-none",
-                "X-none",
-                "Y-none",
-                "XY-none",
-                "XY-none",
-                "XY-X",
-                "XY-Y"
-              ],
-              "clearSurfaceBorders": [
-                1,
-                1,
-                1
-              ]
+              "trialKeys": [],
+              "clearSurfaceBorders": []
             }
           ]
         },
         "B": {
-          "path": "paperwork/generated/VL1_B_en_v7.pdf",
-          "name": "VL1_ComparisonGroup_B_EN_v7.pdf",
+          "path": "paperwork/generated/VL1_B_en_v8.pdf",
+          "name": "VL1_ComparisonGroup_B_EN_v8.pdf",
           "pages": 4,
-          "bytes": 69524,
-          "sha256": "b3ecab7b90e65828d8e3fe60f075568e96912e7a8e28922caa40e5326091ad92",
+          "bytes": 143252,
+          "sha256": "e800f1c7c3d3de0f71bccbf4955a6d50fb8b5e0f81193ef331487901f1f2eb66",
           "layout": [
             {
               "part": "B",
               "page": 1,
               "identity": 0,
-              "introLines": 0,
-              "writingLines": [
-                2,
-                2
-              ],
-              "circles": 2,
-              "questionIds": [
-                "observation",
+              "keywordCount": 22,
+              "infoFor": [
                 "prediction",
                 "variables",
                 "assumptions"
               ],
-              "trialKeys": [
-                "initial"
+              "equations": [],
+              "introLines": 0,
+              "writingLines": [
+                2
               ],
+              "circles": 0,
+              "questionIds": [
+                "prediction",
+                "variables",
+                "assumptions"
+              ],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
               "part": "B",
               "page": 2,
               "identity": 0,
+              "keywordCount": 20,
+              "infoFor": [
+                "control",
+                "limits"
+              ],
+              "equations": [],
               "introLines": 0,
               "writingLines": [
                 2,
@@ -652,13 +778,15 @@
                 2,
                 2,
                 2,
+                2,
                 2
               ],
-              "circles": 0,
+              "circles": 1,
               "questionIds": [
                 "control",
                 "labels",
-                "fairness"
+                "fairness",
+                "limits"
               ],
               "trialKeys": [],
               "clearSurfaceBorders": []
@@ -667,6 +795,13 @@
               "part": "B",
               "page": 3,
               "identity": 0,
+              "keywordCount": 26,
+              "infoFor": [
+                "mainObservations",
+                "xConclusion",
+                "surface"
+              ],
+              "equations": [],
               "introLines": 0,
               "writingLines": [
                 2,
@@ -678,44 +813,65 @@
                 "xConclusion",
                 "surface"
               ],
-              "trialKeys": [],
-              "clearSurfaceBorders": []
+              "trialKeys": [
+                "none-none",
+                "X-none",
+                "Y-none",
+                "XY-none"
+              ],
+              "clearSurfaceBorders": [
+                1
+              ]
             },
             {
               "part": "B",
               "page": 4,
               "identity": 0,
+              "keywordCount": 38,
+              "infoFor": [
+                "heatControl",
+                "application"
+              ],
+              "equations": [],
               "introLines": 0,
               "writingLines": [
                 2,
                 2,
-                2,
                 2
               ],
-              "circles": 2,
+              "circles": 1,
               "questionIds": [
-                "limits",
                 "heatControl",
                 "heatObservations",
                 "heatConclusion",
                 "application"
               ],
-              "trialKeys": [],
-              "clearSurfaceBorders": []
+              "trialKeys": [
+                "XY-none",
+                "XY-X",
+                "XY-Y"
+              ],
+              "clearSurfaceBorders": [
+                1,
+                1
+              ]
             }
           ]
         },
         "C": {
-          "path": "paperwork/generated/VL1_C_en_v7.pdf",
-          "name": "VL1_ComparisonGroup_C_EN_v7.pdf",
+          "path": "paperwork/generated/VL1_C_en_v8.pdf",
+          "name": "VL1_ComparisonGroup_C_EN_v8.pdf",
           "pages": 1,
-          "bytes": 47093,
-          "sha256": "cedc71625cde9d8e24d8c8b2d039eb25a0a486bbecefa3f8c749fb05711e70ca",
+          "bytes": 47475,
+          "sha256": "05305804672491b798fd77193367a6a7d8b117925f46eb1cfbce466c7beb7f8c",
           "layout": [
             {
               "part": "C",
               "page": 1,
               "identity": 1,
+              "keywordCount": 69,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [
                 2,
@@ -729,16 +885,19 @@
           ]
         },
         "D": {
-          "path": "paperwork/generated/VL1_D_en_v7.pdf",
-          "name": "VL1_ComparisonGroup_D_EN_v7.pdf",
+          "path": "paperwork/generated/VL1_D_en_v8.pdf",
+          "name": "VL1_ComparisonGroup_D_EN_v8.pdf",
           "pages": 8,
-          "bytes": 97135,
-          "sha256": "f9aa0ebc1e5a022718a02e4a9d2204e7a498a71da84b60a0404fa8f605e7a219",
+          "bytes": 95664,
+          "sha256": "9041d6f3898faf8f24cfa8b77e3c5b680f5d3677b767086fd1b6f6e5194171c6",
           "layout": [
             {
               "part": "D",
               "page": 1,
               "identity": 0,
+              "keywordCount": 0,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -750,6 +909,9 @@
               "part": "D",
               "page": 2,
               "identity": 0,
+              "keywordCount": 29,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -761,6 +923,9 @@
               "part": "D",
               "page": 3,
               "identity": 0,
+              "keywordCount": 56,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -772,6 +937,9 @@
               "part": "D",
               "page": 4,
               "identity": 0,
+              "keywordCount": 0,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -783,6 +951,9 @@
               "part": "D",
               "page": 5,
               "identity": 0,
+              "keywordCount": 0,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -794,6 +965,9 @@
               "part": "D",
               "page": 6,
               "identity": 0,
+              "keywordCount": 0,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -805,6 +979,9 @@
               "part": "D",
               "page": 7,
               "identity": 0,
+              "keywordCount": 1,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -816,6 +993,9 @@
               "part": "D",
               "page": 8,
               "identity": 0,
+              "keywordCount": 1,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -826,16 +1006,19 @@
           ]
         },
         "all": {
-          "path": "paperwork/generated/VL1_all_en_v7.pdf",
-          "name": "VL1_ComparisonGroup_CompleteTeacherPack_EN_v7.pdf",
+          "path": "paperwork/generated/VL1_all_en_v8.pdf",
+          "name": "VL1_ComparisonGroup_CompleteTeacherPack_EN_v8.pdf",
           "pages": 15,
-          "bytes": 278468,
-          "sha256": "30f08eca55d13568bc90f21df987ea96f20d1bf7d957ae72946e88e1f2063a41",
+          "bytes": 552951,
+          "sha256": "aaa2ebe67994e39f2be29b77f70046cac00d3daeb0b34926163ed1a61dba55bb",
           "layout": [
             {
               "part": "A",
               "page": 1,
               "identity": 1,
+              "keywordCount": 12,
+              "infoFor": [],
+              "equations": [],
               "introLines": 4,
               "writingLines": [],
               "circles": 0,
@@ -847,50 +1030,53 @@
               "part": "A",
               "page": 2,
               "identity": 0,
+              "keywordCount": 43,
+              "infoFor": [],
+              "equations": [
+                "physical",
+                "chemical"
+              ],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
               "questionIds": [],
-              "trialKeys": [
-                "none-none",
-                "X-none",
-                "Y-none",
-                "XY-none",
-                "XY-none",
-                "XY-X",
-                "XY-Y"
-              ],
-              "clearSurfaceBorders": [
-                1,
-                1,
-                1
-              ]
+              "trialKeys": [],
+              "clearSurfaceBorders": []
             },
             {
               "part": "B",
               "page": 1,
               "identity": 0,
-              "introLines": 0,
-              "writingLines": [
-                2,
-                2
-              ],
-              "circles": 2,
-              "questionIds": [
-                "observation",
+              "keywordCount": 22,
+              "infoFor": [
                 "prediction",
                 "variables",
                 "assumptions"
               ],
-              "trialKeys": [
-                "initial"
+              "equations": [],
+              "introLines": 0,
+              "writingLines": [
+                2
               ],
+              "circles": 0,
+              "questionIds": [
+                "prediction",
+                "variables",
+                "assumptions"
+              ],
+              "trialKeys": [],
               "clearSurfaceBorders": []
             },
             {
               "part": "B",
               "page": 2,
               "identity": 0,
+              "keywordCount": 20,
+              "infoFor": [
+                "control",
+                "limits"
+              ],
+              "equations": [],
               "introLines": 0,
               "writingLines": [
                 2,
@@ -898,13 +1084,15 @@
                 2,
                 2,
                 2,
+                2,
                 2
               ],
-              "circles": 0,
+              "circles": 1,
               "questionIds": [
                 "control",
                 "labels",
-                "fairness"
+                "fairness",
+                "limits"
               ],
               "trialKeys": [],
               "clearSurfaceBorders": []
@@ -913,6 +1101,13 @@
               "part": "B",
               "page": 3,
               "identity": 0,
+              "keywordCount": 26,
+              "infoFor": [
+                "mainObservations",
+                "xConclusion",
+                "surface"
+              ],
+              "equations": [],
               "introLines": 0,
               "writingLines": [
                 2,
@@ -924,35 +1119,56 @@
                 "xConclusion",
                 "surface"
               ],
-              "trialKeys": [],
-              "clearSurfaceBorders": []
+              "trialKeys": [
+                "none-none",
+                "X-none",
+                "Y-none",
+                "XY-none"
+              ],
+              "clearSurfaceBorders": [
+                1
+              ]
             },
             {
               "part": "B",
               "page": 4,
               "identity": 0,
+              "keywordCount": 38,
+              "infoFor": [
+                "heatControl",
+                "application"
+              ],
+              "equations": [],
               "introLines": 0,
               "writingLines": [
                 2,
                 2,
-                2,
                 2
               ],
-              "circles": 2,
+              "circles": 1,
               "questionIds": [
-                "limits",
                 "heatControl",
                 "heatObservations",
                 "heatConclusion",
                 "application"
               ],
-              "trialKeys": [],
-              "clearSurfaceBorders": []
+              "trialKeys": [
+                "XY-none",
+                "XY-X",
+                "XY-Y"
+              ],
+              "clearSurfaceBorders": [
+                1,
+                1
+              ]
             },
             {
               "part": "C",
               "page": 1,
               "identity": 1,
+              "keywordCount": 69,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [
                 2,
@@ -967,6 +1183,9 @@
               "part": "D",
               "page": 1,
               "identity": 0,
+              "keywordCount": 0,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -978,6 +1197,9 @@
               "part": "D",
               "page": 2,
               "identity": 0,
+              "keywordCount": 29,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -989,6 +1211,9 @@
               "part": "D",
               "page": 3,
               "identity": 0,
+              "keywordCount": 56,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -1000,6 +1225,9 @@
               "part": "D",
               "page": 4,
               "identity": 0,
+              "keywordCount": 0,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -1011,6 +1239,9 @@
               "part": "D",
               "page": 5,
               "identity": 0,
+              "keywordCount": 0,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -1022,6 +1253,9 @@
               "part": "D",
               "page": 6,
               "identity": 0,
+              "keywordCount": 0,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -1033,6 +1267,9 @@
               "part": "D",
               "page": 7,
               "identity": 0,
+              "keywordCount": 1,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,
@@ -1044,6 +1281,9 @@
               "part": "D",
               "page": 8,
               "identity": 0,
+              "keywordCount": 1,
+              "infoFor": [],
+              "equations": [],
               "introLines": 0,
               "writingLines": [],
               "circles": 0,

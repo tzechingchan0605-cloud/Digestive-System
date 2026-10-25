@@ -515,12 +515,12 @@
         ]
       }
     },
-    "version": "VL1-WS-direct-2",
-    "materialVersion": 7,
+    "version": "VL1-WS-direct-3",
+    "materialVersion": 8,
     "approach": "explanation-example-guided-independent-check",
     "title": "脂質的消化與公平比較",
     "names": {
-      "A": "情境、補充資料與實驗圖",
+      "A": "情境與補充資料",
       "B": "有提示練習及獨立應用",
       "C": "核對答案及修正",
       "D": "教師指引、配對及評分",
@@ -529,7 +529,7 @@
     "introLines": [
       "食物中的脂質須先消化成較小分子，才能被吸收。",
       "本題比較在油水混合物加入 X、Y 或兩者後的外觀。",
-      "另有兩組測試比較煮沸 X 或 Y、冷卻後的結果。",
+      "四個裝置加入相同總量的液體，於相同條件下觀察。",
       "參閱下列補充資料及圖示完成 B，再用 C 核對修正；A 可隨時參閱。"
     ],
     "diagramCaptions": {
@@ -538,7 +538,7 @@
     },
     "labels": {
       "identity": "姓名：________________　班別及學號：________________",
-      "start": "A 從開始即可閱讀，全程可參閱。先看解說及示例，再完成 B；完成 B 後才取得 C。",
+      "start": "A 從開始即可閱讀，全程可參閱。先看補充資料，再完成 B；完成 B 後才取得 C。",
       "teacher": "只供教師，請勿派給學生。",
       "circles": "圈選括號內每組一項；多選題用方格。文字回答各提供兩行。",
       "first": "先完成並保留 B 的首次答案；取得 C 後用另一顏色修正，不擦除原文。",
@@ -547,59 +547,27 @@
       "studentTiming": "活動總時間為 15–20 分鐘，依老師指定的時限完成閱讀、練習及核對修正。",
       "matching": "本組不操作 VL，沒有課前講授；依工作紙自學。兩組的活動總時間均為 15–20 分鐘；同一班次採相同的 T，全程包括自學、練習與核對修正。",
       "limits": "外觀只能作教學線索；清澈不能單獨證明已產生甘油和脂肪酸，也不能量化速度。X＋Y 各 1 mL，而單獨組各加 2 mL；個別試劑量不同，不能據此定量證明協同作用或速率增加。",
-      "check": "完成 B 後才派發 C。現在可核對答案、保留原答並修正；不要虛構原始假說。",
+      "check": "完成 B 後才派發 C，核對答案、保留原答並修正。",
       "draft": "紙本練習回饋初稿；不等同 VL 活動分數、SPSAI 或 CKT。研究成效以另行共同測驗評估。"
     },
     "concepts": [
       {
-        "heading": "X：膽汁",
-        "body": "肝臟製造、膽囊儲存；不含消化酶。"
+        "heading": "01 · 物理消化",
+        "body": "膽汁由肝臟製造、膽囊儲存，不含消化酶；把大油滴乳化成小油滴，總表面積增加，脂質分子不變。"
       },
       {
-        "heading": "乳化：物理消化",
-        "body": "大油滴分成小油滴，脂質分子不變；總表面積增加，有助 Y 作用。"
-      },
-      {
-        "heading": "Y：脂肪酶",
-        "body": "催化脂質水解、改變化學鍵，屬化學消化。完全水解簡化模型：甘油三酯＋3H₂O→甘油＋3個脂肪酸；酶不被消耗。"
-      },
-      {
-        "heading": "高溫與變性",
-        "body": "脂肪酶是蛋白質；煮沸可改變其形狀、令酶變性失活。本模型中冷卻後不恢復；比較前先冷卻至共同 37°C。"
-      },
-      {
-        "heading": "外觀與產物證據",
-        "body": "分層、油層變薄、混濁或清澈，不能單獨證明已產生甘油及脂肪酸；仍需化學檢測及重複測試。"
-      },
-      {
-        "heading": "模型與推論限制",
-        "body": "圖示是預設教學資料，沒有量度速度。合併組與單獨組的個別試劑量不同，不能定量證明協同作用或速率提升。"
+        "heading": "02 · 化學消化",
+        "body": "脂肪酶催化脂質水解，改變化學鍵，形成甘油及脂肪酸；酶不被消耗。本課使用完全水解簡化模型。"
       }
     ],
-    "conditions": "各組起始油水量、加液總量（2 mL）、37°C、觀察時間及搖勻方式相同。各組配方見圖；煮沸液先冷卻至 37°C。",
-    "methods": [
-      {
-        "heading": "變量",
-        "body": "獨立：有意改變；因：觀察／量度的結果；控制：保持相同。"
-      },
-      {
-        "heading": "對照",
-        "body": "按比較問題選基準；對照也可含試劑，例如研究加熱時。"
-      }
-    ],
-    "examples": [
-      {
-        "heading": "示例：可測試預測",
-        "body": "其他條件相同，2 mL X 使大油滴分散；理由是膽汁乳化。比較水組與 X 組可檢驗。可檢驗不等同已獲支持。"
-      },
-      {
-        "heading": "示例：分類與觀察",
-        "body": "若只改搖勻方式，它是獨立變量；外觀是因變量，其餘固定。「杯底有顆粒」是觀察；「已化學分解」仍需證據。"
-      }
-    ],
+    "wordEquations": {
+      "physical": "脂質（大油滴） → 脂質（小油滴）",
+      "chemical": "甘油三酯 + 3H₂O（水） → 甘油 + 3 個脂肪酸"
+    },
+    "conditions": "各組起始油水量、加液總量（2 mL）、37°C、觀察時間及搖勻方式相同。配方見圖。",
     "timePlan": [
       {
-        "stage": "A：補充資料、示例及實驗圖",
+        "stage": "A：情境及補充概念圖",
         "fraction": 0.3
       },
       {
@@ -615,22 +583,8 @@
         "fraction": 0.1
       }
     ],
+    "modelIdentity": "核對說明：本教學模型設定 X 為膽汁、Y 為脂肪酶；這是模型設定，不能只靠外觀確證試劑身分。",
     "questions": [
-      {
-        "id": "observation",
-        "page": 1,
-        "kind": "initial",
-        "max": 2,
-        "source": [
-          "initialObservation"
-        ],
-        "prompt": "只描述圖中未加消化液的油水試管：你看到哪些層及分界？",
-        "hint": "描述可見外觀，先不要寫「已被消化」等解釋。",
-        "key": "油在上層、水在下層，兩層有清楚分界；描述與化學解釋分開。",
-        "goal": "觀察：分辨現象與解釋。",
-        "rule": "2：描述兩層、分界並分開解釋；1：一項具體外觀；0：沒有相關描述。",
-        "number": "B1.1"
-      },
       {
         "id": "prediction",
         "page": 1,
@@ -641,13 +595,15 @@
           "hypothesisOutcome",
           "reason"
         ],
-        "prompt": "評估以下預測能否檢驗，以及理由是否正確，並簡述原因。",
-        "given": "「保持其他條件相同，加入 2 mL Y 會把大油滴分散成小油滴，因為所有消化酶都會乳化脂質。」",
-        "hint": "可檢驗與理由正確，是兩個不同判斷。",
-        "key": "這是可檢驗的預測，但理由不正確：Y 是脂肪酶，催化水解；乳化是膽汁的作用。可測試不等同已證實。",
-        "goal": "設計探究：評估可測試性及理由。",
-        "rule": "2：可檢驗與理由不正確均分辨清楚並說明酶／乳化差異；1：只分辨或解釋其中一項；0：沒有相關判斷。",
-        "number": "B1.2"
+        "prompt": "在相同油水混合物中加入 2 mL 膽汁並搖勻，預測一項可觀察的外觀變化，並寫出理由。",
+        "info": {
+          "heading": "作答資料",
+          "body": "膽汁可把大油滴乳化成小油滴，脂質分子不變。預測須說明可觀察的變化；理由須連結這項作用。"
+        },
+        "key": "例：油滴較小、較分散，外觀可能較混濁；理由連結膽汁乳化。接受其他合理、可觀察及有依據的預測，不因未猜中參考外觀而扣探究能力分。",
+        "goal": "設計探究：根據已提供的概念，寫出可測試預測及理由。",
+        "rule": "可觀察且條件明確的預測 1；連結乳化概念的合理理由 1。不以猜中結果計分。",
+        "number": "B1.1"
       },
       {
         "id": "variables",
@@ -658,11 +614,14 @@
           "variables"
         ],
         "prompt": "本次主比較只改變消化液組合。把因素分為獨立、因及控制變量。",
-        "hint": "參考 A 的分類方法；每類可選多於一項。",
+        "info": {
+          "heading": "變量提示",
+          "body": "示例：只改搖勻方式並觀察外觀，搖勻方式是獨立變量，外觀是因變量；其餘條件保持相同。"
+        },
         "key": "獨立：消化液組合。因：混合物外觀。控制：起始油水量、反應溫度、時間、加液總量、搖勻方式。",
         "goal": "分類：辨識三類變量。",
         "rule": "獨立 1、因 1；五項控制每項 0.4，共 2。每類若選入其他類因素，該類 0 分。",
-        "number": "B1.3"
+        "number": "B1.2"
       },
       {
         "id": "assumptions",
@@ -673,11 +632,14 @@
           "assumptions"
         ],
         "prompt": "選出公平比較所需的實驗前提，可選多於一項。",
-        "hint": "假設是暫視為成立、用於解釋結果的條件；實際程序也要按已指定的固定條件執行。",
+        "info": {
+          "heading": "實驗前提",
+          "body": "公平比較只改變測試因素，其餘條件相同；以下選項中有不合理的安排。"
+        },
         "key": "選相同時間、相同起始油水量及加液總量、相同搖勻方式；不選 X＋Y 可加較多總液量。",
         "goal": "設計及進行實驗：辨識合理固定條件。",
         "rule": "選齊三項且無錯選為 1；其他已作答組合為 0。",
-        "number": "B1.4"
+        "number": "B1.3"
       },
       {
         "id": "control",
@@ -687,11 +649,14 @@
         "source": [
           "controlPlan"
         ],
-        "prompt": "要比較「加入消化液」與「只加水」，四組中哪一組是比較基準？為甚麼要加入相同總液量？",
-        "hint": "對照按這個具體比較問題選擇；不能把其他條件的差異誤當成試劑的作用。",
-        "key": "2 mL 水組是這個問題的基準；相同加液總量避免總體積或稀釋程度成為另一個差異。",
+        "prompt": "要比較「加入消化液」與「只加水」，四組中哪一組是對照組？為甚麼要加入相同總液量？",
+        "info": {
+          "heading": "對照組",
+          "body": "對照組與實驗組比較，用來判斷測試處理的影響；其餘條件應相同。"
+        },
+        "key": "2 mL 水組是這個問題的對照組；相同加液總量避免總體積或稀釋程度成為另一個差異。",
         "goal": "設計探究：理解對照的比較功能。",
-        "rule": "基準 1、固定總液量的合理理由 1。",
+        "rule": "對照組 1、固定總液量的合理理由 1。",
         "number": "B2.1"
       },
       {
@@ -704,8 +669,8 @@
           "setupCanvas",
           "setupPhoto"
         ],
-        "prompt": "四個基本裝置已指定。依 A 的配方在圖下補全組名及加液量，不需自行重新設計。",
-        "hint": "每個裝置均加入 2 mL 總液量；各有相同起始油水量。",
+        "prompt": "依以下配方，在圖下補全四組名稱及加液量。",
+        "hint": "配方：水 2 mL；X 2 mL；Y 2 mL；X＋Y 各 1 mL。起始油水量相同。",
         "key": "依序：水對照 2 mL 水；X 2 mL；Y 2 mL；X＋Y 各 1 mL。",
         "goal": "進行實驗及溝通：讀懂、補全裝置與量。",
         "rule": "四個組名及量均完整為 2；每個完整裝置 0.5。",
@@ -728,15 +693,39 @@
         "number": "B2.3"
       },
       {
+        "id": "limits",
+        "page": 2,
+        "kind": "conclusion",
+        "vlQuestion": "limitations",
+        "max": 2,
+        "source": [
+          "limitations"
+        ],
+        "info": {
+          "heading": "證據提示",
+          "body": "外觀是線索，不能代替消化產物的化學檢測；仍需其他檢測及重複測試。"
+        },
+        "sentence": "本實驗只記錄油層及混濁／清澈外觀，沒有直接檢測消化產物。最恰當的說法是：__________",
+        "prompt": "外觀證據的限制：選出最恰當的說法，再寫出需要的另一類證據。",
+        "key": "選「外觀提供線索，但不能單獨證明甘油及脂肪酸已產生」；需要其他消化產物化學檢測及重複測試。",
+        "goal": "推論及溝通：區分線索、直接證據與限制。",
+        "rule": "恰當說法 1；合理的額外檢測／重複證據 1。",
+        "number": "B2.4"
+      },
+      {
         "id": "mainObservations",
         "page": 3,
         "kind": "observations",
         "max": 4,
         "source": [
+          "initialObservation",
           "basicObservations"
         ],
-        "prompt": "參閱 A2 圖 1，記錄四組的外觀。",
-        "hint": "可參閱 A；先自行判讀，完成 B 後才用 C 核對。",
+        "prompt": "觀察圖 1，記錄四組的外觀。",
+        "info": {
+          "heading": "觀察提示",
+          "body": "留意有否分層、油層厚薄及混濁程度；先描述外觀，再解釋原因。"
+        },
         "key": "水：分層；X：混濁；Y：油層變薄但仍分層；X＋Y：清澈。",
         "goal": "觀察及溝通：保留四種外觀的區別。",
         "rule": "每組正確判讀 1 分，共 4。",
@@ -751,6 +740,10 @@
         "source": [
           "q1"
         ],
+        "info": {
+          "heading": "乳化提示",
+          "body": "乳化把大油滴分散成小油滴，脂質分子結構不變。"
+        },
         "prompt": "X 的作用：完成括號選擇，再用乳化概念解釋外觀。",
         "key": "混濁乳狀液；X 的乳化使油滴分散，屬物理消化，脂質分子結構不變。",
         "goal": "推論：連結外觀與乳化概念。",
@@ -766,26 +759,15 @@
         "source": [
           "q3"
         ],
+        "info": {
+          "heading": "表面積提示",
+          "body": "同量脂質分散成小油滴，可讓脂肪酶接觸更多表面；這不是速度量度。"
+        },
         "prompt": "油滴變小後的總表面積：完成選擇並說明如何有助 Y 作用。",
         "key": "增加；在同一總脂質量下，分散成小油滴增加脂肪酶可作用的表面。這不是速度量度。",
         "goal": "推論：以概念解釋表面積，避免冒充速率資料。",
         "rule": "增加 1；有效表面與酶作用的解釋 1。",
         "number": "B3.3"
-      },
-      {
-        "id": "limits",
-        "page": 4,
-        "kind": "conclusion",
-        "vlQuestion": "limitations",
-        "max": 2,
-        "source": [
-          "limitations"
-        ],
-        "prompt": "外觀證據的限制：選出最恰當的說法，再寫出需要的另一類證據。",
-        "key": "選「外觀提供線索，但不能單獨證明甘油及脂肪酸已產生」；需要其他消化產物化學檢測及重複測試。",
-        "goal": "推論及溝通：區分線索、直接證據與限制。",
-        "rule": "恰當說法 1；合理的額外檢測／重複證據 1。",
-        "number": "B4.1"
       },
       {
         "id": "heatControl",
@@ -796,11 +778,15 @@
           "controlPlan",
           "heatComparison"
         ],
-        "prompt": "要研究煮沸某一消化液的影響，應以哪一組作比較基準？比較前要怎樣處理煮沸的液體？",
+        "info": {
+          "heading": "熱處理資料",
+          "body": "脂肪酶是蛋白質；高溫可改變其形狀，使酶變性失活。本模型中冷卻後不恢復作用。煮沸的液體須先冷卻至共同 37°C，才作公平比較。"
+        },
+        "prompt": "要研究煮沸某一消化液的影響，應以哪一組作對照組？比較前要怎樣處理煮沸的液體？",
         "key": "未煮沸 X＋Y 各 1 mL 組；煮沸後冷卻至共同 37°C，其餘條件相同。這個對照含 X 與 Y。",
         "goal": "設計及進行實驗：按問題選對照並控制反應溫度。",
         "rule": "未煮沸組 1；冷卻至共同溫度及公平比較 1。",
-        "number": "B4.2"
+        "number": "B4.1"
       },
       {
         "id": "heatObservations",
@@ -810,11 +796,11 @@
         "source": [
           "extensionObservations"
         ],
-        "prompt": "參閱 A2 圖 2，記錄兩組熱處理外觀，與未煮沸 X＋Y 比較。",
+        "prompt": "觀察圖 2，記錄兩組熱處理外觀，與未煮沸 X＋Y 對照組比較。",
         "key": "煮沸 X＋未煮沸 Y：清澈；未煮沸 X＋煮沸 Y：混濁。",
-        "goal": "觀察：比較熱處理與基準。",
+        "goal": "觀察：比較熱處理與對照組。",
         "rule": "兩組各 1 分。",
-        "number": "B4.3"
+        "number": "B4.2"
       },
       {
         "id": "heatConclusion",
@@ -829,7 +815,7 @@
         "key": "Y；脂肪酶是蛋白質，煮沸使酶變性而失去功能，本模型中冷卻後也不恢復。",
         "goal": "推論及內容知識：用酶變性解釋熱處理。",
         "rule": "Y 1；蛋白質酶變性及不能單靠冷卻復原 1。",
-        "number": "B4.4"
+        "number": "B4.3"
       },
       {
         "id": "application",
@@ -839,11 +825,15 @@
         "source": [
           "reflection"
         ],
+        "info": {
+          "heading": "資料限制",
+          "body": "脂肪酶水解脂質，形成甘油及脂肪酸。圖示沒有量度速度；X＋Y 各 1 mL，單獨組各 2 mL，不能定量證明協同作用或速率增加。解釋時寫出組名及觀察差異。"
+        },
         "prompt": "引用至少一組主實驗比較及一組熱處理比較，解釋乳化、酶作用及變性。寫明你比較的組別；不要聲稱定量證明協同作用或速度增加。",
         "key": "例如水與 X 比較連結乳化；未煮沸 X＋Y 與煮沸 Y 組比較連結酶失去作用。合理說明膽汁分散油滴、脂肪酶水解及熱變性；外觀與不同個別試劑量限制定量推論。其他正確具體比較亦可。",
         "goal": "溝通及內容知識：用具體組間比較整合概念。",
         "rule": "乳化 1、水解酶作用 1、變性 1；主實驗及熱處理的具體比較與清楚表達 1。不以關鍵字計分。",
-        "number": "B4.5"
+        "number": "B4.4"
       }
     ],
     "corrections": [
@@ -852,20 +842,12 @@
     ],
     "mapping": [
       {
-        "id": "observation",
-        "original": "你的初步觀察：只描述圖中油+水試管的可見現象（暫不猜測 X、Y 的身分或實驗結果）。",
-        "treatment": "保留／等值改寫",
-        "revised": "只描述圖中未加消化液的油水試管：你看到哪些層及分界？",
-        "goal": "觀察：分辨現象與解釋。",
-        "reason": "保留共同內容／技能，以自學或靜態資料提供相應練習。"
-      },
-      {
         "id": "prediction",
         "original": "完成你的預測 / 若在油和水中加入 <span>__________</span>，試管中溶液的外觀將會 <span>__________</span>。 / 我的理由（必答；沒有固定答案）",
         "treatment": "改寫",
-        "revised": "評估以下預測能否檢驗，以及理由是否正確，並簡述原因。",
-        "goal": "設計探究：評估可測試性及理由。",
-        "reason": "以示例教方法，再評析另一預測與理由。"
+        "revised": "在相同油水混合物中加入 2 mL 膽汁並搖勻，預測一項可觀察的外觀變化，並寫出理由。",
+        "goal": "設計探究：根據已提供的概念，寫出可測試預測及理由。",
+        "reason": "根據已提供的膽汁乳化知識自行作預測，不假裝是課前原始猜想。"
       },
       {
         "id": "variables",
@@ -887,7 +869,7 @@
         "id": "control",
         "original": "你認為此實驗需要對照組嗎？如需要，你會如何設計比較裝置？",
         "treatment": "改寫",
-        "revised": "要比較「加入消化液」與「只加水」，四組中哪一組是比較基準？為甚麼要加入相同總液量？",
+        "revised": "要比較「加入消化液」與「只加水」，四組中哪一組是對照組？為甚麼要加入相同總液量？",
         "goal": "設計探究：理解對照的比較功能。",
         "reason": "保留共同內容／技能，以自學或靜態資料提供相應練習。"
       },
@@ -895,7 +877,7 @@
         "id": "labels",
         "original": "文字設計（可代替繪圖）：描述四個裝置、加液量及固定條件。 / 繪畫並標示你的實驗裝置 / 試參考實驗變量，繪畫並標示你的實驗裝置。",
         "treatment": "改寫",
-        "revised": "四個基本裝置已指定。依 A 的配方在圖下補全組名及加液量，不需自行重新設計。",
+        "revised": "依以下配方，在圖下補全四組名稱及加液量。",
         "goal": "進行實驗及溝通：讀懂、補全裝置與量。",
         "reason": "補全及評估給定程序，保留裝置與公平比較技能。"
       },
@@ -908,12 +890,20 @@
         "reason": "保留共同內容／技能，以自學或靜態資料提供相應練習。"
       },
       {
-        "id": "mainObservations",
-        "original": "根據你看到的現象，選擇外觀：",
-        "treatment": "靜態化",
-        "revised": "參閱 A2 圖 1，記錄四組的外觀。",
-        "goal": "觀察及溝通：保留四種外觀的區別。",
+        "id": "limits",
+        "original": "3. 本實驗能告訴我們甚麼？：我們只觀察油層、混濁或清澈的外觀，沒有檢測消化產物。以下哪個說法最恰當？<span class=\"paper-fill\">__________</span>",
+        "treatment": "保留／等值改寫",
+        "revised": "外觀證據的限制：選出最恰當的說法，再寫出需要的另一類證據。",
+        "goal": "推論及溝通：區分線索、直接證據與限制。",
         "reason": "保留共同內容／技能，以自學或靜態資料提供相應練習。"
+      },
+      {
+        "id": "mainObservations",
+        "original": "你的初步觀察：只描述圖中油+水試管的可見現象（暫不猜測 X、Y 的身分或實驗結果）。 / 根據你看到的現象，選擇外觀：",
+        "treatment": "合併／靜態化",
+        "revised": "觀察圖 1，記錄四組的外觀。",
+        "goal": "觀察及溝通：保留四種外觀的區別。",
+        "reason": "取消獨立初步觀察題，觀察證據保留於四組主實驗及兩組熱處理記錄。"
       },
       {
         "id": "xConclusion",
@@ -932,27 +922,19 @@
         "reason": "保留共同內容／技能，以自學或靜態資料提供相應練習。"
       },
       {
-        "id": "limits",
-        "original": "3. 本實驗能告訴我們甚麼？：我們只觀察油層、混濁或清澈的外觀，沒有檢測消化產物。以下哪個說法最恰當？<span class=\"paper-fill\">__________</span>",
-        "treatment": "保留／等值改寫",
-        "revised": "外觀證據的限制：選出最恰當的說法，再寫出需要的另一類證據。",
-        "goal": "推論及溝通：區分線索、直接證據與限制。",
-        "reason": "保留共同內容／技能，以自學或靜態資料提供相應練習。"
-      },
-      {
         "id": "heatControl",
         "original": "你認為此實驗需要對照組嗎？如需要，你會如何設計比較裝置？ / 哪一種消化液受高溫影響？",
         "treatment": "改寫",
-        "revised": "要研究煮沸某一消化液的影響，應以哪一組作比較基準？比較前要怎樣處理煮沸的液體？",
+        "revised": "要研究煮沸某一消化液的影響，應以哪一組作對照組？比較前要怎樣處理煮沸的液體？",
         "goal": "設計及進行實驗：按問題選對照並控制反應溫度。",
         "reason": "保留共同內容／技能，以自學或靜態資料提供相應練習。"
       },
       {
         "id": "heatObservations",
-        "original": "以「加入各 1 mL 消化液 X、消化液 Y」為比較基準，每次只煮沸其中一種消化液。完成兩項測試並記錄觀察。",
+        "original": "延伸探究：加熱對消化液的影響：哪一種消化液受高溫影響？",
         "treatment": "靜態化",
-        "revised": "參閱 A2 圖 2，記錄兩組熱處理外觀，與未煮沸 X＋Y 比較。",
-        "goal": "觀察：比較熱處理與基準。",
+        "revised": "觀察圖 2，記錄兩組熱處理外觀，與未煮沸 X＋Y 對照組比較。",
+        "goal": "觀察：比較熱處理與對照組。",
         "reason": "保留共同內容／技能，以自學或靜態資料提供相應練習。"
       },
       {
@@ -972,7 +954,7 @@
         "reason": "已先教概念；改為證據運用，不捏造原始假說。"
       }
     ],
-    "practiceMaximum": 36
+    "practiceMaximum": 34
   },
   "en": {
     "language": "en",
@@ -1490,12 +1472,12 @@
         ]
       }
     },
-    "version": "VL1-WS-direct-2",
-    "materialVersion": 7,
+    "version": "VL1-WS-direct-3",
+    "materialVersion": 8,
     "approach": "explanation-example-guided-independent-check",
     "title": "Digestion of lipids and fair comparisons",
     "names": {
-      "A": "Context, quick notes and experiment figures",
+      "A": "Context and supporting notes",
       "B": "Guided practice and independent application",
       "C": "Answer check and corrections",
       "D": "Teacher guide, mapping and feedback",
@@ -1504,7 +1486,7 @@
     "introLines": [
       "Lipids in food must be digested into small molecules before absorption.",
       "Four sets compare adding X, Y or both to an oil–water mixture.",
-      "Two further tests compare boiling X or Y and then cooling it.",
+      "The four setups receive equal total added volumes and use the same conditions.",
       "Use the notes and figures to complete B, then check with C. Keep A available."
     ],
     "diagramCaptions": {
@@ -1513,7 +1495,7 @@
     },
     "labels": {
       "identity": "Name: ____________________   Class and student number: ____________________",
-      "start": "Read A from the start and keep it available. Study the explanations and examples, complete B, then receive C.",
+      "start": "Read A from the start and keep it available. Read the supporting notes, complete B, then receive C.",
       "teacher": "For teachers only. Do not give this part to students.",
       "circles": "Circle one answer in each set of brackets; use boxes for multiple choices. Each written answer has two lines.",
       "first": "Complete and keep the first answers in B. After receiving C, correct in another colour without erasing the original.",
@@ -1522,59 +1504,27 @@
       "studentTiming": "The total activity time is 15–20 minutes. Follow the teacher’s time limit for reading, practice, checking and correcting.",
       "matching": "This group uses the worksheet without operating the VL or receiving a lesson beforehand. Both groups have 15–20 minutes in total. Use the same T for both groups in each session, including self-study, practice and checking.",
       "limits": "Appearance is a teaching clue: clarity alone does not prove glycerol (甘油) and fatty acids (脂肪酸) formed or measure speed. X + Y uses 1 mL each, while a single-juice set uses 2 mL. The different individual amounts cannot prove a measured combined effect or faster rate.",
-      "check": "Give out C only after B is completed. Check, keep the first answers and correct them. Do not invent an original hypothesis.",
+      "check": "Give out C only after B is completed. Check, keep the first answers and correct them.",
       "draft": "Draft worksheet feedback guide. These marks are not equivalent to VL activity marks, SPSAI or CKT. Use separate common tests to assess research outcomes."
     },
     "concepts": [
       {
-        "heading": "X: bile (膽汁)",
-        "body": "Made in the liver, stored in the gall bladder (膽囊); contains no digestive enzymes."
+        "heading": "01 · Physical digestion (物理消化)",
+        "body": "Bile (膽汁), made in the liver and stored in the gall bladder (膽囊), has no digestive enzymes. Emulsification (乳化作用) makes smaller droplets with more total surface area; lipid molecules stay unchanged."
       },
       {
-        "heading": "Emulsification (乳化作用): physical digestion (物理消化)",
-        "body": "Large oil droplets become small droplets. Lipid molecules stay unchanged; total surface area increases, helping Y act."
-      },
-      {
-        "heading": "Y: lipase (脂肪酶)",
-        "body": "Catalyses hydrolysis that changes chemical bonds: chemical digestion (化學消化). Simplified complete hydrolysis: triglyceride (甘油三酯) + 3H₂O → glycerol (甘油) + 3 fatty acids (脂肪酸). The enzyme is not used up."
-      },
-      {
-        "heading": "Heat and denaturation",
-        "body": "Lipase (脂肪酶) is a protein. Boiling can change its shape and stop it working (denaturation). Cooling does not restore it in this model. Compare at 37°C."
-      },
-      {
-        "heading": "Appearance and product evidence",
-        "body": "Layers, a thinner oil layer, cloudiness or clarity alone cannot prove glycerol (甘油) and fatty acids (脂肪酸) formed. Chemical tests and repeated tests are needed."
-      },
-      {
-        "heading": "Model and limits",
-        "body": "The figures are preset model data, with no speed measurements. Individual juice amounts differ between combined and single-juice sets, so a measured combined effect or faster rate cannot be proved."
+        "heading": "02 · Chemical digestion (化學消化)",
+        "body": "Lipase (脂肪酶) catalyses hydrolysis, changing chemical bonds to form glycerol (甘油) and fatty acids (脂肪酸). The enzyme is not used up. This course uses a simplified complete-hydrolysis model."
       }
     ],
-    "conditions": "Keep starting oil/water amounts, total added volume (2 mL), 37°C, observation time and shaking the same. Added liquids are shown in the figures. Cool boiled liquids to 37°C first.",
-    "methods": [
-      {
-        "heading": "Variables",
-        "body": "Independent: changed on purpose. Dependent: observed/measured result. Controlled: kept the same."
-      },
-      {
-        "heading": "Control",
-        "body": "Choose a baseline for the question. A control may contain reagents, for example in a heating comparison."
-      }
-    ],
-    "examples": [
-      {
-        "heading": "Example: a testable prediction",
-        "body": "With other conditions equal, 2 mL X disperses large oil droplets because bile (膽汁) emulsifies lipids (乳化脂質). Compare water with X to test it. Testable does not mean already supported."
-      },
-      {
-        "heading": "Example: classification and observation",
-        "body": "If only shaking changes, it is independent; appearance is dependent, and other conditions stay fixed. “Particles at the bottom” is an observation; “chemically broken down” needs evidence."
-      }
-    ],
+    "wordEquations": {
+      "physical": "Lipids (large oil droplets) → Lipids (small oil droplets)",
+      "chemical": "Triglyceride (甘油三酯) + 3H₂O (water) → glycerol (甘油) + 3 fatty acids (脂肪酸)"
+    },
+    "conditions": "Keep starting oil/water amounts, total added volume (2 mL), 37°C, observation time and shaking the same. Added liquids are shown in the figure.",
     "timePlan": [
       {
-        "stage": "A: notes, examples and experiment figures",
+        "stage": "A: context and supporting concept diagrams",
         "fraction": 0.3
       },
       {
@@ -1590,22 +1540,8 @@
         "fraction": 0.1
       }
     ],
+    "modelIdentity": "Check note: this teaching model assigns X to bile (膽汁) and Y to lipase (脂肪酶). These are model settings, not identities proved by appearance alone.",
     "questions": [
-      {
-        "id": "observation",
-        "page": 1,
-        "kind": "initial",
-        "max": 2,
-        "source": [
-          "initialObservation"
-        ],
-        "prompt": "Describe only the oil–water test tube before any digestive juice is added. What layers and boundary can you see?",
-        "hint": "Describe what you can see. Keep explanations such as “digested” separate.",
-        "key": "Oil is above the water, with a clear boundary. Keep the visible description separate from a chemical explanation.",
-        "goal": "Observation: separate what is seen from an explanation.",
-        "rule": "2: describes both layers and the boundary without claiming digestion; 1: one specific visible feature; 0: no relevant description.",
-        "number": "B1.1"
-      },
       {
         "id": "prediction",
         "page": 1,
@@ -1616,13 +1552,15 @@
           "hypothesisOutcome",
           "reason"
         ],
-        "prompt": "Judge whether this prediction is testable and its reason is correct. Explain briefly.",
-        "given": "“With the other conditions kept the same, adding 2 mL Y will spread large oil droplets into small droplets, because all digestive enzymes emulsify lipids (乳化脂質).”",
-        "hint": "Testable and correctly explained are different judgements.",
-        "key": "The prediction can be tested, but the reason is wrong. Y is lipase (脂肪酶), which speeds up hydrolysis. Bile (膽汁) causes emulsification (乳化作用). Testable does not mean already proved.",
-        "goal": "Inquiry design: judge whether a prediction is testable and whether its reason is sound.",
-        "rule": "2: separates testability from the wrong reason and explains enzyme action versus emulsification (乳化作用); 1: one useful judgement or explanation; 0: neither.",
-        "number": "B1.2"
+        "prompt": "Add 2 mL bile (膽汁) to the same oil–water mixture and shake it. Write one observable prediction and give your reason.",
+        "info": {
+          "heading": "Information for this question",
+          "body": "Bile (膽汁) emulsifies lipids (乳化脂質) into smaller droplets without changing the lipid molecules. Predict a visible change and link your reason to this action."
+        },
+        "key": "For example: smaller, more dispersed oil droplets; the mixture may look cloudier, because bile (膽汁) causes emulsification (乳化作用). Accept other reasoned, observable predictions; do not deduct inquiry marks just for not matching a reference appearance.",
+        "goal": "Inquiry design: apply a supplied concept to write a testable prediction and reason.",
+        "rule": "1 for an observable prediction with a clear treatment; 1 for a sound reason linked to emulsification (乳化作用). Do not score by guessing the result.",
+        "number": "B1.1"
       },
       {
         "id": "variables",
@@ -1633,11 +1571,14 @@
           "variables"
         ],
         "prompt": "The main comparison changes the combination of digestive juices. Classify the factors as independent, dependent or controlled variables.",
-        "hint": "Use the method in A. More than one factor may belong to a group.",
+        "info": {
+          "heading": "Variable reminder",
+          "body": "Example: change only the shaking method and observe the appearance. Shaking is the independent variable; appearance is the dependent variable. Keep other conditions the same."
+        },
         "key": "Independent: combination of juices. Dependent: appearance. Controlled: starting oil/water volume, temperature, time, total added volume and shaking method.",
         "goal": "Classification: identify the three kinds of variables.",
         "rule": "Independent 1, dependent 1; five controlled factors at 0.4 each, total 2. A factor from a wrong category gives 0 for that category.",
-        "number": "B1.3"
+        "number": "B1.2"
       },
       {
         "id": "assumptions",
@@ -1648,11 +1589,14 @@
           "assumptions"
         ],
         "prompt": "Choose all the conditions needed for a fair comparison.",
-        "hint": "An assumption is a condition taken as true when explaining results. The procedure must also follow the fixed conditions provided.",
+        "info": {
+          "heading": "Conditions for a fair test",
+          "body": "Change only the factor being tested and keep the other conditions equal. Some options below describe an unfair arrangement."
+        },
         "key": "Choose equal time, equal starting and total added volumes, and equal shaking; do not choose extra total liquid for X + Y.",
         "goal": "Inquiry design and experimental reasoning: identify sound fixed conditions.",
         "rule": "1 for all three correct conditions with no wrong choice; 0 for another attempted set.",
-        "number": "B1.4"
+        "number": "B1.3"
       },
       {
         "id": "control",
@@ -1662,11 +1606,14 @@
         "source": [
           "controlPlan"
         ],
-        "prompt": "To compare adding digestive juice with adding only water, which of the four sets is the baseline? Why keep the total volume added the same?",
-        "hint": "Choose the control for this specific question. A change in another condition must not be mistaken for the effect of the juice.",
-        "key": "The 2 mL water set is the baseline for this question. Equal added volume avoids a difference in total volume or dilution.",
+        "prompt": "To compare adding digestive juice with adding only water, which of the four sets is the control group? Why keep the total volume added the same?",
+        "info": {
+          "heading": "Control group",
+          "body": "Compare the experimental group with a control group to judge the treatment’s effect. Keep other conditions the same."
+        },
+        "key": "The 2 mL water set is the control group for this question. Equal added volume avoids a difference in total volume or dilution.",
         "goal": "Inquiry design: explain the purpose of a control.",
-        "rule": "1 for the baseline, 1 for a sound reason to keep total volume fixed.",
+        "rule": "1 for the control group, 1 for a sound reason to keep total volume fixed.",
         "number": "B2.1"
       },
       {
@@ -1679,8 +1626,8 @@
           "setupCanvas",
           "setupPhoto"
         ],
-        "prompt": "The four basic setups are already specified. Use the recipes in A to complete each label and added volume; no new apparatus design is needed.",
-        "hint": "Each setup receives 2 mL in total and starts with the same amounts of oil and water.",
+        "prompt": "Use the following recipes to complete the four setup labels and added volumes.",
+        "hint": "Recipes: water, 2 mL; X, 2 mL; Y, 2 mL; X + Y, 1 mL each. All start with the same amounts of oil and water.",
         "key": "In order: water control, 2 mL water; X, 2 mL; Y, 2 mL; X + Y, 1 mL each.",
         "goal": "Experimental reasoning and communication: read and label setups and volumes.",
         "rule": "2 for all four correct setup/volume labels; 0.5 per complete label.",
@@ -1703,15 +1650,39 @@
         "number": "B2.3"
       },
       {
+        "id": "limits",
+        "page": 2,
+        "kind": "conclusion",
+        "vlQuestion": "limitations",
+        "max": 2,
+        "source": [
+          "limitations"
+        ],
+        "info": {
+          "heading": "Evidence reminder",
+          "body": "Appearance gives clues but cannot replace chemical product tests. Other tests and repeated tests are needed."
+        },
+        "sentence": "This experiment records the oil layer and cloudiness/clarity, without directly testing for digestion products. Which statement fits best? __________",
+        "prompt": "Limits of appearance evidence: choose the best statement, then name another kind of evidence needed.",
+        "key": "Choose the statement that appearance gives clues but does not prove glycerol (甘油) and fatty acids (脂肪酸) formed. Other chemical product tests and repeated tests are needed.",
+        "goal": "Inference and communication: distinguish clues, direct evidence and limits.",
+        "rule": "1 for the sound statement, 1 for a useful additional test or repeated evidence.",
+        "number": "B2.4"
+      },
+      {
         "id": "mainObservations",
         "page": 3,
         "kind": "observations",
         "max": 4,
         "source": [
+          "initialObservation",
           "basicObservations"
         ],
-        "prompt": "Use Figure 1 on A2 to record the four appearances.",
-        "hint": "Use A as needed. Interpret the figures before checking with C after B.",
+        "prompt": "Observe Figure 1 and record the four appearances.",
+        "info": {
+          "heading": "Observation reminder",
+          "body": "Look for layers, oil-layer thickness and cloudiness. Describe what you see before explaining why."
+        },
         "key": "Water: separated layers; X: cloudy; Y: thinner oil layer, still separated; X + Y: clear.",
         "goal": "Observation and communication: distinguish the four appearances.",
         "rule": "1 per correctly described set, total 4.",
@@ -1726,6 +1697,10 @@
         "source": [
           "q1"
         ],
+        "info": {
+          "heading": "Emulsification (乳化作用) reminder",
+          "body": "Emulsification (乳化作用) makes smaller oil droplets without changing the lipid molecules."
+        },
         "prompt": "X: choose the appearance, then explain it using emulsification (乳化作用).",
         "key": "Cloudy emulsion (乳狀液). X disperses oil droplets by emulsification (乳化作用), a form of physical digestion (物理消化), without changing the lipid molecules.",
         "goal": "Inference: link an appearance with emulsification (乳化作用).",
@@ -1741,26 +1716,15 @@
         "source": [
           "q3"
         ],
+        "info": {
+          "heading": "Surface-area reminder",
+          "body": "Spreading the same amount of lipid into smaller droplets lets lipase (脂肪酶) contact more surface. This is not a speed measurement."
+        },
         "prompt": "Total surface area after droplets become smaller: choose the answer and explain how this helps Y act.",
         "key": "Increases. For the same total amount of lipid, small droplets provide more surface for lipase (脂肪酶) to act on. This is not a measurement of speed.",
         "goal": "Inference: explain surface area without inventing speed data.",
         "rule": "1 for increase, 1 for explaining the available surface and enzyme action.",
         "number": "B3.3"
-      },
-      {
-        "id": "limits",
-        "page": 4,
-        "kind": "conclusion",
-        "vlQuestion": "limitations",
-        "max": 2,
-        "source": [
-          "limitations"
-        ],
-        "prompt": "Limits of appearance evidence: choose the best statement, then name another kind of evidence needed.",
-        "key": "Choose the statement that appearance gives clues but does not prove glycerol (甘油) and fatty acids (脂肪酸) formed. Other chemical product tests and repeated tests are needed.",
-        "goal": "Inference and communication: distinguish clues, direct evidence and limits.",
-        "rule": "1 for the sound statement, 1 for a useful additional test or repeated evidence.",
-        "number": "B4.1"
       },
       {
         "id": "heatControl",
@@ -1771,11 +1735,15 @@
           "controlPlan",
           "heatComparison"
         ],
-        "prompt": "To study boiling one digestive juice, which set should be the baseline? What must happen to the boiled liquid before comparison?",
+        "info": {
+          "heading": "Information for the heating tests",
+          "body": "Lipase (脂肪酶) is a protein. High heat can change its shape and stop it working (denaturation); cooling does not restore its action in this model. Cool boiled liquids to the common 37°C before a fair comparison."
+        },
+        "prompt": "To study boiling one digestive juice, which set should be the control group? What must happen to the boiled liquid before comparison?",
         "key": "The unboiled X + Y set, 1 mL each; cool the boiled juice to the common 37°C and keep the other conditions equal. This control contains X and Y.",
         "goal": "Inquiry design and experimental reasoning: choose the control for the question and control reaction temperature.",
-        "rule": "1 for the unboiled baseline, 1 for cooling to the common temperature for a fair comparison.",
-        "number": "B4.2"
+        "rule": "1 for the unboiled control group, 1 for cooling to the common temperature for a fair comparison.",
+        "number": "B4.1"
       },
       {
         "id": "heatObservations",
@@ -1785,11 +1753,11 @@
         "source": [
           "extensionObservations"
         ],
-        "prompt": "Use Figure 2 on A2 to record the heated sets and compare them with unboiled X + Y.",
+        "prompt": "Observe Figure 2, record the heated sets and compare them with the unboiled X + Y control group.",
         "key": "Boiled X + unboiled Y: clear; unboiled X + boiled Y: cloudy.",
-        "goal": "Observation: compare heating treatments with a baseline.",
+        "goal": "Observation: compare heating treatments with a control group.",
         "rule": "1 for each set.",
-        "number": "B4.3"
+        "number": "B4.2"
       },
       {
         "id": "heatConclusion",
@@ -1804,7 +1772,7 @@
         "key": "Y. Lipase (脂肪酶) is a protein; boiling causes denaturation and loss of function. Cooling does not restore it in this model.",
         "goal": "Inference and content knowledge: explain heat treatment using enzyme denaturation.",
         "rule": "1 for Y, 1 for protein-enzyme denaturation and why cooling alone does not restore it.",
-        "number": "B4.4"
+        "number": "B4.3"
       },
       {
         "id": "application",
@@ -1814,11 +1782,15 @@
         "source": [
           "reflection"
         ],
+        "info": {
+          "heading": "Limits of these data",
+          "body": "Lipase (脂肪酶) hydrolyses lipids into glycerol (甘油) and fatty acids (脂肪酸). No speed was measured. X + Y uses 1 mL each; single-juice sets use 2 mL. This cannot prove a measured combined effect or faster rate. Name the compared sets and differences."
+        },
         "prompt": "Use at least one main-set comparison and one heating comparison to explain emulsification (乳化作用), enzyme action and denaturation. Name the sets. Do not claim a measured combined effect or increase in speed.",
         "key": "For example, compare water with X for emulsification (乳化作用), and unboiled X + Y with boiled Y for enzyme loss. Explain bile (膽汁), lipase (脂肪酶) hydrolysis and heat denaturation. Appearance and different individual juice amounts limit measured claims. Other sound specific comparisons are accepted.",
         "goal": "Communication and content knowledge: explain concepts using named comparisons.",
         "rule": "1 each for emulsification (乳化作用), enzyme hydrolysis and denaturation; 1 for clear main/heating comparisons. Judge explanations, not keywords.",
-        "number": "B4.5"
+        "number": "B4.4"
       }
     ],
     "corrections": [
@@ -1827,20 +1799,12 @@
     ],
     "mapping": [
       {
-        "id": "observation",
-        "original": "Your first observation：Describe only what you can see in the oil + water test tube (do not yet guess what X and Y are or what the results will be).",
-        "treatment": "Retained / equivalent rewrite",
-        "revised": "Describe only the oil–water test tube before any digestive juice is added. What layers and boundary can you see?",
-        "goal": "Observation: separate what is seen from an explanation.",
-        "reason": "Keep the common content and skills, practised through self-study or static data."
-      },
-      {
         "id": "prediction",
         "original": "Complete your prediction / If I add <span>__________</span>to the oil and water, the mixture in the test tube will <span>__________</span>.  / My reason (required; there is no single correct answer)",
         "treatment": "Rewritten",
-        "revised": "Judge whether this prediction is testable and its reason is correct. Explain briefly.",
-        "goal": "Inquiry design: judge whether a prediction is testable and whether its reason is sound.",
-        "reason": "Teach the method with an example, then evaluate another prediction and reason."
+        "revised": "Add 2 mL bile (膽汁) to the same oil–water mixture and shake it. Write one observable prediction and give your reason.",
+        "goal": "Inquiry design: apply a supplied concept to write a testable prediction and reason.",
+        "reason": "Write a prediction using supplied knowledge of bile (膽汁) and emulsification (乳化作用); do not present it as a pre-learning original guess."
       },
       {
         "id": "variables",
@@ -1862,7 +1826,7 @@
         "id": "control",
         "original": "Does this experiment need a control group? If so, how would you design the setups to compare?",
         "treatment": "Rewritten",
-        "revised": "To compare adding digestive juice with adding only water, which of the four sets is the baseline? Why keep the total volume added the same?",
+        "revised": "To compare adding digestive juice with adding only water, which of the four sets is the control group? Why keep the total volume added the same?",
         "goal": "Inquiry design: explain the purpose of a control.",
         "reason": "Keep the common content and skills, practised through self-study or static data."
       },
@@ -1870,7 +1834,7 @@
         "id": "labels",
         "original": "Written design (can replace a drawing): describe the four setups, how much liquid you add and which conditions you keep the same. / Draw and label your setup / Use your experimental variables to help you draw and label your setup.",
         "treatment": "Rewritten",
-        "revised": "The four basic setups are already specified. Use the recipes in A to complete each label and added volume; no new apparatus design is needed.",
+        "revised": "Use the following recipes to complete the four setup labels and added volumes.",
         "goal": "Experimental reasoning and communication: read and label setups and volumes.",
         "reason": "Label and evaluate a given procedure while practising apparatus and fair-comparison skills."
       },
@@ -1883,12 +1847,20 @@
         "reason": "Keep the common content and skills, practised through self-study or static data."
       },
       {
-        "id": "mainObservations",
-        "original": "Select the appearance based on what you observe:",
-        "treatment": "Static data",
-        "revised": "Use Figure 1 on A2 to record the four appearances.",
-        "goal": "Observation and communication: distinguish the four appearances.",
+        "id": "limits",
+        "original": "3. What can this experiment tell us?：We only observed the oil layer and whether the mixture was cloudy or clear. We did not test for digestion products. Which statement fits best?<span class=\"paper-fill\">__________</span>",
+        "treatment": "Retained / equivalent rewrite",
+        "revised": "Limits of appearance evidence: choose the best statement, then name another kind of evidence needed.",
+        "goal": "Inference and communication: distinguish clues, direct evidence and limits.",
         "reason": "Keep the common content and skills, practised through self-study or static data."
+      },
+      {
+        "id": "mainObservations",
+        "original": "Your first observation：Describe only what you can see in the oil + water test tube (do not yet guess what X and Y are or what the results will be). / Select the appearance based on what you observe:",
+        "treatment": "Merged / static data",
+        "revised": "Observe Figure 1 and record the four appearances.",
+        "goal": "Observation and communication: distinguish the four appearances.",
+        "reason": "Remove the separate initial-observation item; retain observation evidence in the four main and two heating records."
       },
       {
         "id": "xConclusion",
@@ -1907,27 +1879,19 @@
         "reason": "Keep the common content and skills, practised through self-study or static data."
       },
       {
-        "id": "limits",
-        "original": "3. What can this experiment tell us?：We only observed the oil layer and whether the mixture was cloudy or clear. We did not test for digestion products. Which statement fits best?<span class=\"paper-fill\">__________</span>",
-        "treatment": "Retained / equivalent rewrite",
-        "revised": "Limits of appearance evidence: choose the best statement, then name another kind of evidence needed.",
-        "goal": "Inference and communication: distinguish clues, direct evidence and limits.",
-        "reason": "Keep the common content and skills, practised through self-study or static data."
-      },
-      {
         "id": "heatControl",
         "original": "Does this experiment need a control group? If so, how would you design the setups to compare? / Which digestive juice is affected by high temperature?",
         "treatment": "Rewritten",
-        "revised": "To study boiling one digestive juice, which set should be the baseline? What must happen to the boiled liquid before comparison?",
+        "revised": "To study boiling one digestive juice, which set should be the control group? What must happen to the boiled liquid before comparison?",
         "goal": "Inquiry design and experimental reasoning: choose the control for the question and control reaction temperature.",
         "reason": "Keep the common content and skills, practised through self-study or static data."
       },
       {
         "id": "heatObservations",
-        "original": "Use “add 1 mL each of digestive juices X and Y” as the group for comparison. Boil only one digestive juice at a time. Complete both tests and record your observations.",
+        "original": "Extension: the effects of heating on digestive juices：Which digestive juice is affected by high temperature?",
         "treatment": "Static data",
-        "revised": "Use Figure 2 on A2 to record the heated sets and compare them with unboiled X + Y.",
-        "goal": "Observation: compare heating treatments with a baseline.",
+        "revised": "Observe Figure 2, record the heated sets and compare them with the unboiled X + Y control group.",
+        "goal": "Observation: compare heating treatments with a control group.",
         "reason": "Keep the common content and skills, practised through self-study or static data."
       },
       {
@@ -1947,6 +1911,6 @@
         "reason": "Concepts are taught first; assess their use with evidence rather than inventing an original hypothesis."
       }
     ],
-    "practiceMaximum": 36
+    "practiceMaximum": 34
   }
 }

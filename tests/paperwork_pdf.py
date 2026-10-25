@@ -13,11 +13,14 @@ def compact(value):
 def require_text(text, values, context):
     for value in values:
         assert compact(value) in compact(text), (*context,'missing content',value)
-assert manifest['version']=='VL1-WS-direct-2' and manifest['materialVersion']==7
+assert manifest['version']=='VL1-WS-direct-3' and manifest['materialVersion']==8
 assert manifest['approach']=='explanation-example-guided-independent-check'
 for lang in ['zh','en']:
     model=sources[lang]; vl=model['vl']
-    assert model['practiceMaximum']==36 and len(model['questions'])==len(model['mapping'])==15
+    assert model['practiceMaximum']==34 and len(model['questions'])==len(model['mapping'])==14
+    assert 'observation' not in {q['id'] for q in model['questions']}
+    assert model['questions'][0]['id']=='prediction' and 'given' not in model['questions'][0]
+    assert len(model['concepts'])==2 and 'methods' not in model and 'examples' not in model
     assert abs(sum(s['fraction'] for s in model['timePlan'])-1)<1e-12
     for total in [15,20]:
         assert abs(sum(round(s['fraction']*total,2) for s in model['timePlan'])-total)<1e-12
@@ -36,43 +39,64 @@ for lang in ['zh','en']:
             if layout['part']=='B':
                 expected=[q for q in model['questions'] if q['page']==layout['page']]
                 assert layout['questionIds']==[q['id'] for q in expected], (*ctx,'question coverage/order')
-                require_text(page_text,[q['prompt'] for q in expected]+[q.get('given','') for q in expected]+[q.get('hint','') for q in expected],ctx)
+                require_text(page_text,[q['prompt'] for q in expected]+[q.get('hint','') for q in expected]+[q.get('sentence','').replace('__________','') for q in expected]+[q['info'][key] for q in expected if 'info' in q for key in ['heading','body']],ctx)
+                assert layout['infoFor']==[q['id'] for q in expected if 'info' in q], (*ctx,'question-local support')
             if layout['part']=='A' and layout['page']==1:
                 assert layout['introLines']==4, (*ctx,'four-line opening')
                 require_text(page_text,model['introLines'],ctx)
+                assert len(page.get_images())>=4, (*ctx,'original VL context images')
             if layout['part']=='A' and layout['page']==2:
+                assert layout['equations']==['physical','chemical']
+                require_text(page_text,list(model['wordEquations'].values()),ctx)
+                frames=[d['rect'] for d in page.get_drawings() if d.get('color') and all(abs(a-b)<.005 for a,b in zip(d['color'],[184/255,198/255,194/255])) and d['rect'].height>100*72/25.4]
+                assert len(frames)==2, (*ctx,'two equal supplement frames')
+                assert abs(frames[0].width-frames[1].width)<1 and abs(frames[0].height-frames[1].height)<1
                 outlines=[d['rect'] for d in page.get_drawings() if d.get('color') and all(abs(a-b)<.005 for a,b in zip(d['color'],[195/255,212/255,206/255]))]
                 assert len(outlines)==3, (*ctx,'three separate fatty acids')
                 outlines.sort(key=lambda r:r.x0)
                 assert outlines[0].x1<outlines[1].x0 and outlines[1].x1<outlines[2].x0
                 assert min(r.width for r in outlines)>20*72/25.4
+            if layout['part'] in ['A','B','C']:
+                assert layout['keywordCount']>0
+                # Chromium may encode coloured bold CJK as Type3 outlines; verify actual rendered ink.
+                pixels=page.get_pixmap().samples
+                assert sum(r>120 and r>g*1.7 and r>b*1.7 for r,g,b in zip(pixels[0::3],pixels[1::3],pixels[2::3]))>50, (*ctx,'printed red keywords')
         assert '\ufffd' not in text
+        assert '比較基準' not in text and not re.search(r'\bbaseline\b',text,re.I)
         if part in ['A','B','C']:
             assert 'tzechingchan0605' not in text and '@gmail.com' not in text
             assert compact(vl['reflection']['question']) not in compact(text), (lang,part,'old original-hypothesis reflection')
             assert compact(vl['control']['hint']) not in compact(text), (lang,part,'overgeneralised control explanation')
             assert not re.search(r'SPSAI|最高分|Maximum|32-point|36-point',text)
         if part=='A':
-            require_text(text,[model['title'],model['labels']['studentTiming'],model['conditions']]+model['introLines']+list(model['diagramCaptions'].values())
-                +[c[k] for c in model['concepts']+model['methods']+model['examples'] for k in ['heading','body']],(lang,part))
-            keys=[key for page in file['layout'] for key in page['trialKeys']]
-            assert set(keys)=={t['key'] for t in vl['trials']} and keys.count('XY-none')==2
-            require_text(text,[t['label'] for t in vl['trials']],(lang,part))
+            require_text(text,[model['title'],model['conditions']]+model['introLines']+list(model['diagramCaptions'].values())
+                +[c[k] for c in model['concepts'] for k in ['heading','body']],(lang,part))
+            assert [key for page in file['layout'] for key in page['trialKeys']]==[]
+            assert '煮沸' not in text and '變性' not in text and not re.search(r'boil|denatur',text,re.I)
+            assert '示例' not in text and not re.search(r'example',text,re.I)
+            assert compact(model['labels']['studentTiming']) not in compact(text)
             assert compact(next(q for q in model['questions'] if q['id']=='mainObservations')['key']) not in compact(text)
             assert compact(next(q for q in model['questions'] if q['id']=='heatObservations')['key']) not in compact(text)
         if part=='B':
             assert [qid for page in file['layout'] for qid in page['questionIds']]==[q['id'] for q in model['questions']]
-            assert [key for page in file['layout'] for key in page['trialKeys']]==['initial']
-            require_text(text,[t['label'] for t in vl['trials']]+[o['text'] for o in vl['basic']['options']],(lang,part))
+            keys=[key for page in file['layout'] for key in page['trialKeys']]
+            assert keys==['none-none','X-none','Y-none','XY-none','XY-none','XY-X','XY-Y']
+            require_text(text,[t['label'] for t in vl['trials'] if t['key']!='none-none']+[o['text'] for o in vl['basic']['options']],(lang,part))
+            assert file['layout'][0]['writingLines']==[2], (lang,'one written prediction/reason')
+            for i,page in enumerate(doc):
+                if i<3:
+                    assert '煮沸' not in page.get_text() and not re.search(r'boil|denatur',page.get_text(),re.I)
             for option in vl['variables']['choices']:
                 assert compact(text).count(compact(option['text']))>=3
+        if part in ['A','B']:
+            assert not re.search(r'X\s*[＝=:：為是]\s*膽汁|Y\s*[＝=:：為是]\s*脂肪酶|X\s*(?:is|=|:)\s*bile|Y\s*(?:is|=|:)\s*lipase',text,re.I), (lang,part,'no explicit X/Y identity assignment before checking')
         if part=='C':
-            require_text(text,[model['labels']['check'],model['labels']['limits']]+[q['key'] for q in model['questions']]+model['corrections'],(lang,part))
+            require_text(text,[model['labels']['check'],model['labels']['limits'],model['modelIdentity']]+[q['key'] for q in model['questions']]+model['corrections'],(lang,part))
             assert file['layout'][0]['writingLines']==[2,2]
         if part=='D':
             require_text(text,[model['labels']['matching'],model['labels']['draft']]+[q[k] for q in model['questions'] for k in ['prompt','key','rule','goal']]
                 +[row[k] for row in model['mapping'] for k in ['original','treatment','revised','goal','reason']],(lang,part))
-            assert '15' in text and '20' in text and '36' in text and '32' in text
+            assert '15' in text and '20' in text and '34' in text and '32' in text
         if lang=='en':
             for word in re.findall(r'[\u3400-\u9fff]+',text):
                 assert word in supported,(part,word)
@@ -91,4 +115,4 @@ for lang in ['zh','en']:
             page.get_pixmap(matrix=fitz.Matrix(1.4,1.4)).save(output/f'{lang}-{part}-{i+1}.png')
 doc=fitz.open(root/manifest['languages']['zh']['files']['B']['path'])
 doc[2].get_pixmap(matrix=fitz.Matrix(1.5,1.5),colorspace=fitz.csGRAY).save(output/'zh-B-3-grayscale.png')
-print('PASS: ten real A4 PDFs, four-line opening and six quick notes, compact examples, 15 guided/independent items, all six model sets on A2, delayed keys/corrections, 15–20 minute matched timing, complete item mapping/36-point separate feedback guide, bilingual text/fonts/two lines/identity positions, three fatty-acid outlines; all pages rendered.')
+print('PASS: ten real A4 PDFs; four-line opening with original VL context, matching concept frames and single-line word equations; printed red keywords and question-local notes; 14 items / 34-point separate feedback guide; all six datasets on B3/B4, heating support only at B4; delayed model-identity check and corrections; bilingual fonts, two-line responses, mapping, timing and downloads ready; all pages rendered.')
