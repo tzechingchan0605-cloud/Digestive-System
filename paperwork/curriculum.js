@@ -2,8 +2,8 @@
 // Paper comparison condition only: direct explanation, worked examples, practice.
 // No student state, record, timer, cloud or scoring-workbook writes.
 (() => {
-  const version='VL1-WS-direct-1';
-  const materialVersion=6;
+  const version='VL1-WS-direct-2';
+  const materialVersion=7;
   const expectedOutcomes={'none-none':'separated','X-none':'cloudy','Y-none':'thin-oil','XY-none':'clear','XY-X':'clear','XY-Y':'cloudy'};
   const p=(zh,en)=>({zh,en});
   const resolve=(value,lang)=>Array.isArray(value)?value.map(v=>resolve(v,lang)):value&&typeof value==='object'?
@@ -19,9 +19,9 @@
         hint:p('描述可見外觀，先不要寫「已被消化」等解釋。','Describe what you can see. Keep explanations such as “digested” separate.'),
         key:p('油在上層、水在下層，兩層有清楚分界；描述與化學解釋分開。','Oil is above the water, with a clear boundary. Keep the visible description separate from a chemical explanation.'),goal:p('觀察：分辨現象與解釋。','Observation: separate what is seen from an explanation.'),rule:p('2：描述兩層、分界並分開解釋；1：一項具體外觀；0：沒有相關描述。','2: describes both layers and the boundary without claiming digestion; 1: one specific visible feature; 0: no relevant description.')},
       {id:'prediction',page:1,kind:'prediction',max:2,source:['hypothesisLiquid','hypothesisOutcome','reason'],
-        prompt:p('評估給定預測及理由，不用建立「原始假說」。','Evaluate this given prediction and reason. You do not need to invent an “original hypothesis”.'),
+        prompt:p('評估以下預測能否檢驗，以及理由是否正確，並簡述原因。','Judge whether this prediction is testable and its reason is correct. Explain briefly.'),
         given:p('「保持其他條件相同，加入 2 mL Y 會把大油滴分散成小油滴，因為所有消化酶都會乳化脂質。」','“With the other conditions kept the same, adding 2 mL Y will spread large oil droplets into small droplets, because all digestive enzymes emulsify lipids (乳化脂質).”'),
-        hint:p('先分開判斷「能否用觀察檢驗」和「理由是否符合概念」，再指出理由的問題。','Judge separately whether observations can test the prediction and whether the reason fits the concepts. Then explain the problem with the reason.'),
+        hint:p('可檢驗與理由正確，是兩個不同判斷。','Testable and correctly explained are different judgements.'),
         key:p('這是可檢驗的預測，但理由不正確：Y 是脂肪酶，催化水解；乳化是膽汁的作用。可測試不等同已證實。','The prediction can be tested, but the reason is wrong. Y is lipase (脂肪酶), which speeds up hydrolysis. Bile (膽汁) causes emulsification (乳化作用). Testable does not mean already proved.'),goal:p('設計探究：評估可測試性及理由。','Inquiry design: judge whether a prediction is testable and whether its reason is sound.'),rule:p('2：可檢驗與理由不正確均分辨清楚並說明酶／乳化差異；1：只分辨或解釋其中一項；0：沒有相關判斷。','2: separates testability from the wrong reason and explains enzyme action versus emulsification (乳化作用); 1: one useful judgement or explanation; 0: neither.')},
       {id:'variables',page:1,kind:'variables',max:4,source:['variables'],
         prompt:p('本次主比較只改變消化液組合。把因素分為獨立、因及控制變量。','The main comparison changes the combination of digestive juices. Classify the factors as independent, dependent or controlled variables.'),hint:p('參考 A 的分類方法；每類可選多於一項。','Use the method in A. More than one factor may belong to a group.'),
@@ -39,7 +39,7 @@
         prompt:p('某人讓水組加 2 mL 水，X＋Y 組卻加 2 mL X 及 2 mL Y，其餘條件相同。這是否公平？指出問題、修正兩種消化液的量，並說明理由。','Someone adds 2 mL water to the control but 2 mL X and 2 mL Y to the combined set, with other conditions equal. Is this fair? Identify the problem, fix the two volumes and explain why.'),hint:p('先計每組的加液總量；再判斷是否只改了一項因素。','First find the total volume added to each set. Then check whether only one factor changed.'),
         key:p('不公平：2 mL 對 4 mL。改為 X、Y 各 1 mL，保持總量 2 mL，排除總體積／稀釋差異。','Unfair: 2 mL versus 4 mL. Use 1 mL of each juice, keeping the total at 2 mL to avoid a volume/dilution difference.'),goal:p('設計及進行實驗：評估並修正不公平程序。','Inquiry design and experimental reasoning: evaluate and correct an unfair procedure.'),rule:p('問題 1、正確改量 1、因果／公平理由 1。','1 for the flaw, 1 for corrected volumes, 1 for the fairness explanation.')},
       {id:'mainObservations',page:3,kind:'observations',max:4,source:['basicObservations'],
-        prompt:p('獨立應用：觀察四組靜態圖，自行記錄外觀。','Independent application: observe the four static images and record their appearances.'),hint:p('A 可繼續參閱；現在不要索取答案。外觀圖是教學模型的資料，不是直接產物檢測。','You may keep using A. Do not request the answer key yet. The images are model data, not direct product tests.'),
+        prompt:p('參閱 A2 圖 1，記錄四組的外觀。','Use Figure 1 on A2 to record the four appearances.'),hint:p('可參閱 A；先自行判讀，完成 B 後才用 C 核對。','Use A as needed. Interpret the figures before checking with C after B.'),
         key:p('水：分層；X：混濁；Y：油層變薄但仍分層；X＋Y：清澈。','Water: separated layers; X: cloudy; Y: thinner oil layer, still separated; X + Y: clear.'),goal:p('觀察及溝通：保留四種外觀的區別。','Observation and communication: distinguish the four appearances.'),rule:p('每組正確判讀 1 分，共 4。','1 per correctly described set, total 4.')},
       {id:'xConclusion',page:3,kind:'conclusion',vlQuestion:'q1',max:2,source:['q1'],
         prompt:p('X 的作用：完成括號選擇，再用乳化概念解釋外觀。','X: choose the appearance, then explain it using emulsification (乳化作用).'),
@@ -54,7 +54,7 @@
         prompt:p('要研究煮沸某一消化液的影響，應以哪一組作比較基準？比較前要怎樣處理煮沸的液體？','To study boiling one digestive juice, which set should be the baseline? What must happen to the boiled liquid before comparison?'),
         key:p('未煮沸 X＋Y 各 1 mL 組；煮沸後冷卻至共同 37°C，其餘條件相同。這個對照含 X 與 Y。','The unboiled X + Y set, 1 mL each; cool the boiled juice to the common 37°C and keep the other conditions equal. This control contains X and Y.'),goal:p('設計及進行實驗：按問題選對照並控制反應溫度。','Inquiry design and experimental reasoning: choose the control for the question and control reaction temperature.'),rule:p('未煮沸組 1；冷卻至共同溫度及公平比較 1。','1 for the unboiled baseline, 1 for cooling to the common temperature for a fair comparison.')},
       {id:'heatObservations',page:4,kind:'heatObservations',max:2,source:['extensionObservations'],
-        prompt:p('觀察兩組煮沸後冷卻的圖，記錄外觀；與未煮沸 X＋Y 組比較。','Record the appearances of the two boiled-and-cooled sets and compare them with unboiled X + Y.'),
+        prompt:p('參閱 A2 圖 2，記錄兩組熱處理外觀，與未煮沸 X＋Y 比較。','Use Figure 2 on A2 to record the heated sets and compare them with unboiled X + Y.'),
         key:p('煮沸 X＋未煮沸 Y：清澈；未煮沸 X＋煮沸 Y：混濁。','Boiled X + unboiled Y: clear; unboiled X + boiled Y: cloudy.'),goal:p('觀察：比較熱處理與基準。','Observation: compare heating treatments with a baseline.'),rule:p('兩組各 1 分。','1 for each set.')},
       {id:'heatConclusion',page:4,kind:'conclusion',vlQuestion:'q2',max:2,source:['q2'],
         prompt:p('受熱後失去作用的消化液：完成選擇，並解釋冷卻後仍失去作用的原因。','Juice that loses its action after heating: choose the answer and explain why cooling does not restore its action.'),
@@ -65,7 +65,17 @@
     ];
     const content={
       version,materialVersion,approach:'explanation-example-guided-independent-check',title:p('脂質的消化與公平比較','Digestion of lipids and fair comparisons'),
-      names:{A:p('自學概念、圖像及示例','Self-study concepts, diagrams and examples'),B:p('有提示練習及獨立應用','Guided practice and independent application'),C:p('核對答案及修正','Answer check and corrections'),D:p('教師指引、配對及評分','Teacher guide, mapping and feedback'),all:p('完整教師列印套裝','Complete teacher print pack')},
+      names:{A:p('情境、補充資料與實驗圖','Context, quick notes and experiment figures'),B:p('有提示練習及獨立應用','Guided practice and independent application'),C:p('核對答案及修正','Answer check and corrections'),D:p('教師指引、配對及評分','Teacher guide, mapping and feedback'),all:p('完整教師列印套裝','Complete teacher print pack')},
+      introLines:[
+        p('食物中的脂質須先消化成較小分子，才能被吸收。','Lipids in food must be digested into small molecules before absorption.'),
+        p('本題比較在油水混合物加入 X、Y 或兩者後的外觀。','Four sets compare adding X, Y or both to an oil–water mixture.'),
+        p('另有兩組測試比較煮沸 X 或 Y、冷卻後的結果。','Two further tests compare boiling X or Y and then cooling it.'),
+        p('參閱下列補充資料及圖示完成 B，再用 C 核對修正；A 可隨時參閱。','Use the notes and figures to complete B, then check with C. Keep A available.')
+      ],
+      diagramCaptions:{
+        physical:p('乳化前後脂質分子相同；圖示不按實際比例。','Lipid molecules stay the same during emulsification (乳化作用). Not to scale.'),
+        chemical:p('完全水解簡化模型。R₁–R₃ 是脂肪酸烴鏈；橙線是水解位置。','Complete-hydrolysis model. R₁–R₃ are fatty acid (脂肪酸) chains; orange bonds show where hydrolysis occurs.')
+      },
       labels:{identity:p('姓名：________________　班別及學號：________________','Name: ____________________   Class and student number: ____________________'),
         start:p('A 從開始即可閱讀，全程可參閱。先看解說及示例，再完成 B；完成 B 後才取得 C。','Read A from the start and keep it available. Study the explanations and examples, complete B, then receive C.'),
         teacher:p('只供教師，請勿派給學生。','For teachers only. Do not give this part to students.'),
@@ -79,22 +89,24 @@
         check:p('完成 B 後才派發 C。現在可核對答案、保留原答並修正；不要虛構原始假說。','Give out C only after B is completed. Check, keep the first answers and correct them. Do not invent an original hypothesis.'),
         draft:p('紙本練習回饋初稿；不等同 VL 活動分數、SPSAI 或 CKT。研究成效以另行共同測驗評估。','Draft worksheet feedback guide. These marks are not equivalent to VL activity marks, SPSAI or CKT. Use separate common tests to assess research outcomes.')},
       concepts:[
-        {heading:p('X：膽汁與物理消化','X: bile (膽汁) and physical digestion (物理消化)'),body:p('X 是膽汁，由肝臟製造、儲存在膽囊，不含消化酶。乳化把大油滴分散成小油滴，脂質分子結構不變；同一總脂質量分散後，總表面積增加，讓脂肪酶更容易作用。','X is bile (膽汁), made in the liver and stored in the gall bladder (膽囊). It contains no digestive enzymes. Emulsification (乳化作用) spreads large oil droplets into small droplets without changing lipid molecules. For the same total amount of lipid, total surface area increases, giving lipase (脂肪酶) more surface to act on.')},
-        {heading:p('Y：脂肪酶與化學消化','Y: lipase (脂肪酶) and chemical digestion (化學消化)'),body:p('Y 是脂肪酶，催化脂質水解，改變化學鍵。本課採完全水解簡化模型：甘油三酯＋3H₂O→甘油＋3個脂肪酸。酶是催化劑，不在反應中被消耗。','Y is lipase (脂肪酶), which speeds up lipid hydrolysis and changes chemical bonds. This course uses a complete-hydrolysis model: triglyceride (甘油三酯) + 3H₂O → glycerol (甘油) + 3 fatty acids (脂肪酸). The enzyme is a catalyst and is not used up.')},
-        {heading:p('高溫、變性與公平比較','High temperature, denaturation and fair comparison'),body:p('脂肪酶是蛋白質；煮沸可使酶變性、失去功能。本模型中，冷卻後不會恢復作用。煮沸後先冷卻至與其他組相同的 37°C，才比較；否則反應溫度也不同，不能只歸因於煮沸處理。','Lipase (脂肪酶) is a protein. Boiling can cause denaturation and loss of function; cooling does not restore its action in this model. Cool boiled liquids to the common 37°C before comparison, so reaction temperature does not become another difference.')},
-        {heading:p('外觀與產物證據不同','Appearance and product evidence are different'),body:p('油層、混濁及清澈是預設教學線索。它們不能單獨證明甘油或脂肪酸已形成，也不能量化消化速度；實際實驗仍需化學檢測與重複測試。','Oil layers, cloudiness and clarity are set teaching clues. They alone cannot prove glycerol (甘油) or fatty acids (脂肪酸) formed, or measure digestion speed. Real experiments need chemical tests and repeated tests.')}
+        {heading:p('X：膽汁','X: bile (膽汁)'),body:p('肝臟製造、膽囊儲存；不含消化酶。','Made in the liver, stored in the gall bladder (膽囊); contains no digestive enzymes.')},
+        {heading:p('乳化：物理消化','Emulsification (乳化作用): physical digestion (物理消化)'),body:p('大油滴分成小油滴，脂質分子不變；總表面積增加，有助 Y 作用。','Large oil droplets become small droplets. Lipid molecules stay unchanged; total surface area increases, helping Y act.')},
+        {heading:p('Y：脂肪酶','Y: lipase (脂肪酶)'),body:p('催化脂質水解、改變化學鍵，屬化學消化。完全水解簡化模型：甘油三酯＋3H₂O→甘油＋3個脂肪酸；酶不被消耗。','Catalyses hydrolysis that changes chemical bonds: chemical digestion (化學消化). Simplified complete hydrolysis: triglyceride (甘油三酯) + 3H₂O → glycerol (甘油) + 3 fatty acids (脂肪酸). The enzyme is not used up.')},
+        {heading:p('高溫與變性','Heat and denaturation'),body:p('脂肪酶是蛋白質；煮沸可改變其形狀、令酶變性失活。本模型中冷卻後不恢復；比較前先冷卻至共同 37°C。','Lipase (脂肪酶) is a protein. Boiling can change its shape and stop it working (denaturation). Cooling does not restore it in this model. Compare at 37°C.')},
+        {heading:p('外觀與產物證據','Appearance and product evidence'),body:p('分層、油層變薄、混濁或清澈，不能單獨證明已產生甘油及脂肪酸；仍需化學檢測及重複測試。','Layers, a thinner oil layer, cloudiness or clarity alone cannot prove glycerol (甘油) and fatty acids (脂肪酸) formed. Chemical tests and repeated tests are needed.')},
+        {heading:p('模型與推論限制','Model and limits'),body:p('圖示是預設教學資料，沒有量度速度。合併組與單獨組的個別試劑量不同，不能定量證明協同作用或速率提升。','The figures are preset model data, with no speed measurements. Individual juice amounts differ between combined and single-juice sets, so a measured combined effect or faster rate cannot be proved.')}
       ],
-      conditions:p('四組均有相同起始油水量；加入總液量 2 mL，於 37°C 反應，使用相同觀察時間及搖勻方式。配方：水對照加 2 mL 水；X 組加 2 mL X；Y 組加 2 mL Y；X＋Y 組加各 1 mL。觀察時間、起始量及搖勻細節採研究者的共同安排，不捏造本模型未提供的數值。','Each set starts with the same amounts of oil and water, receives 2 mL in total, reacts at 37°C, and uses equal observation time and shaking. Recipes: control, 2 mL water; X, 2 mL X; Y, 2 mL Y; X + Y, 1 mL each. Use the researcher’s common starting amounts, timing and shaking details; do not invent values missing from the model.'),
+      conditions:p('各組起始油水量、加液總量（2 mL）、37°C、觀察時間及搖勻方式相同。各組配方見圖；煮沸液先冷卻至 37°C。','Keep starting oil/water amounts, total added volume (2 mL), 37°C, observation time and shaking the same. Added liquids are shown in the figures. Cool boiled liquids to 37°C first.'),
       methods:[
-        {heading:p('變量分類方法','How to classify variables'),body:p('獨立變量是有意改變的因素；因變量是觀察或量度的結果；控制變量是保持相同的條件。先找比較問題，再找只改變的一項因素。','The independent variable is the factor changed on purpose; the dependent variable is the result seen or measured; controlled variables are kept the same. Start with the comparison question, then find the one factor that changes.')},
-        {heading:p('對照按問題選擇','Choose the control for the question'),body:p('對照是比較基準，用來排除其他因素的干擾。它不一定「完全沒有自變量」或沒有試劑；必須看這次要比較的是加液、加熱還是其他處理。','A control is a baseline that helps rule out other causes. It need not be free of every factor or reagent. Choose it for the actual question: adding liquid, heating, or another treatment.')}
+        {heading:p('變量','Variables'),body:p('獨立：有意改變；因：觀察／量度的結果；控制：保持相同。','Independent: changed on purpose. Dependent: observed/measured result. Controlled: kept the same.')},
+        {heading:p('對照','Control'),body:p('按比較問題選基準；對照也可含試劑，例如研究加熱時。','Choose a baseline for the question. A control may contain reagents, for example in a heating comparison.')}
       ],
       examples:[
-        {heading:p('已解說示例：可測試假說','Worked example: a testable prediction'),body:p('「其他條件相同時，加入 2 mL X 會使大油滴分散成小油滴。」理由：X 是膽汁，能乳化脂質。可比較水組與 X 組並觀察外觀。這是已解說的示例，不是你的原始假說。可觀察、可比較的預測可以檢驗；是否得到資料支持是另一項判斷。','“With other conditions equal, adding 2 mL X will spread large oil droplets into small droplets.” Reason: X is bile (膽汁), which can emulsify lipids (乳化脂質). Compare water with X and observe appearances. This is a worked example, not your original hypothesis. A prediction that can be observed and compared is testable; whether data support it is a separate judgement.')},
-        {heading:p('已解說示例：分類與觀察','Worked example: classification and observation'),body:p('若比較搖勻方式，獨立變量是搖勻方式，觀察結果是因變量，消化液組合及其他條件要相同。這是分類方法示例，不是 B 的主比較答案。描述「杯底有顆粒」是觀察；「顆粒已化學分解」是需要其他證據的解釋。','If the question compares shaking methods, shaking is independent, the observed result is dependent, and the juice combination and other conditions stay the same. This teaches the method; it is not B’s main-comparison answer. “Particles are at the bottom” is an observation; “they have chemically broken down” needs other evidence.')}
+        {heading:p('示例：可測試預測','Example: a testable prediction'),body:p('其他條件相同，2 mL X 使大油滴分散；理由是膽汁乳化。比較水組與 X 組可檢驗。可檢驗不等同已獲支持。','With other conditions equal, 2 mL X disperses large oil droplets because bile (膽汁) emulsifies lipids (乳化脂質). Compare water with X to test it. Testable does not mean already supported.')},
+        {heading:p('示例：分類與觀察','Example: classification and observation'),body:p('若只改搖勻方式，它是獨立變量；外觀是因變量，其餘固定。「杯底有顆粒」是觀察；「已化學分解」仍需證據。','If only shaking changes, it is independent; appearance is dependent, and other conditions stay fixed. “Particles at the bottom” is an observation; “chemically broken down” needs evidence.')}
       ],
       timePlan:[
-        {stage:p('A：解說及示例','A: explanations and examples'),fraction:0.30},
+        {stage:p('A：補充資料、示例及實驗圖','A: notes, examples and experiment figures'),fraction:0.30},
         {stage:p('B1–B2：有提示練習','B1–B2: guided practice'),fraction:0.35},
         {stage:p('B3–B4：獨立應用','B3–B4: independent application'),fraction:0.25},
         {stage:p('C：核對修正','C: check and correct'),fraction:0.10}

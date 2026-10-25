@@ -5,7 +5,7 @@ const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),
 const {chromium}=require('playwright');
 const {generate}=require('./render.cjs');
 const root=path.resolve(__dirname,'..'),out=path.join(__dirname,'generated');
-const MATERIAL_VERSION=6;
+const MATERIAL_VERSION=7;
 const inputs=['package.json','package-lock.json','index.html','app.js','language.js','language-dictionary.js','styles.css','paperwork/fonts/NotoSansHK-paper.otf','paperwork/source.js','paperwork/print.css','paperwork/curriculum.js','paperwork/render.cjs','paperwork/build.cjs',...fs.readdirSync(path.join(root,'assets')).filter(n=>/\.(svg|png)$/.test(n)).map(n=>'assets/'+n)].sort();
 const sha=data=>crypto.createHash('sha256').update(data).digest('hex');
 const fingerprints=()=>Object.fromEntries(inputs.map(name=>[name,sha(fs.readFileSync(path.join(root,name)))]));
@@ -58,8 +58,9 @@ async function main(){
           return enzyme.bottom>arrow.top+1||arrow.bottom>label.top+1||Math.abs(centre(enzyme)-centre(arrow))>2||Math.abs(centre(label)-centre(arrow))>2;
         }));
         if(reactionMisalignment)throw new Error(`${lang}/${part}: hydrolysis labels overlap or are not centred around the arrow`);
-        const layout=await page.locator('.sheet').evaluateAll(sheets=>sheets.map(sheet=>({part:sheet.dataset.part,page:Number(sheet.dataset.page),identity:sheet.querySelectorAll('.identity').length,writingLines:[...sheet.querySelectorAll('.ruled')].map(el=>el.querySelectorAll('.writing-line').length),circles:sheet.querySelectorAll('.circle-options').length,questionIds:[...sheet.querySelectorAll('[data-question-id]')].map(el=>el.dataset.questionId),trialKeys:[...sheet.querySelectorAll('[data-trial]')].map(el=>el.dataset.trial),clearSurfaceBorders:[...sheet.querySelectorAll('.test-tube.clear .tube-liquid')].map(el=>parseFloat(getComputedStyle(el).borderTopWidth))})));
+        const layout=await page.locator('.sheet').evaluateAll(sheets=>sheets.map(sheet=>({part:sheet.dataset.part,page:Number(sheet.dataset.page),identity:sheet.querySelectorAll('.identity').length,introLines:(()=>{const tops=[];sheet.querySelectorAll('.intro-line').forEach(line=>{const range=document.createRange();range.selectNodeContents(line);for(const rect of range.getClientRects())if(rect.width>0&&!tops.some(top=>Math.abs(top-rect.top)<3))tops.push(rect.top);});return tops.length;})(),writingLines:[...sheet.querySelectorAll('.ruled')].map(el=>el.querySelectorAll('.writing-line').length),circles:sheet.querySelectorAll('.circle-options').length,questionIds:[...sheet.querySelectorAll('[data-question-id]')].map(el=>el.dataset.questionId),trialKeys:[...sheet.querySelectorAll('[data-trial]')].map(el=>el.dataset.trial),clearSurfaceBorders:[...sheet.querySelectorAll('.test-tube.clear .tube-liquid')].map(el=>parseFloat(getComputedStyle(el).borderTopWidth))})));
         if(layout.some(p=>p.identity!==(p.page===1&&['A','C'].includes(p.part)?1:0)||p.writingLines.some(n=>n!==2)))throw new Error('Identity or two-line layout rule failed');
+        if(layout.some(p=>p.part==='A'&&p.page===1&&p.introLines!==4))throw new Error('Opening context must fit exactly four printed lines.');
         if(layout.some(p=>p.clearSurfaceBorders.some(width=>width<1)))throw new Error('Clear test-tube liquid surface is missing');
         const filename=`VL1_${part}_${lang}_v${MATERIAL_VERSION}.pdf`,file=path.join(out,filename);
         await page.pdf({path:file,format:'A4',printBackground:true,preferCSSPageSize:true});

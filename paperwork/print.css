@@ -39,3 +39,15 @@ html[lang="en-HK"]{word-break:keep-all}
 .paper-methods .card{padding:2mm;margin-bottom:2mm}
 
 .compact-data .question{padding:1mm 0 1.5mm}.compact-data h3{font-size:9.5pt;line-height:1.3}
+
+/* Brief context, lookup notes and one shared experiment-data page. */
+.brief-study,.experiment-reference{font-size:9.5pt;line-height:1.4}
+.brief-study h1,.experiment-reference h1{font-size:14pt;margin-bottom:2mm}
+.brief-study h2,.experiment-reference h2{font-size:10.5pt;margin:2mm 0 1mm}
+.brief-intro{margin:2mm 0 3mm}.brief-intro .intro-line{margin:0;line-height:1.5}
+.reference-notes{font-size:9pt;line-height:1.35;margin:1mm 0 2mm}.reference-notes th{width:27%;font-weight:600}.reference-notes td,.reference-notes th{padding:1.5mm 2mm}
+.brief-study .physical-diagram{margin:2mm 0}.brief-study .physical-diagram h4{font-size:9.5pt;margin-bottom:1mm}.brief-study .physical-diagram img{max-height:32mm}.brief-study .digestion-diagram figcaption{font-size:8pt;margin:1mm 0}
+.method-strip{font-size:8.5pt;border-left:2px solid #7f9b94;padding:1mm 2mm;margin:2mm 0}.method-strip>div{margin:1mm 0}
+.brief-study .mini-example{padding:2mm;margin:1.5mm 0;font-size:8.5pt;line-height:1.35}.brief-study .mini-example h2{font-size:9pt;margin:0}.brief-study .mini-example p{margin:1mm 0}.brief-study .hint{font-size:8pt;margin:1mm 0}
+.experiment-reference .chemical-flow{grid-template-columns:1fr 24mm 1.45fr}.experiment-reference .molecule-card{padding:1.5mm;font-size:8pt;gap:1mm}.experiment-reference .molecule-card img{height:30mm}.experiment-reference .reaction-products .molecule-card img{height:20mm}.experiment-reference .reaction-products .fatty-acids img{height:auto}.experiment-reference .reaction-products{gap:1mm}.experiment-reference .bond-key,.experiment-reference .reaction-water{font-size:7.5pt}.experiment-reference .chemical-diagram h4{font-size:9.5pt;margin-bottom:1mm}.experiment-reference .digestion-equation{font-size:8pt;margin:1mm 0}.experiment-reference .digestion-diagram{margin:1mm 0}.experiment-reference .digestion-diagram figcaption{font-size:8pt;margin:1mm 0}
+.experiment-reference>p{font-size:8.5pt;margin:2mm 0}.experiment-reference .hint{font-size:8pt;margin:1mm 0}.experiment-data{margin:2mm 0}.experiment-reference .result-card{padding:1.5mm;margin:0}.experiment-reference .result-label{font-size:8pt;min-height:11mm}.experiment-reference .test-tube{width:17mm;height:22mm;margin:1.5mm auto}.water-bath{border:1px solid #90aaa5;border-radius:2mm;padding:1.5mm}.bath-label{text-align:center;font-size:8pt;margin:1mm 0}

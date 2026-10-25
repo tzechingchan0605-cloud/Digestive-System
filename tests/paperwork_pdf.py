@@ -13,7 +13,7 @@ def compact(value):
 def require_text(text, values, context):
     for value in values:
         assert compact(value) in compact(text), (*context,'missing content',value)
-assert manifest['version']=='VL1-WS-direct-1' and manifest['materialVersion']==6
+assert manifest['version']=='VL1-WS-direct-2' and manifest['materialVersion']==7
 assert manifest['approach']=='explanation-example-guided-independent-check'
 for lang in ['zh','en']:
     model=sources[lang]; vl=model['vl']
@@ -37,6 +37,9 @@ for lang in ['zh','en']:
                 expected=[q for q in model['questions'] if q['page']==layout['page']]
                 assert layout['questionIds']==[q['id'] for q in expected], (*ctx,'question coverage/order')
                 require_text(page_text,[q['prompt'] for q in expected]+[q.get('given','') for q in expected]+[q.get('hint','') for q in expected],ctx)
+            if layout['part']=='A' and layout['page']==1:
+                assert layout['introLines']==4, (*ctx,'four-line opening')
+                require_text(page_text,model['introLines'],ctx)
             if layout['part']=='A' and layout['page']==2:
                 outlines=[d['rect'] for d in page.get_drawings() if d.get('color') and all(abs(a-b)<.005 for a,b in zip(d['color'],[195/255,212/255,206/255]))]
                 assert len(outlines)==3, (*ctx,'three separate fatty acids')
@@ -50,14 +53,16 @@ for lang in ['zh','en']:
             assert compact(vl['control']['hint']) not in compact(text), (lang,part,'overgeneralised control explanation')
             assert not re.search(r'SPSAI|最高分|Maximum|32-point|36-point',text)
         if part=='A':
-            require_text(text,[model['title'],vl['background'],model['labels']['start'],model['labels']['studentTiming'],model['conditions'],model['labels']['limits']]
+            require_text(text,[model['title'],model['labels']['studentTiming'],model['conditions']]+model['introLines']+list(model['diagramCaptions'].values())
                 +[c[k] for c in model['concepts']+model['methods']+model['examples'] for k in ['heading','body']],(lang,part))
+            keys=[key for page in file['layout'] for key in page['trialKeys']]
+            assert set(keys)=={t['key'] for t in vl['trials']} and keys.count('XY-none')==2
+            require_text(text,[t['label'] for t in vl['trials']],(lang,part))
             assert compact(next(q for q in model['questions'] if q['id']=='mainObservations')['key']) not in compact(text)
             assert compact(next(q for q in model['questions'] if q['id']=='heatObservations')['key']) not in compact(text)
         if part=='B':
             assert [qid for page in file['layout'] for qid in page['questionIds']]==[q['id'] for q in model['questions']]
-            keys=[key for page in file['layout'] for key in page['trialKeys'] if key!='initial']
-            assert set(keys)=={t['key'] for t in vl['trials']} and keys.count('XY-none')==2
+            assert [key for page in file['layout'] for key in page['trialKeys']]==['initial']
             require_text(text,[t['label'] for t in vl['trials']]+[o['text'] for o in vl['basic']['options']],(lang,part))
             for option in vl['variables']['choices']:
                 assert compact(text).count(compact(option['text']))>=3
@@ -86,4 +91,4 @@ for lang in ['zh','en']:
             page.get_pixmap(matrix=fitz.Matrix(1.4,1.4)).save(output/f'{lang}-{part}-{i+1}.png')
 doc=fitz.open(root/manifest['languages']['zh']['files']['B']['path'])
 doc[2].get_pixmap(matrix=fitz.Matrix(1.5,1.5),colorspace=fitz.csGRAY).save(output/'zh-B-3-grayscale.png')
-print('PASS: ten real A4 PDFs, upfront concepts/examples, 15 guided/independent items, all six model sets, delayed keys/corrections, 15–20 minute matched timing, complete item mapping/36-point separate feedback guide, bilingual text/fonts/two lines/identity positions, three fatty-acid outlines; all pages rendered.')
+print('PASS: ten real A4 PDFs, four-line opening and six quick notes, compact examples, 15 guided/independent items, all six model sets on A2, delayed keys/corrections, 15–20 minute matched timing, complete item mapping/36-point separate feedback guide, bilingual text/fonts/two lines/identity positions, three fatty-acid outlines; all pages rendered.')

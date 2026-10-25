@@ -20,7 +20,7 @@ const sha=data=>crypto.createHash('sha256').update(data).digest('hex');
   assert.equal(built.zh.vl.assumptions.choices.length,4);assert.equal(built.zh.vl.conclusions.questions.length,3);assert.equal(built.zh.vl.trials.length,6);
   assert.equal(built.zh.vl.control.hint,'（提示：對照組主要功能是作為比較的基準，用來確認實驗中的改變是由獨立變量所引起，而非其他外在因素的干擾，因此對照組不包含獨立變量的處理條件）');
   assert.deepEqual(built.zh.vl.extension.options.map(x=>x.id),['cloudy','clear']);
-  assert.equal(built.zh.approach,'explanation-example-guided-independent-check');assert.equal(built.zh.version,'VL1-WS-direct-1');assert.equal(built.zh.materialVersion,6);assert.equal(built.zh.practiceMaximum,36);assert.equal(built.zh.questions.length,15);assert.equal(built.zh.mapping.length,15);assert(Math.abs(built.zh.timePlan.reduce((sum,s)=>sum+s.fraction,0)-1)<1e-12);
+  assert.equal(built.zh.approach,'explanation-example-guided-independent-check');assert.equal(built.zh.version,'VL1-WS-direct-2');assert.equal(built.zh.materialVersion,7);assert.equal(built.zh.introLines.length,4);assert.equal(built.zh.concepts.length,6);assert.equal(built.zh.practiceMaximum,36);assert.equal(built.zh.questions.length,15);assert.equal(built.zh.mapping.length,15);assert(Math.abs(built.zh.timePlan.reduce((sum,s)=>sum+s.fraction,0)-1)<1e-12);
   assert.equal(await page.evaluate(()=>{try{const vl=getVL1PaperSource('zh').vl;vl.trials[4].outcome='cloudy';VL1ComparisonWorksheet.create(vl,'zh');return false;}catch(e){return /model outcomes changed/.test(e.message);}}),true,'Changed model must require curriculum review.');
   assert.equal(await page.evaluate(()=>{try{const vl=getVL1PaperSource('zh').vl;vl.reference.conclusions.q2='X';VL1ComparisonWorksheet.create(vl,'zh');return false;}catch(e){return /reference answers changed/.test(e.message);}}),true);
   // Extracted words/options are compared directly with the live question DOM.
@@ -35,7 +35,7 @@ const sha=data=>crypto.createHash('sha256').update(data).digest('hex');
   const excel=async name=>{const wait=page.waitForEvent('download');await page.click('#exportCsv');const dl=await wait;await dl.saveAs('/tmp/'+name);return fs.readFileSync('/tmp/'+name);};
   const excelBefore=await excel('paper-excel-before.xlsx');
   await page.click('#openPaperwork');await page.waitForFunction(()=>!document.querySelector('[data-paper-download="A"]').disabled);
-  assert.equal(await page.locator('#paperLanguage').inputValue(),'zh');assert.equal(await page.locator('#paperContentVersion').textContent(),built.zh.version);assert.equal(await page.locator('#paperVLVersion').textContent(),built.zh.vlVersion);assert.match(await page.locator('.paper-notice').textContent(),/15–20/);assert.match(await page.locator('.paper-notice').textContent(),/A＋B/);assert.match(await page.locator('[data-paper-preview=\"C\"]').locator('..').locator('..').textContent(),/核對答案及修正/);
+  assert.equal(await page.locator('#paperPanel .paper-row').first().locator('strong').textContent(),'A · 情境、補充資料與實驗圖');assert.equal(await page.locator('#paperLanguage').inputValue(),'zh');assert.equal(await page.locator('#paperContentVersion').textContent(),built.zh.version);assert.equal(await page.locator('#paperVLVersion').textContent(),built.zh.vlVersion);assert.match(await page.locator('.paper-notice').textContent(),/15–20/);assert.match(await page.locator('.paper-notice').textContent(),/A＋B/);assert.match(await page.locator('[data-paper-preview=\"C\"]').locator('..').locator('..').textContent(),/核對答案及修正/);
   const manifest=JSON.parse(fs.readFileSync('paperwork/generated/manifest.json','utf8'));
   for(const lang of ['zh','en']){
    await page.selectOption('#paperLanguage',lang);
@@ -58,7 +58,7 @@ const sha=data=>crypto.createHash('sha256').update(data).digest('hex');
   await page.route('**/paperwork/generated/manifest.json',r=>r.fulfill({json:{...manifest,sourceDigest:'0'.repeat(64)}}));
   assert.equal(await page.evaluate(()=>VL1Paperwork.open()),false);assert(await page.locator('[data-paper-download="A"]').isDisabled());assert.equal(await page.evaluate(()=>VL1Paperwork.download('A')),false);
   await page.unroute('**/paperwork/generated/manifest.json');
-  await page.route('**/paperwork/generated/manifest.json',r=>r.fulfill({json:{...manifest,materialVersion:5}}));assert.equal(await page.evaluate(()=>VL1Paperwork.open()),false);
+  await page.route('**/paperwork/generated/manifest.json',r=>r.fulfill({json:{...manifest,materialVersion:6}}));assert.equal(await page.evaluate(()=>VL1Paperwork.open()),false);
   await page.unroute('**/paperwork/generated/manifest.json');assert.equal(await page.evaluate(()=>VL1Paperwork.open()),true);
   await page.route('**/'+manifest.languages.en.files.A.path,r=>r.fulfill({contentType:'application/pdf',body:'broken PDF'}));
   assert.equal(await page.evaluate(()=>VL1Paperwork.download('A')),false);assert.match(await page.locator('#paperStatus').textContent(),/download failed/i);

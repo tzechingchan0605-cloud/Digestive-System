@@ -409,6 +409,7 @@
     '切換至英文': 'Switch to Chinese',
     "下載紙本比較組自學工作紙 PDF": "Download comparison-group self-study worksheets PDF",
     "紙本比較組自學材料": "Comparison-group self-study materials",
+    "A · 情境、補充資料與實驗圖": "A · Context, quick notes and experiment figures",
     "A · 自學概念、圖像及示例": "A · Self-study concepts, diagrams and examples",
     "B · 有提示練習及獨立應用": "B · Guided practice and independent application",
     "C · 核對答案及修正": "C · Answer check and corrections",
