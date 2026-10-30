@@ -11,7 +11,7 @@ TEXT={
 '工作紙一：脂質的消化與公平比較':'Worksheet 1: Lipid Digestion and Fair Comparisons',
 '工作紙一：脂質的消化與公平比較（參考答案）':'Worksheet 1: Lipid Digestion and Fair Comparisons — Answers',
 '姓名：________________　　班別：________　　學號：________':'Name: ________________    Class: ________    No.: ________',
-'請先閱讀「課題需知」，再根據提供的情境及模擬結果作答。紅色粗體為重點詞彙，並非正誤提示。本工作紙毋須操作虛擬實驗室。':'Read the topic notes, then answer using the context and model results. Red bold terms highlight key concepts. You do not need to operate the virtual lab.',
+'請先閱讀「課題需知」，再根據提供的情境及模擬結果作答。':'Read the topic notes, then answer using the context and model results.',
 '課題需知':'Topic notes',
 '01　膽汁：乳化脂質':'01  Bile: emulsifying lipids',
 '本教學模型設定消化液 X 是膽汁。膽汁由肝臟製造，儲存於膽囊，不含消化酶。它把大油滴乳化成小油滴，增加同量脂質的總表面積，有助脂肪酶作用。這屬物理消化，脂質分子的結構沒有改變。':'In this model, X is bile. Made in the liver and stored in the gall bladder, bile contains no digestive enzymes. It emulsifies large oil droplets into small droplets, increasing the total surface area for lipase to act on. This is physical digestion: lipid molecules remain unchanged.',
@@ -53,6 +53,25 @@ TEXT={
 '混濁乳狀液':'cloudy emulsion','增加':'increases','消化液 Y':'digestive juice Y',
 }
 
+# Translate the reviewed red terms as well as the surrounding text. Apply these
+# only where the Chinese student source has emphasis, never to every occurrence
+# across the worksheet (which could inadvertently cue an answer).
+KEYWORD_COLOUR='B7312C'
+KEYWORDS={
+    '膽汁':['bile'],'乳化':['emulsifies'],'小油滴':['small droplets'],
+    '總表面積':['total surface area'],'脂肪酶':['lipase'],
+    '物理消化':['physical digestion'],'胰液':['pancreatic juice'],
+    '化學消化':['chemical digestion'],'甘油三酯':['triglycerides'],
+    '甘油':['glycerol'],'脂肪酸':['fatty-acid','fatty acids'],
+    '蛋白質':['protein'],'變性':['denature'],'對照組':['control group'],
+    '獨立變量':['Independent variable'],'因變量':['Dependent variable'],
+    '控制變量':['Controlled variables'],
+}
+
+def red_terms(paragraph):
+    return [r.text for r in paragraph.runs
+            if r.text.strip() and str(r.font.color.rgb)==KEYWORD_COLOUR]
+
 def translate(source,dictionary):
     if not source.strip():return source
     if source.startswith('8. '):return '8. '+EN_QUESTION
@@ -71,6 +90,9 @@ def translate(source,dictionary):
 def create(root,diagram_dir):
     command="const fs=require('fs'),vm=require('vm');const c={window:{}};vm.runInNewContext(fs.readFileSync('language-dictionary.js','utf8'),c);process.stdout.write(JSON.stringify(c.window.VL1_TRANSLATIONS.texts))"
     dictionary=json.loads(subprocess.check_output(['node','-e',command],cwd=ROOT,text=True))
+    # The answer generator may rebuild a choice paragraph to mark its answer.
+    # Use the reviewed student text for the shared conceptual emphasis too.
+    emphasis={p.text:red_terms(p) for p in Document(root/'WS1_student.docx').paragraphs}
     for stem in ['student','answers']:
         doc=Document(root/f'WS1_{stem}.docx')
         for style_name in ['Normal','Heading 1','Heading 2','Heading 3']:
@@ -88,15 +110,23 @@ def create(root,diagram_dir):
             runs=[r for r in paragraph.runs if r.text.strip()]
             answer=bool(runs) and all(r.font.color.rgb and str(r.font.color.rgb)=='145DA0' for r in runs)
             chosen=[translate(r.text,dictionary) for r in runs if r.underline and r.font.color.rgb and str(r.font.color.rgb)=='145DA0']
+            terms=emphasis.get(original,red_terms(paragraph))
+            keywords=[word for term in terms for word in KEYWORDS[term]]
+            keyword_pattern=r'\b(?:'+'|'.join(re.escape(x) for x in keywords)+r')\b' if keywords else None
             hint=original.startswith('（')
             heading=paragraph.style.name.startswith('Heading')
             paragraph.clear()
-            pattern='('+'|'.join(re.escape(x) for x in sorted(chosen,key=len,reverse=True))+')' if chosen else None
-            for part in re.split(pattern,english) if pattern else [english]:
+            pieces=[re.escape(x) for x in sorted(chosen,key=len,reverse=True)]
+            if keyword_pattern:pieces.append(keyword_pattern)
+            pattern='('+'|'.join(pieces)+')' if pieces else None
+            for part in re.split(pattern,english,flags=re.IGNORECASE) if pattern else [english]:
+                if not part:continue
                 run=paragraph.add_run(part)
                 if not heading:run.font.size=Pt(11 if hint else 12)
                 if answer or part in chosen:
                     run.font.color.rgb=RGBColor.from_string('145DA0');run.bold=True;run.underline=part in chosen
+                elif keyword_pattern and re.fullmatch(keyword_pattern,part,re.IGNORECASE):
+                    run.font.color.rgb=RGBColor.from_string(KEYWORD_COLOUR);run.bold=True
                 elif hint:run.font.color.rgb=RGBColor.from_string('658087')
             if english.startswith('Name:'):paragraph.paragraph_format.line_spacing=1.2
             if original.startswith('你認為此實驗需要對照組嗎？') or original.startswith('（提示：對照組'):

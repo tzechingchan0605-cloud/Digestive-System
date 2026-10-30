@@ -17,6 +17,7 @@ assert images(out/'WS1_student.docx')==images(out/'WS1_answers.docx')==images(ro
 assert len(student.inline_shapes)==len(answers.inline_shapes)==5
 text=lambda d:'\n'.join(p.text for p in d.paragraphs)
 source=text(student);key=text(answers)
+assert '紅色粗體為重點詞彙' not in source+key and '本工作紙毋須操作虛擬實驗室' not in source+key
 questions=[p.text for p in student.paragraphs if re.match(r'^\d+\. ',p.text)]
 assert len(questions)==8
 assert all(q in key for q in questions)
@@ -95,6 +96,7 @@ for stem in ['student','answers']:
   for row in table.rows:
    for cell in row.cells:all_paragraphs.extend(cell.paragraphs)
  en_text='\n'.join(p.text for p in all_paragraphs)
+ assert 'Red bold terms' not in en_text and 'You do not need to operate' not in en_text
  assert not re.search(r'[\u3400-\u9fff]',en_text), 'Untranslated Chinese in English worksheet'
  assert 'Part 3 | Integrated explanation' in en_text and '8. Using the experimental results and topic notes' in en_text
  assert len(en.inline_shapes)==5
@@ -102,7 +104,23 @@ for stem in ['student','answers']:
  for p in all_paragraphs:
   for r in p.runs:
    if r.text.strip():assert (r.font.size or p.style.font.size or en.styles['Normal'].font.size).pt>=11
+ # Translation must retain the reviewed conceptual emphasis, alongside the
+ # separate blue answer marks. In particular, both MC options get equal emphasis.
+ red=lambda p:[r.text.lower() for r in p.runs if str(r.font.color.rgb)=='B7312C' and r.bold]
+ notes=[p for p in en.paragraphs if p.text.startswith('In this model,')]
+ assert red(notes[0])==['bile','bile','emulsifies','small droplets','total surface area','lipase','physical digestion']
+ assert red(notes[1])==['pancreatic juice','lipase','lipase','chemical digestion','triglycerides','glycerol','fatty-acid','lipase','protein','denature']
+ control=next(p for p in en.paragraphs if p.text.startswith('Does this experiment'))
+ assert red(control)==['control group']
+ area=next(p for p in en.paragraphs if p.text.startswith('X disperses'))
+ assert red(area)==['small droplets','total surface area']
+ if stem=='student':
+  for label in ['A. Appearance','B. A clear']:
+   assert red(next(p for p in en.paragraphs if p.text.startswith(label)))==['glycerol','fatty acids']
  en_pdf=fitz.open(out/f'WS1_{stem}_en.pdf');assert len(en_pdf)==4
+ red_spans=[s for b in en_pdf[0].get_text('dict')['blocks'] if 'lines' in b for l in b['lines'] for s in l['spans'] if s['color']==0xB7312C]
+ assert red_spans and all(s['flags'] & 16 for s in red_spans), 'English PDF lost red bold concepts'
+ assert all(any(term in s['text'].lower() for s in red_spans) for term in ['bile','lipase','protein','denature'])
  first_lines=[''.join(s['text'] for s in line['spans']) for b in en_pdf[0].get_text('dict')['blocks'] if 'lines' in b for line in b['lines']]
  assert any(all(x in t for x in ['Name:','Class:','No.:']) for t in first_lines)
  for page in en_pdf:
@@ -116,3 +134,4 @@ guide_en=fitz.open(out/'WS1_D_teacher_guide_en.pdf');en_guide_text='\n'.join(p.g
 assert 'Teacher guide, mapping and marking' in en_guide_text and 'Integrated explanation: 8 marks' in en_guide_text
 assert not re.search(r'[\u3400-\u9fff]',en_guide_text)
 print('PASS: English PDF/Word versions have English text and diagram labels, translated answer markings, 4-page worksheets and one-line identity fields.')
+print('PASS: English student and answer PDFs/Word retain red bold conceptual keywords and distinct blue answer marks.')
