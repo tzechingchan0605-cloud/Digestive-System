@@ -38,7 +38,7 @@ def diagrams(out,lang):
    cx=w*(i+.5);b+=rect(i*w+5,5,w-10,h-10)+text(cx,35,title,23,TEAL,'bold')+text(cx,70,sub,22)+'<g transform="translate(0,25) scale(1,.72)">'+tube(cx,85,kind)+'</g>'
    for j,line in enumerate(lines):b+=text(cx,220+j*29,line,22,RED,'bold')
   save(name,h,b)
- panel('main',[(t('X 組','Set X'),t('加入 2 mL X','Add 2 mL X'),'cloudy',[t('混濁乳狀液','Cloudy emulsion')]),(t('Y 組','Set Y'),t('加入 2 mL Y','Add 2 mL Y'),'thin',[t('油層變薄，仍有分層','Thinner oil layer; two layers remain')])])
+ panel('main',[(t('X 組','Set X'),t('加入 2 mL X','Add 2 mL X'),'cloudy',[]),(t('Y 組','Set Y'),t('加入 2 mL Y','Add 2 mL Y'),'thin',[])])
  panel('sequence',[(t('先加 X，再加 Y','X first, then Y'),t('X 1 mL → Y 1 mL','1 mL X → 1 mL Y'),'reduced',[t('混濁程度減低','Less cloudy'),t('沒有明顯油層','No obvious oil layer')]),(t('先加水，再加 Y','Water first, then Y'),t('水 1 mL → Y 1 mL','1 mL water → 1 mL Y'),'thin',[t('油層變薄','Thinner oil layer'),t('仍有油水分層','Two layers remain')])],270)
  # Show the actual unboiled baseline alongside both heat treatments.
  b=''
@@ -137,7 +137,7 @@ def create(out,tmp):
     for part in re.split('('+re.escape(correct[0])+'|'+re.escape(correct[1])+')',sentence):
      r=para.add_run(part);r.font.size=Pt(12)
      if answers and part in correct:r.bold=True;r.underline=True;r.font.color.rgb=RGBColor.from_string('145DA0')
-   fill_sentence('消化液 X 最主要使脂質變成 （混濁乳狀液 ／ 清澈溶液）。','Digestive juice X mainly causes lipids to form a (cloudy emulsion / clear solution).',('混濁乳狀液','cloudy emulsion'))
+   fill_sentence('消化液 X 使溶液變得（混濁 ／ 清澈）。','Digestive juice X makes the mixture (cloudy / clear).',('混濁','cloudy'))
    p(t('部分 2.2｜分析 X 如何有助 Y 作用','Part 2.2 | Analyse how X helps Y act'),'Heading 2')
    p(t('研究員用兩支新試管，先加1 mL X或水並同樣搖勻，再各加1 mL Y，比較一小時後外觀。','Two fresh tubes received 1 mL X or water and identical shaking, then 1 mL Y each. Results show one hour later.'));pic('sequence',16)
    p(t('5. 消化液 X 如何有助消化液 Y 作用？','5. How does digestive juice X help Y act?'),'Heading 2')

@@ -141,7 +141,7 @@ function assertApprovedChinese(entries,label){
   await page.waitForFunction(()=>/add/i.test(document.querySelector('#dataBody td:nth-child(2)').textContent));
   assert.match(await page.locator('#variableFeedback').innerText(),/recorded|saved/i);
   assert.equal(await page.locator('#initialObservation').inputValue(),'變得混濁');assert.equal(await page.locator('#reason').inputValue(),'開始實驗');assert.equal(await page.locator('#studentName').innerText(),'同學');
-  assert.equal(await page.evaluate(()=>answerText('q1','cloudy')),'混濁乳狀液','Excel answer text must remain canonical Chinese.');
+  assert.equal(await page.evaluate(()=>answerText('q1','cloudy')),'混濁','Excel answer text must remain canonical Chinese.');
   const workbookEn=await exportFrozen('/tmp/vl1-language-en.xlsx');assert(workbookZh.equals(workbookEn),'Actual teacher XLSX bytes changed with display language.');
   await switchLanguage('zh');assert.deepEqual(await stableSnapshot(),before);assert.equal(await page.locator('#hypothesisOutcome option[value="cloudy"]').innerText(),'變得混濁');
   await assertPlaceholders('zh');
