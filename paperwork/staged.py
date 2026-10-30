@@ -129,7 +129,7 @@ def create(out,tmp):
      for edge in ['bottom','between']:
       rule=OxmlElement('w:'+edge);rule.set(qn('w:val'),'single');rule.set(qn('w:color'),'333333');rule.set(qn('w:sz'),'8');border.append(rule)
      para._p.get_or_add_pPr().append(border)
-   p(t('部分 2.1｜分析 X、Y 的個別作用','Part 2.1 | Analyse the individual actions of X and Y'),'Heading 2')
+   p(t('部分 2.1｜分析 X 、 Y 的個別作用','Part 2.1 | Analyse the individual actions of X and Y'),'Heading 2')
    p(t('以下為搖勻後一小時的模擬結果。','Model results one hour after shaking.'));pic('main',16)
    p(t('4. 消化液 X 有甚麼作用？','4. What does digestive juice X do?'),'Heading 2')
    def fill_sentence(z,e,correct):
@@ -216,7 +216,7 @@ def create(out,tmp):
    context.paragraph_format.page_break_before=True
    for para in d.paragraphs:
     if para.text==t('部分 1｜主探究結果及分析','Part 1 | Main results and analysis'):
-     para.text=t('部分 1｜運用概念分析 X、Y 的個別作用','Part 1 | Apply concepts to the individual actions of X and Y')
+     para.text=t('部分 1｜運用概念分析 X 、 Y 的個別作用','Part 1 | Apply concepts to the individual actions of X and Y')
     elif para.text==t('下一步：X 形成乳狀液，會如何影響其後 Y 的作用？','Next: how might the emulsion formed by X affect the later action of Y?'):
      para.text=t('運用乳化與表面積概念，分析 X 如何幫助 Y。','Apply emulsification and surface-area concepts to analyse how X helps Y.')
    d.core_properties.title=t('工作紙一：脂質消化的概念與應用','Worksheet 1: Lipid Digestion — Concepts and Applications')+(' — Answers' if answers else '')
