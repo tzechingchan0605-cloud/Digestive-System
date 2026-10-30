@@ -143,7 +143,7 @@ def create(out,tmp):
    p(t('5. 消化液 X 如何有助消化液 Y 作用？','5. How does digestive juice X help Y act?'),'Heading 2')
    fill_sentence('消化液 X 先把大油滴分散成小油滴，令總表面積 （增加 ／ 減少），有助消化液 Y 作用。','X disperses large oil droplets into small droplets. Their total surface area (increases / decreases), helping Y act.',('增加','increases'))
    q=p(t('6. 本實驗能告訴我們甚麼？','6. What can this experiment tell us?'),'Heading 2');q.paragraph_format.page_break_before=True
-   p(t('我們只觀察油層、混濁或清澈的外觀，沒有檢測消化產物。以下哪個說法最恰當？','We observed only the oil layer, cloudiness or clarity, without testing digestion products. Which statement is most appropriate?'))
+   p(t('我們只觀察油層、混濁或清澈的外觀，沒有檢測消化產物。以下哪個說法最恰當？（圈出正確答案。）','We observed only the oil layer, cloudiness or clarity, without testing digestion products. Which statement is most appropriate? (Circle the correct answer.)'))
    p(t('A. 外觀可提供消化液作用的線索，但不能單獨證明已產生甘油和脂肪酸。','A. Appearance gives clues about the juices, but alone cannot prove that glycerol and fatty acids have formed.'),answer=answers)
    p(t('B. 只要混合物清澈，就已完全證明脂質分解成甘油和脂肪酸。','B. A clear mixture fully proves that lipids have broken down into glycerol and fatty acids.'))
    p(t('部分 2.3｜加熱對消化液作用的影響','Part 2.3 | Effects of heating the juices'),'Heading 2')
