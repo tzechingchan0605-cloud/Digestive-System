@@ -13,7 +13,7 @@ const assert=require('node:assert/strict');
  assert.doesNotMatch(identity,/消化液 Y 是脂肪酶/);
  await page.fill('#profileName','圖解測試');await page.fill('#profileClass','S4');await page.fill('#profileEmail','learning@example.com');await page.click('#profileForm button');
  await page.fill('#initialObservation','油水分層。');await page.click('[data-next="2"]');
- assert.equal(await page.locator('#controlPlan').getAttribute('type'),'hidden');
+ assert.equal(await page.locator('#controlPlan').isVisible(),true);
  const order=await page.evaluate(()=>({saved:state.optionOrder,actual:[...document.querySelectorAll('#assumptionChoices input')].map(el=>el.value),all: Object.fromEntries(Object.keys(conclusionAnswers).map(id=>[id,[...document.querySelector('#'+id).options].map(o=>o.value).filter(Boolean)]))}));
  assert.deepEqual(order.actual,order.saved.assumptions);assert.deepEqual(order.all,order.saved.conclusions);assert.deepEqual([...order.actual].sort(),['mixing','more','time','volume']);
  const samples=await page.evaluate(()=>[0,.3,.6,.999].map(value=>shuffledChoices(['time','volume','mixing','more'],()=>value)));

@@ -22,9 +22,10 @@ const previousAssumptions = [
   ['hot','煮沸組應趁熱觀察，毋須控制反應溫度。',false]
 ];
 const legacyAssumptions = previousAssumptions.filter(([id])=>!['temperature','hot'].includes(id));
-const assumptions = legacyAssumptions.map(a=>a[0]==='more'?[a[0],'X 組可加入較多總液量，以便與 Y 組比較。',false]:a);
-function assumptionsForRecord(r) {return r.uiVersion>=4?assumptions:r.uiVersion===3?legacyAssumptions:previousAssumptions;}
-function assumptionText(id,r) {return (isStaged(r||{})?assumptions:previousAssumptions).find(a=>a[0]===id)?.[1]||id;}
+const stagedAssumptions = legacyAssumptions.map(a=>a[0]==='more'?[a[0],'X 組可加入較多總液量，以便與 Y 組比較。',false]:a);
+const assumptions=stagedAssumptions.map(([id,text,ok])=>[id,({time:'各組在相同反應時間後觀察。',volume:'各組起始油量及水量相同，加入液體的總量也相同。',mixing:'各組使用相同搖勻方式。'})[id]||text,ok]);
+function assumptionsForRecord(r) {return r.uiVersion>=7?assumptions:r.uiVersion>=4?stagedAssumptions:r.uiVersion===3?legacyAssumptions:previousAssumptions;}
+function assumptionText(id,r) {return (r?.uiVersion>=7?assumptions:isStaged(r||{})?stagedAssumptions:previousAssumptions).find(a=>a[0]===id)?.[1]||id;}
 const CONTROL_REFERENCE = '以油水＋2 mL 水作對照，與油水＋2 mL X、油水＋2 mL Y、油水＋各 1 mL X 和 Y 比較。保持起始油水量、加液總量、反應溫度、反應時間及搖勻方式相同。';
 const DESIGN_REFERENCE = '四個標示清楚的基本裝置，分別是對照、X、Y、X＋Y；熱處理另比較煮沸 X 或 Y 後冷卻至 37°C 的組合，每次只改變一項因素。';
 const LIMIT_REFERENCE = '油層是否存在及混濁程度只提供外觀線索，不能單獨證明產生甘油和脂肪酸；需其他化學檢測。此模擬使用預設教學結果，沒有量度反應速度。';
@@ -43,11 +44,13 @@ const trialsForRecord=r=>r.uiVersion>=4?trialKeys:Object.keys(legacyExperiments)
 const resultsForRecord=r=>r.uiVersion>=4?experiments:legacyExperiments;
 const isStaged=r=>r.uiVersion>=4;
 const STAGED_DESIGN='主探究只設兩個裝置：相同油水混合物分別加入 2 mL X 或 2 mL Y；標示清楚，保持溫度、搖勻方式及一小時觀察時間相同。';
-const outcomeLabels = {cloudy:'變得混濁',clear:'油層消失',reduced:'混濁程度減低，沒有明顯油層',separated:'油水分層（沒有明顯變化）','thin-oil':'油水分層（油層變薄）'};
+const outcomeLabels = {'layer-change':'油層變薄／消失',cloudy:'變得混濁',clear:'油層消失',reduced:'混濁程度減低，沒有明顯油層',separated:'油水分層（沒有明顯變化）','thin-oil':'油水分層（油層變薄）'};
 const questionLabels = {q1:'結論 1｜X 組的主要外觀',q3:'結論 2｜小油滴的總表面積',limitations:'結論 3｜本實驗的證據界限',q2:'延伸結論｜煮沸後失去作用的消化液',qY:'主探究結論｜Y 組的外觀'};
 const legacyConclusionAnswers = {q1:'cloudy',q3:'increase',limitations:'indirect',q2:'Y'};
-const conclusionAnswers={...legacyConclusionAnswers,qY:'thin-oil'};
-const answersForRecord=r=>r.uiVersion>=4?conclusionAnswers:r.uiVersion===3?legacyConclusionAnswers:previousConclusionAnswers;
+const stageOneAnswers={...legacyConclusionAnswers,qY:'thin-oil'};
+const stageTwoAnswers={q1:'cloudy',qY:'thin-oil',q3:'increase',q2:'Y'};
+const conclusionAnswers={...stageOneAnswers};
+const answersForRecord=r=>r.uiVersion>=7?conclusionAnswers:r.uiVersion>=5?stageTwoAnswers:r.uiVersion===4?stageOneAnswers:r.uiVersion===3?legacyConclusionAnswers:previousConclusionAnswers;
 const previousConclusionAnswers = {...legacyConclusionAnswers,comparison:'combined',heatComparison:'yaffected'};
 const FIELDS = ['initialObservation','hypothesisLiquid','hypothesisOutcome','reason','controlPlan','setupDescription','q1','qY','q2','q3','limitations','reflection'];
 function shuffledChoices(values,random=Math.random) {
@@ -66,7 +69,7 @@ function renderAnswerOrder() {
   }
 }
 function freshState(profile=null) {
-  return {schemaVersion:2,uiVersion:4,experimentVersion:'staged-1',moduleId:MODULE_ID,id:crypto.randomUUID(),createdAt:new Date().toISOString(),profile,
+  return {schemaVersion:2,uiVersion:7,experimentVersion:'staged-4',moduleId:MODULE_ID,id:crypto.randomUUID(),createdAt:new Date().toISOString(),profile,
     phase:1,unlocked:1,liquid:'X',heat:'none',records:[],firstObservations:{},initialDesign:null,finalAnswers:null,
     optionOrder:freshOptionOrder(),variableChoices:{iv:[],dv:[],cv:[]},assumptions:[],setupMade:false,setupSaved:false,setupMethod:'',setupImage:'',
     part2Unlocked:false,part3Unlocked:false,sequence:'',sequenceObservation:'',sequenceHasRun:false,sequenceRunning:false,selectedObservation:'',experimentHasRun:false,extensionHeat:'',extensionObservation:'',extensionHasRun:false,
@@ -92,7 +95,7 @@ function designSnapshot() { return {at:new Date().toISOString(),form:readForms()
 function buildRecord() {
   accountTime(); const form=readForms();
   const attemptCounts=state.events.reduce((out,e)=>{out[e.type]=(out[e.type]||0)+1;return out;},{});
-  return {schemaVersion:2,uiVersion:4,experimentVersion:'staged-1',moduleId:MODULE_ID,id:state.id,createdAt:state.createdAt,savedAt:new Date().toISOString(),profile:copy(state.profile),
+  return {schemaVersion:2,uiVersion:7,experimentVersion:'staged-4',moduleId:MODULE_ID,id:state.id,createdAt:state.createdAt,savedAt:new Date().toISOString(),profile:copy(state.profile),
     phase:state.phase,part2Unlocked:state.part2Unlocked,part3Unlocked:state.part3Unlocked,optionOrder:copy(state.optionOrder),submitted:state.submitted,submittedAt:state.submittedAt,reflectionSubmittedAt:state.reflectionSubmittedAt,
     durationSeconds:Math.round(Object.values(state.phaseDurations).reduce((a,b)=>a+b,0)),phaseDurations:copy(state.phaseDurations),attemptCounts,
     initialDesign:copy(state.initialDesign),finalAnswers:copy(state.finalAnswers),firstObservations:copy(state.firstObservations),
@@ -153,6 +156,7 @@ function incompleteDesignParts() {
   if(!variableGroups.every(([g])=>state.variableChoices[g].length))missing.push('三類變量');
   if(!state.assumptions.length)missing.push('實驗前提');
 
+  if(!$('#controlPlan').value.trim())missing.push('探究的對照組設計');
   if(!state.setupSaved)missing.push('已儲存的文字、繪圖或相片裝置設計');return missing;
 }
 function refreshDesignGate() { $('#variableFeedback').textContent=variableGroups.every(([g])=>state.variableChoices[g].length)?'已記錄你的變量選擇。':'請在三類變量中各選擇至少一項。'; }
@@ -312,7 +316,7 @@ function renderPrint(r) {
   $('#printReport').innerHTML=`<header class="report-cover"><span class="report-logo">✦</span><div><p>IBL 虛擬實驗室 · S4 生物</p><h1>未知消化液 X 與 Y</h1><strong>個人學習紀錄與回饋${isTeacher(r.profile)?'（教師示範）':''}</strong></div></header>
   <section class="report-profile"><div><small>學生</small><b data-language-user>${escapeHtml(r.profile?.name)}</b></div><div><small>班別及學號</small><b data-language-user>${escapeHtml(r.profile?.classInfo)}</b></div><div><small>紀錄時間</small><b>${formatDate(r.savedAt)}</b></div><div><small>有效探究用時${r.schemaVersion===2?'':'（舊版計時）'}</small><b>${formatDuration(r.durationSeconds)}</b></div></section>
   <section class="report-stage"><h2>01 了解情境</h2><div class="report-card context-summary"><img src="assets/oil-water-tube.png" alt="油水試管"><div><h3>研究任務</h3><p>比較 X、Y 及其組合對油水混合物外觀的影響。</p></div></div><div class="report-card">${open('你的初步觀察',r.phase1?.observation,'描述可見的油水層及試管外觀；不要以身分猜測代替觀察。')}</div></section>
-  <section class="report-stage"><h2>02 設計探究</h2><div class="report-card">${open('第一次實驗前固定保存的原始假說',hypothesisText(h),'合理且可測試的原始假說不因預測錯誤而判錯。',false)}${open('原始理由',h?.reason,'說明可測試預測的理由；沒有唯一措辭。')}</div><div class="report-card">${variables}${reportAnswer('實驗前提',selected?.map(id=>assumptionText(id,r)).join('；'),recordAssumptions.filter(a=>a[2]).map(a=>a[1]).join('；'),selected?.length?sameChoices(selected,recordAssumptions.filter(a=>a[2]).map(a=>a[0])):null)}${isStaged(r)?'':open('探究的對照組',r.phase2?.controlPlan,CONTROL_REFERENCE)}${open('裝置文字設計',r.phase2?.setup?.description,isStaged(r)?STAGED_DESIGN:DESIGN_REFERENCE)}${image?`<img class="setup-image" src="${image}" alt="學生保存的裝置設計">`:''}<p class="feedback-note">裝置圖及開放題由教師判斷，沒有自動對錯標記。</p></div></section>
+  <section class="report-stage"><h2>02 設計探究</h2><div class="report-card">${open('第一次實驗前固定保存的原始假說',hypothesisText(h),'合理且可測試的原始假說不因預測錯誤而判錯。',false)}${open('原始理由',h?.reason,'說明可測試預測的理由；沒有唯一措辭。')}</div><div class="report-card">${variables}${reportAnswer('實驗前提',selected?.map(id=>assumptionText(id,r)).join('；'),recordAssumptions.filter(a=>a[2]).map(a=>a[1]).join('；'),selected?.length?sameChoices(selected,recordAssumptions.filter(a=>a[2]).map(a=>a[0])):null)}${isStaged(r)&&r.uiVersion<6?'':open('探究的對照組',r.phase2?.controlPlan,r.uiVersion>=6?'可另設相同油水混合物加入2 mL水作比較基準，與X或Y比較，保持起始油水量、加液量、溫度、時間及搖勻方式相同。':CONTROL_REFERENCE)}${open('裝置文字設計',r.phase2?.setup?.description,isStaged(r)?STAGED_DESIGN:DESIGN_REFERENCE)}${image?`<img class="setup-image" src="${image}" alt="學生保存的裝置設計">`:''}<p class="feedback-note">裝置圖及開放題由教師判斷，沒有自動對錯標記。</p></div></section>
   <section class="report-stage page-break"><h2>03 六組觀察</h2><div class="report-card">${table}<p>${LIMIT_REFERENCE}</p></div></section>
   <section class="report-stage"><h2>04 分析與結論</h2><div class="report-card">${Object.keys(answersForRecord(r)).map(id=>reportAnswer(questionLabels[id],answerText(id,answers[id]),answerText(id,answersForRecord(r)[id]),answers[id]?answers[id]===answersForRecord(r)[id]:null)).join('')}</div>
   ${r.submitted||r.schemaVersion!==2?`<div class="concept-summary"><h3>學習重點</h3>${canonicalHTML($('#conceptReveal .learning-points'))}${canonicalHTML($('#conceptReveal .learning-diagrams'))}<p>${LIMIT_REFERENCE}</p></div>`:'<p>此份紀錄尚未遞交探究，學習重點尚未開放。</p>'}
@@ -376,11 +380,11 @@ function scoringWorkbook(records) {
     ['id','探究識別碼','identity'],['name','姓名','identity'],['class','班別及學號','identity'],['status','完成狀態','identity'],
     ['observation','觀察｜初步觀察（教師 0–2）','observing',2],['trials','觀察｜六組外觀（自動 0–2）','observing'],['observing','SPS 觀察（0–4）','observing'],
     ['iv','分類｜獨立變量（自動 0–1）','classifying'],['dv','分類｜因變量（自動 0–1）','classifying'],['cv','分類｜控制變量（自動 0–2）','classifying'],['classifying','SPS 分類（0–4）','classifying'],
-    ['hypothesis','設計｜原始假說與理由（教師 0–2）','designing',2],['assumptions','設計｜前提選擇（自動 0–1）','designing'],['control','設計｜對照組（教師 0–1）','designing',1],['designing','SPS 設計探究（新版 0–3／舊版 0–4）','designing'],
+    ['hypothesis','設計｜原始假說與理由（教師 0–2）','designing',2],['assumptions','設計｜前提選擇（自動 0–1）','designing'],['control','設計｜對照組（教師 0–1）','designing',1],['designing','SPS 設計探究（依版本 0–3／0–4）','designing'],
     ['setup','實作｜裝置品質（教師 0–2）','conducting',2],['fair','實作｜固定條件與實驗安排（教師 0–2）','conducting',2],['conducting','SPS 進行實驗（0–4）','conducting'],
     ['inference','推論｜結論及界限（自動 0–4）','inferring'],['inferring','SPS 推論（0–4）','inferring'],
-    ['communication','溝通｜資料與主張（教師 0–4）','communicating',4],['communicating','SPS 溝通（0–4）','communicating'],['sps','SPS 總分（新版 0–23／舊版 0–24）','score'],
-    ['emulsion','舊反思｜膽汁乳化與表面積（教師 0–2）','knowledge',2],['enzyme','舊反思｜脂肪酶與產物（教師 0–2）','knowledge',2],['heat','舊反思｜高溫與變性（教師 0–2）','knowledge',2],['revision','舊反思｜修訂解釋並連結數據（教師 0–2）','knowledge',2],['knowledge','反思概念解釋（綜合 0–8／前題 0–4）','knowledge'],['overall','整體分數（新版 0–31／舊版 0–32 或 28）','score'],['marking','評分狀態','score'],['reflectionScore','綜合解釋／前題酶變性（教師：0–8／0–4）','knowledge',8],['rubricVersion','反思評分版本','reference'],['maximum','活動滿分','reference']
+    ['communication','溝通｜資料與主張（教師 0–4）','communicating',4],['communicating','SPS 溝通（0–4）','communicating'],['sps','SPS 總分（依版本 0–23／0–24）','score'],
+    ['emulsion','舊反思｜膽汁乳化與表面積（教師 0–2）','knowledge',2],['enzyme','舊反思｜脂肪酶與產物（教師 0–2）','knowledge',2],['heat','舊反思｜高溫與變性（教師 0–2）','knowledge',2],['revision','舊反思｜修訂解釋並連結數據（教師 0–2）','knowledge',2],['knowledge','反思概念解釋（綜合 0–8／前題 0–4）','knowledge'],['overall','整體分數（依版本 0–28／31／32）','score'],['marking','評分狀態','score'],['reflectionScore','綜合解釋／前題酶變性（教師：0–8／0–4）','knowledge',8],['rubricVersion','反思評分版本','reference'],['maximum','活動滿分','reference']
   ];
   const col=Object.fromEntries(columns.map(([id],i)=>[id,colName(i)]));
   const rows=[columns.map(([,label,group])=>excelCell(label,group))],conditional=[],validations=[];
@@ -392,14 +396,14 @@ function scoringWorkbook(records) {
     const integrated=concept||r.phase4?.reflectionQuestionId==='integrated-explanation-evidence';
     const current=integrated||r.phase4?.reflectionQuestionId==='enzyme-denaturation',reflectionMax=integrated?8:4;
     const rowMaxima=Object.fromEntries(Object.entries(maxima).filter(([id])=>current?!['emulsion','enzyme','heat','revision'].includes(id):id!=='reflectionScore'));
-    if(current)rowMaxima.reflectionScore=reflectionMax;if(staged)delete rowMaxima.control;
+    if(current)rowMaxima.reflectionScore=reflectionMax;if(staged&&r.uiVersion<6)delete rowMaxima.control;
     Object.entries(rowMaxima).forEach(([id,max])=>validations.push({range:ref(id),max}));
     const recordKeys=trialsForRecord(r),recordResults=resultsForRecord(r);const completeTrialSet=recordKeys.every(key=>trials.some(t=>t.key===key));
     const objective=(g,max)=>Array.isArray(v[g])&&v[g].length?(sameChoices(v[g],expectedVariables[g])?max:0):'未提供';
     const cv=r.schemaVersion===2&&Array.isArray(v.cv)&&v.cv.length?round(expectedVariables.cv.filter(x=>v.cv.includes(x)).length/5*2*(v.cv.some(x=>!expectedVariables.cv.includes(x))?0:1)):'未提供';
     const expectedAnswers=answersForRecord(r);
-    const weight=staged?{q1:.8,qY:.8,q3:.8,limitations:.8,q2:.8}:r.uiVersion===3?{q1:1,q3:1,limitations:1,q2:1}:{q1:.5,q2:.5,q3:.5,comparison:.75,heatComparison:.75,limitations:1};
-    const values={rubricVersion:staged?'staged-1：三部分探究；SPS 23＋反思 8':concept?'現版：綜合概念解釋（0–8）':integrated?'前版：綜合解釋與證據（0–8）':current?'前版：酶變性（0–4）':'舊版：四項反思（0–8）',maximum:staged?31:current?24+reflectionMax:32,id:r.id,name:r.profile?.name,class:r.profile?.classInfo,status:reflectionComplete(r)?'已完成':r.schemaVersion!==2?'舊版／未提供':r.submitted?'待提交反思':'進行中',
+    const weight=r.uiVersion>=7?{q1:.8,qY:.8,q3:.8,limitations:.8,q2:.8}:r.uiVersion>=5?{q1:1,qY:1,q3:1,q2:1}:staged?{q1:.8,qY:.8,q3:.8,limitations:.8,q2:.8}:r.uiVersion===3?{q1:1,q3:1,limitations:1,q2:1}:{q1:.5,q2:.5,q3:.5,comparison:.75,heatComparison:.75,limitations:1};
+    const values={rubricVersion:r.uiVersion>=7?'staged-4：對照組及五項推論；SPS24＋反思8':r.uiVersion>=6?'staged-3：恢復對照組；SPS24＋反思8':r.uiVersion>=5?'staged-2：四項推論；SPS 23＋反思 8':staged?'staged-1：三部分探究；SPS 23＋反思 8':concept?'現版：綜合概念解釋（0–8）':integrated?'前版：綜合解釋與證據（0–8）':current?'前版：酶變性（0–4）':'舊版：四項反思（0–8）',maximum:r.uiVersion>=6?32:staged?31:current?24+reflectionMax:32,id:r.id,name:r.profile?.name,class:r.profile?.classInfo,status:reflectionComplete(r)?'已完成':r.schemaVersion!==2?'舊版／未提供':r.submitted?'待提交反思':'進行中',
       trials:completeTrialSet?round(recordKeys.filter(key=>trials.find(t=>t.key===key)?.studentObservation===recordResults[key][0]).length/recordKeys.length*2):'未提供',
       iv:objective('iv',1),dv:objective('dv',1),cv,
       assumptions:r.phase2?.assumptions?.length?(sameChoices(r.phase2.assumptions,assumptionsForRecord(r).filter(x=>x[2]).map(x=>x[0]))?1:0):'未提供',
@@ -408,17 +412,20 @@ function scoringWorkbook(records) {
     const valid=ids=>ids.map(id=>rowMaxima[id]!==undefined?`AND(ISNUMBER(${ref(id)}),${ref(id)}>=0,${ref(id)}<=${rowMaxima[id]},IFERROR(MOD(${ref(id)},1)=0,FALSE))`:`ISNUMBER(${ref(id)})`).join(',');
     const sum=ids=>`IF(AND(${valid(ids)}),ROUND(SUM(${ids.map(ref).join(',')}),2),"待評")`;
     const sps=['observing','classifying','designing','conducting','inferring','communicating'],knowledge=current?['reflectionScore']:['emulsion','enzyme','heat','revision'];
-    const formulas={observing:sum(['observation','trials']),classifying:sum(['iv','dv','cv']),designing:sum(staged?['hypothesis','assumptions']:['hypothesis','assumptions','control']),conducting:sum(['setup','fair']),inferring:sum(['inference']),communicating:sum(['communication']),sps:sum(sps),knowledge:sum(knowledge),
+    const formulas={observing:sum(['observation','trials']),classifying:sum(['iv','dv','cv']),designing:sum(staged&&r.uiVersion<6?['hypothesis','assumptions']:['hypothesis','assumptions','control']),conducting:sum(['setup','fair']),inferring:sum(['inference']),communicating:sum(['communication']),sps:sum(sps),knowledge:sum(knowledge),
       overall:`IF(AND(ISNUMBER(${ref('sps')}),ISNUMBER(${ref('knowledge')}),${ref('status')}="已完成"),ROUND(SUM(${ref('sps')},${ref('knowledge')}),2),"待評／未完成")`,
       marking:`IF(AND(${valid(Object.keys(rowMaxima))},ISNUMBER(${ref('sps')}),ISNUMBER(${ref('knowledge')}),${ref('status')}="已完成"),"評分完成","待評／學生未完成／分數不符範圍")`};
     rows.push(columns.map(([id,,group,max])=>formulas[id]?excelFormula(formulas[id],group):excelCell(max!==undefined?(rowMaxima[id]!==undefined?'':'不適用'):values[id],group)));
-    const allMax={...rowMaxima,trials:2,iv:1,dv:1,cv:2,assumptions:1,inference:4,observing:4,classifying:4,designing:staged?3:4,conducting:4,inferring:4,communicating:4,sps:staged?23:24,knowledge:current?reflectionMax:8,overall:staged?31:current?24+reflectionMax:32};
+    const allMax={...rowMaxima,trials:2,iv:1,dv:1,cv:2,assumptions:1,inference:4,observing:4,classifying:4,designing:staged&&r.uiVersion<6?3:4,conducting:4,inferring:4,communicating:4,sps:staged&&r.uiVersion<6?23:24,knowledge:current?reflectionMax:8,overall:r.uiVersion>=6?32:staged?31:current?24+reflectionMax:32};
     Object.entries(allMax).forEach(([id,max])=>conditional.push(colourRule(ref(id),ref(id),max)));
   });
 
   const rubric=[['類別／題目','最高分','評分方式','滿分準則','部分得分準則','零分／缺漏處理']];
   const add=(g,title,max,method,full,partial,zero)=>rubric.push([excelCell(title,g),max,method,full,partial,zero]);
-  add('reference','新版 staged-1',31,'版本說明','主探究 X／Y、延伸一 X 後加 Y／水後加 Y、延伸二煮沸 X／Y，均為模擬一小時後。SPS 23＋整合 8＝31；紙本16（deductive-2；前版18）。','設計探究只評原始假說理由 2＋前提 1；對照組欄不適用，無需填分。','五項推論各 0.8 共 4；裝置只要求主探究兩組。舊紀錄沿用原規準及滿分。');
+  add('reference','新版 staged-4',32,'版本說明','保留對照長答及外觀證據題。X、Y外觀、表面積、證據界限、煮沸各0.8，共4。','SPS24＋反思8＝32；紙本八題19分。','歷史版本各按當時題目與規準。');
+  add('reference','前版 staged-3',32,'版本說明','恢復對照組設計人工0–1；SPS24＋整合8＝32。四項推論各1，不設外觀證據題。','紙本deductive-4七題18分：對照設計2、X作用1。','staged-1／2紀錄保留原31分及不適用對照欄；不改寫歷史作答。');
+  add('reference','前版 staged-2',31,'版本說明','X外觀、Y外觀、表面積及煮沸結論各1，共4。已刪除外觀證據題，不要求作答或人工補分。','SPS23＋整合8＝31；紙本deductive-3五題15分。','staged-1歷史紀錄保留五項各0.8的原規準，不改寫舊答。');
+  add('reference','舊版 staged-1',31,'版本說明','主探究 X／Y、延伸一 X 後加 Y／水後加 Y、延伸二煮沸 X／Y，均為模擬一小時後。SPS 23＋整合 8＝31；紙本16（deductive-2；前版18）。','設計探究只評原始假說理由 2＋前提 1；對照組欄不適用，無需填分。','五項推論各 0.8 共 4；裝置只要求主探究兩組。舊紀錄沿用原規準及滿分。');
   add('observing','staged-1｜觀察',4,'人工2＋自動2','初步可見描述0–2；六組新序列外觀答齊後，正確組數／6×2。','保留首次及最後觀察，按內容判斷。','缺組未提供；不是按完成率給分。');
   add('classifying','staged-1｜分類',4,'自動','IV1、DV1、CV2；使用與主探究相同的完整候選。','CV正確項各0.4，選入非CV使CV分為0。','缺答未提供。');
   add('communicating','staged-1｜溝通',4,'人工','依已問的原始理由、主探究裝置、數據及最後解釋評清晰度與組織。','3稍欠連結、2基本可理解、1單一相關表達。','0無有效溝通；不要求已刪水對照或額外證據比較。');
@@ -457,7 +464,7 @@ async function exportExcel() {
   try {records=await allTeacherRecords();}
   catch(e){toast('未匯出：'+e.message+'。請解鎖雲端並重試，避免下載不完整的全班紀錄。');return;}
   if(!isTeacher())return;
-  const headings=['探究識別碼','姓名','班別及學號','電郵','狀態','建立時間','探究提交時間','反思提交時間','初步觀察','原始假說','原始理由','最後假說','最後理由','獨立變量','因變量','控制變量','實驗前提','舊版｜對照組設計（新版不適用）','裝置文字設計',...Object.values(questionLabels).slice(0,4),'歷史具體比較說明（現版不設此題）','實際學習反思','總有效秒數','階段一秒數','階段二秒數','階段三秒數','階段四秒數','主探究實驗次數','煮沸實驗次數','確認觀察次數','理由修改次數','主探究結論｜Y 組的外觀','實驗版本','延伸一實驗次數'];
+  const headings=['探究識別碼','姓名','班別及學號','電郵','狀態','建立時間','探究提交時間','反思提交時間','初步觀察','原始假說','原始理由','最後假說','最後理由','獨立變量','因變量','控制變量','實驗前提','對照組設計（按紀錄版本）','裝置文字設計',...Object.values(questionLabels).slice(0,4),'歷史具體比較說明（現版不設此題）','實際學習反思','總有效秒數','階段一秒數','階段二秒數','階段三秒數','階段四秒數','主探究實驗次數','煮沸實驗次數','確認觀察次數','理由修改次數','主探究結論｜Y 組的外觀','實驗版本','延伸一實驗次數'];
   const groups=headings.map((heading,c)=>heading===questionLabels.qY?'inferring':c<8?'identity':c===8?'observing':c<13?'designing':c<16?'classifying':c<19?'designing':c<23?'inferring':c===23?'communicating':c===24?'knowledge':'identity');
   const answers=[headings.map((h,c)=>excelCell(h,groups[c]))],observations=[['探究識別碼','姓名','裝置','首次確認外觀','最後確認外觀','參考外觀','最後回饋','首次確認時間','最後確認時間']];
   const events=[['探究識別碼','姓名','事件','時間（香港）','階段','原始時間戳','內容分段','完整事件內容']];
@@ -465,7 +472,7 @@ async function exportExcel() {
   const designs=[['姓名','班別及學號','電郵','文字設計','裝置設計圖']],images=[];
   records.forEach(r=>{
     const h=originalHypothesis(r),last=r.phase2?.hypothesis,v=r.phase2?.variableChoices||{},conclusions=r.phase4?.conclusions||{},selection=r.phase2?.assumptions;
-    const row=[r.id,r.profile.name,r.profile.classInfo,r.profile.email,reflectionComplete(r)?'已完成':r.submitted?'待提交反思':r.schemaVersion===2?'進行中':'舊版／未提供',formatDate(r.createdAt),formatDate(r.submittedAt),formatDate(r.reflectionSubmittedAt),r.phase1?.observation||'未提供',hypothesisText(h),h?.reason||'未提供',last?hypothesisText(last):'未提供',last?.reason||'未提供',v.iv?.join('、')||'未提供',v.dv?.join('、')||'未提供',v.cv?.join('、')||'未提供',selection?.map(id=>assumptionText(id,r)).join('；')||'未提供',isStaged(r)?'不適用':r.phase2?.controlPlan||'未提供',r.phase2?.setup?.description||'未提供',...Object.keys(questionLabels).slice(0,4).map(id=>answerText(id,conclusions[id])),r.phase4?.evidenceExplanation||'未提供',r.phase4?.reflection||'未提供',r.durationSeconds??'未提供',...[1,2,3,4].map(p=>r.phaseDurations?.[p]===undefined?'未提供':Math.round(r.phaseDurations[p])),...['trial_run','extension_trial_run','observation_recorded','reason_updated'].map(id=>r.attemptCounts?.[id]??'未提供'),isStaged(r)?answerText('qY',conclusions.qY):'不適用',r.experimentVersion||'legacy',r.attemptCounts?.sequence_trial_run??'未提供'];
+    const row=[r.id,r.profile.name,r.profile.classInfo,r.profile.email,reflectionComplete(r)?'已完成':r.submitted?'待提交反思':r.schemaVersion===2?'進行中':'舊版／未提供',formatDate(r.createdAt),formatDate(r.submittedAt),formatDate(r.reflectionSubmittedAt),r.phase1?.observation||'未提供',hypothesisText(h),h?.reason||'未提供',last?hypothesisText(last):'未提供',last?.reason||'未提供',v.iv?.join('、')||'未提供',v.dv?.join('、')||'未提供',v.cv?.join('、')||'未提供',selection?.map(id=>assumptionText(id,r)).join('；')||'未提供',isStaged(r)&&r.uiVersion<6?'不適用':r.phase2?.controlPlan||'未提供',r.phase2?.setup?.description||'未提供',...Object.keys(questionLabels).slice(0,4).map(id=>r.uiVersion>=5&&r.uiVersion<7&&id==='limitations'?'不適用':answerText(id,conclusions[id])),r.phase4?.evidenceExplanation||'未提供',r.phase4?.reflection||'未提供',r.durationSeconds??'未提供',...[1,2,3,4].map(p=>r.phaseDurations?.[p]===undefined?'未提供':Math.round(r.phaseDurations[p])),...['trial_run','extension_trial_run','observation_recorded','reason_updated'].map(id=>r.attemptCounts?.[id]??'未提供'),isStaged(r)?answerText('qY',conclusions.qY):'不適用',r.experimentVersion||'legacy',r.attemptCounts?.sequence_trial_run??'未提供'];
     const checks={13:v.iv?.length?sameChoices(v.iv,expectedVariables.iv):null,14:v.dv?.length?sameChoices(v.dv,expectedVariables.dv):null,15:v.cv?.length?sameChoices(v.cv,variablesForRecord(r,'cv')):null,16:selection?.length?sameChoices(selection,assumptionsForRecord(r).filter(a=>a[2]).map(a=>a[0])):null};
     Object.keys(legacyConclusionAnswers).forEach((id,i)=>checks[19+i]=conclusions[id]?conclusions[id]===conclusionAnswers[id]:null);
     checks[headings.indexOf(questionLabels.qY)]=isStaged(r)&&conclusions.qY?conclusions.qY===conclusionAnswers.qY:null;

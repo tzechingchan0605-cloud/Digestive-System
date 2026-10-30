@@ -36,6 +36,7 @@ const photo = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQ
       await page.click(`[data-group="${group}"][data-variable="${value}"]`);
     await page.check('#assumptionChoices input[value="time"]');
 
+    await page.fill('#controlPlan','加水作比較基準，保持相同條件。');
     assert.equal(await page.locator('#saveSetup').count(), 1);
     assert.equal(await page.locator('#saveTextSetup').count(), 0);
     assert.equal(await page.locator('.drawing-tools #saveSetup').count(), 0, 'The shared save button must be below both design inputs.');

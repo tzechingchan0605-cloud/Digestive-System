@@ -18,8 +18,8 @@ answers, scores, observations = w['學生探究答案'], w['教師評分'], w['�
 assert answers['B2'].value == '陳小明'
 heads={c.value:c.column for c in answers[1]}
 assert answers.cell(2,heads['主探究結論｜Y 組的外觀']).font.color.rgb=='FF00834A'
-assert answers.cell(2,heads['實驗版本']).value=='staged-1'
-assert scores['AG2'].value==31
+assert answers.cell(2,heads['實驗版本']).value=='staged-4'
+assert scores['AG2'].value==32
 assert len(w['裝置設計圖']._images) == 1
 assert answers['N2'].font.color.rgb == 'FF00834A'  # Independent variable, correct.
 assert answers['Q2'].font.color.rgb == 'FFC03030'  # Deliberately incorrect premise selection.
@@ -27,10 +27,10 @@ assert answers['I2'].font.color.rgb == 'FF173E34'  # Open observation remains un
 assert len({answers[f'{c}2'].fill.fgColor.rgb for c in ['I', 'N', 'Q', 'T', 'X', 'Y']}) == 6
 assert observations['D2'].font.color.rgb == 'FFC03030'  # First X answer was incorrect.
 assert observations['E2'].font.color.rgb == 'FF00834A'  # Final X answer was correct.
-assert len(scores.data_validations.dataValidation) == 28
+assert len(scores.data_validations.dataValidation) == 31
 assert len(answers.conditional_formatting) == 4 * 6
-assert scores['N2'].value=='不適用'
-assert 'N2' not in [str(v.sqref) for v in scores.data_validations.dataValidation]
+assert scores['N2'].value in ('',None)
+assert 'N2' in [str(v.sqref) for v in scores.data_validations.dataValidation]
 assert w.calculation.fullCalcOnLoad and w.calculation.forceFullCalc
 assert w['評分準則'].max_row >= 19
 assert w['操作事件紀錄'].max_row > 80
@@ -115,8 +115,8 @@ for validation in scores.data_validations.dataValidation:
     address=str(validation.sqref).split(':')[0]
     if re.search(r'(?<![0-9])2$',address): scores[address] = int(validation.formula2)
 assert ev('AB2') == 8
-assert ev('W2') == 22  # One point lost on premises.
-assert ev('AC2') == 30
+assert ev('W2') == 23  # One point lost on premises.
+assert ev('AC2') == 31
 assert ev('AD2') == '評分完成'
 scores['AE2'] = 0
 assert ev('AB2') == 0
@@ -183,19 +183,19 @@ if large_path.exists():
 version_path=Path('/tmp/vl1-rubric-versions.xlsx')
 assert version_path.exists(), 'Run tests/scoring_versions.cjs first'
 mixed=load_workbook(version_path);scores=mixed['教師評分']
-assert len(scores.data_validations.dataValidation)==37
-for row,maximum,reflection_max in [(2,31,8),(3,32,8),(4,32,8),(5,28,4),(6,32,8)]:
+assert len(scores.data_validations.dataValidation)==57
+for row,maximum,reflection_max in [(2,32,8),(3,32,8),(4,31,8),(5,31,8),(6,32,8),(7,32,8),(8,28,4),(9,32,8)]:
     assert scores[f'AG{row}'].value==maximum
     assert ev(f'AC{row}')=='待評／未完成'
     applicable=[v for v in scores.data_validations.dataValidation if str(v.sqref).endswith(str(row))]
-    assert len(applicable)==(6 if row==2 else 10 if row==6 else 7)
+    assert len(applicable)==(6 if row in [4,5] else 10 if row==9 else 7)
     for v in applicable:scores[str(v.sqref)]=int(v.formula2)
     assert ev(f'AB{row}')==reflection_max and ev(f'AC{row}')==maximum
     assert ev(f'AD{row}')=='評分完成'
-    answer_cell=f'X{row}' if row==6 else f'AE{row}'
-    limit=2 if row==6 else reflection_max
+    answer_cell=f'X{row}' if row==9 else f'AE{row}'
+    limit=2 if row==9 else reflection_max
     scores[answer_cell]=0
-    assert ev(f'AB{row}')==(6 if row==6 else 0)
+    assert ev(f'AB{row}')==(6 if row==9 else 0)
     for invalid in [None,limit+1,-1,0.5,'2']:
         scores[answer_cell]=invalid
         assert ev(f'AB{row}')=='待評' and ev(f'AC{row}')=='待評／未完成'

@@ -118,7 +118,7 @@ function assertApprovedChinese(entries,label){
   await page.selectOption('#hypothesisLiquid','X');await page.selectOption('#hypothesisOutcome','cloudy');await page.fill('#reason','開始實驗');
   for(const [group,names]of Object.entries({iv:['消化液組合'],dv:['混合物外觀'],cv:['油和水總體積','反應溫度','反應時間','加液總量','搖勻方式']}))for(const name of names)await page.click(`[data-group="${group}"][data-variable="${name}"]`);
   for(const value of ['time','volume','mixing'])await page.check(`#assumptionChoices input[value="${value}"]`);
-  await page.fill('#setupDescription','實驗裝置');
+  await page.fill('#controlPlan','探究的對照組');await page.fill('#setupDescription','實驗裝置');
   const canvasBox=await page.locator('#setupCanvas').boundingBox();
   await page.mouse.move(canvasBox.x+40,canvasBox.y+40);await page.mouse.down();await page.mouse.move(canvasBox.x+100,canvasBox.y+70,{steps:8});await page.mouse.up();await page.click('#saveSetup');
   await page.click('[data-next="3"]');

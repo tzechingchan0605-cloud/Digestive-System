@@ -155,3 +155,6 @@ html[lang="en-HK"] .reaction-step{word-break:keep-all}
 #sequenceInvestigation td,#sequenceInvestigation th{overflow-wrap:anywhere}
 #sequenceAnalysis select,#qY{width:100%;max-width:100%;font:inherit}
 .extension-layout>*{min-width:0}
+/* Long prediction choices must fit within the sentence on phones. */
+.builder-card .sentence select{max-width:100%;min-width:0;box-sizing:border-box}
+@media(max-width:760px){#hypothesisOutcome{display:block;width:100%;margin:8px 0}.builder-card{min-width:0;overflow-wrap:anywhere}}
