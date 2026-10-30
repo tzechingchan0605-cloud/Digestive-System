@@ -5,7 +5,7 @@
   "spsMaximum": 23,
   "vlMaximum": 31,
   "legacyMaximum": 32,
-  "worksheetMaximum": 18,
+  "worksheetMaximum": 16,
   "reflectionPoints": [
     "膽汁透過物理作用，把大油滴乳化成小油滴。",
     "乳化沒有改變脂質分子的結構。",
@@ -37,57 +37,39 @@
     },
     {
       "number": 3,
-      "title": "消化液 X 的作用",
-      "vl": "數據與推論：q1",
-      "max": 1,
-      "answer": "混濁乳狀液。",
-      "marking": "正確 1；已答錯誤 0。不另要求物理／化學消化分類或文字比較。",
-      "english": "3. Main q1 (1): cloudy emulsion."
-    },
-    {
-      "number": 4,
-      "title": "Y 組的外觀",
-      "vl": "主探究分析：qY",
-      "max": 1,
-      "answer": "油層變薄，但仍有油水分層。",
-      "marking": "正確1；已答錯誤0。",
-      "english": "4. Main qY (1): thinner oil layer, with two layers remaining."
-    },
-    {
-      "number": 5,
       "title": "X 如何有助 Y 作用",
       "vl": "數據與推論：q3",
       "max": 1,
       "answer": "增加。",
       "marking": "正確 1；已答錯誤 0。不另要求分子結構解釋。",
-      "english": "5. Extension 1 q3 (1): increases."
+      "english": "3. Extension 1 q3 (1): increases."
     },
     {
-      "number": 6,
+      "number": 4,
       "title": "外觀證據的界限",
       "vl": "數據與推論：limitations",
       "max": 1,
       "answer": "A：外觀可提供線索，但不能單獨證明已產生甘油和脂肪酸。",
       "marking": "選 A 1；已答錯誤 0。",
-      "english": "6. Extension 1 limitations (1): appearance alone cannot prove glycerol and fatty acids formed."
+      "english": "4. Extension 1 limitations (1): appearance alone cannot prove glycerol and fatty acids formed."
     },
     {
-      "number": 7,
+      "number": 5,
       "title": "煮沸後失去作用的消化液",
       "vl": "延伸探究：q2",
       "max": 1,
       "answer": "消化液 Y。",
       "marking": "選 Y 1；已答錯誤 0。不另要求對照組或冷卻程序解釋。",
-      "english": "7. Extension 2 q2 (1): Y."
+      "english": "5. Extension 2 q2 (1): Y."
     },
     {
-      "number": 8,
+      "number": 6,
       "title": "部分 3：綜合概念解釋",
       "vl": "最後學習重點後的整合解釋；此時才揭示 X、Y 身分。",
       "max": 8,
       "answer": "膽汁不含消化酶，透過物理消化把大油滴乳化成小油滴，脂質分子沒有改變。小油滴使同量脂質的總表面積增加，讓脂肪酶接觸更多脂質。胰液中的脂肪酶催化脂質的化學消化，按本課完全水解簡化模型，將脂質分解為甘油與脂肪酸。脂肪酶是蛋白質，煮沸使其變性，失去催化功能，冷卻後也不能恢復原來的作用；本模型中的膽汁則在煮沸後仍保留乳化作用。",
       "marking": "按共同八個概念／8 分規準；不另要求引用觀察、外觀限制或修訂假說。",
-      "english": "8. Final integration (8): use the eight concept points below. No extra observation citation, limits or hypothesis revision required."
+      "english": "6. Final integration (8): use the eight concept points below. No extra observation citation, limits or hypothesis revision required."
     }
   ],
   "sps": [
@@ -141,5 +123,5 @@
     "Boiling denatures lipase and stops catalysis.",
     "Bile retains emulsifying action after boiling in this model."
   ],
-  "worksheetDesignVersion": "deductive-1"
+  "worksheetDesignVersion": "deductive-2"
 }

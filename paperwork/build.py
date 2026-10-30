@@ -19,7 +19,7 @@ SPECS = [('student-pdf', 'WS1_student.pdf', 'application/pdf'),
 def specs(language):
     return [(id, name if language=='zh' else Path(name).stem+'_en'+Path(name).suffix,mime) for id,name,mime in SPECS]
 
-INPUTS = ['paperwork/staged.py','paperwork/diagrams_en.py','paperwork/render_diagrams.cjs','language-dictionary.js','index.html','paperwork/build.py','paperwork/build.cjs','paperwork/rubric.json','app.js']
+INPUTS = ['paperwork/templates/WS1_topic_notes_zh.docx','paperwork/templates/WS1_topic_notes_en.docx','paperwork/staged.py','paperwork/diagrams_en.py','paperwork/render_diagrams.cjs','language-dictionary.js','index.html','paperwork/build.py','paperwork/build.cjs','paperwork/rubric.json','app.js']
 sha = lambda b: hashlib.sha256(b).hexdigest()
 def fingerprints():
     return {name: sha((ROOT/name).read_bytes()) for name in INPUTS}

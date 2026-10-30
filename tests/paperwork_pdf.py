@@ -5,8 +5,8 @@ import re,json,fitz
 from docx import Document
 root=Path(__file__).resolve().parents[1];out=root/'paperwork/generated'
 rules=json.loads((root/'paperwork/rubric.json').read_text())
-assert rules['worksheetDesignVersion']=='deductive-1'
-assert rules['vlMaximum']==31 and rules['worksheetMaximum']==18
+assert rules['worksheetDesignVersion']=='deductive-2'
+assert rules['vlMaximum']==31 and rules['worksheetMaximum']==16
 assert len(rules['reflectionPoints'])==8
 for lang in ['','_en']:
  for stem in ['student','answers']:
@@ -17,10 +17,23 @@ for lang in ['','_en']:
    for row in table.rows:
     for cell in row.cells:paragraphs.extend(cell.paragraphs)
   text='\n'.join(p.text for p in paragraphs)
-  assert len([p for p in doc.paragraphs if re.match(r'^\d+\. ',p.text)])==8
+  assert len([p for p in doc.paragraphs if re.match(r'^\d+\. ',p.text)])==6
+  assert '主要外觀' not in text and 'Appearance of X after' not in text
   assert '對照組' not in text and 'clear solution' not in text and '清澈' not in text
   assert len(doc.inline_shapes)==6
-  assert doc.core_properties.subject.startswith('deductive-1')
+  reference=Document(root/f'paperwork/templates/WS1_topic_notes_{"en" if lang else "zh"}.docx')
+  topic=next(i for i,p in enumerate(doc.paragraphs) if p.text in ['課題需知','Topic notes'])
+  assert [p.text for p in doc.paragraphs[topic:topic+len(reference.paragraphs)]]==[p.text for p in reference.paragraphs]
+  for actual,expected in zip(doc.paragraphs[topic:topic+len(reference.paragraphs)],reference.paragraphs):
+   runs=lambda p:[(r.text,r.bold,str(r.font.color.rgb),r.font.size.pt if r.font.size else None) for r in p.runs]
+   assert runs(actual)==runs(expected), 'Reference keyword formatting changed'
+   if expected.style.font.bold:
+    assert actual.style.font.bold==expected.style.font.bold
+    assert str(actual.style.font.color.rgb)==str(expected.style.font.color.rgb)
+  for actual,expected in zip(list(doc.inline_shapes)[:2],reference.inline_shapes):
+   embed=lambda shape:shape._inline.xpath('.//a:blip')[0].get('{http://schemas.openxmlformats.org/officeDocument/2006/relationships}embed')
+   assert doc.part.related_parts[embed(actual)].blob==reference.part.related_parts[embed(expected)].blob
+  assert doc.core_properties.subject.startswith('deductive-2')
   for p in paragraphs:
    for r in p.runs:
     if r.text.strip():assert (r.font.size or p.style.font.size or doc.styles['Normal'].font.size).pt>=11
@@ -41,11 +54,11 @@ for lang in ['','_en']:
    assert len(rules)>=5, 'Printed response lines must not merge into a single border'
    for b in borders:assert b.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}color')=='333333'
   else:
-   assert sum(p.text.startswith('☑') for p in doc.paragraphs)==8 # Three premises + five analyses.
+   assert sum(p.text.startswith('☑') for p in doc.paragraphs)==6 # Three premises + three analyses.
    assert any(str(r.font.color.rgb)=='145DA0' for p in doc.paragraphs for r in p.runs)
-  print('PASS:',name,'4 A4 pages, 8 tasks, 6 diagrams, >=11pt, same-line identity, concept-first deductive flow, distinct key.')
+  print('PASS:',name,'4 A4 pages, 6 tasks, 6 diagrams, >=11pt, same-line identity, concept-first deductive flow, distinct key.')
  for stem in ['D_teacher_guide']:
   pdf=fitz.open(out/f'WS1_{stem}{lang}.pdf');t='\n'.join(p.get_text() for p in pdf)
-  assert 'staged-1' in t and '31' in t and '18' in t
+  assert 'staged-1' in t and '31' in t and '16' in t
   if lang:assert not re.search(r'[\u3400-\u9fff]',t)
 print('PASS: bilingual teacher guides, new maxima and dark response lines.')
