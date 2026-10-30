@@ -23,10 +23,15 @@
       const response=await fetch('paperwork/generated/manifest.json',{cache:'no-store'});
       if(!response.ok)throw new Error('manifest');
       const data=await response.json();
-      if(data.format!=='VL1-reviewed-worksheet-v2'||data.version!==2||data.language!=='zh-Hant'||!Array.isArray(data.files)||data.files.length!==5)throw new Error('format');
-      for(const [id,[name,mime]] of Object.entries(specs)){
-        const matches=data.files.filter(f=>f.id===id),file=matches[0];
-        if(matches.length!==1||file.path!=='paperwork/generated/'+name||file.name!==name||file.mime!==mime||!Number.isInteger(file.bytes)||file.bytes<1||!Number.isInteger(file.pages)||file.pages<1||!/^[a-f0-9]{64}$/.test(file.sha256))throw new Error('file metadata');
+      if(data.format!=='VL1-reviewed-worksheet-v3'||data.version!==3||!data.languages)throw new Error('format');
+      for(const lang of ['zh','en']){
+        const files=data.languages[lang]?.files;
+        if(!Array.isArray(files)||files.length!==5)throw new Error('language files');
+        for(const [id,[base,mime]] of Object.entries(specs)){
+          const name=lang==='zh'?base:base.replace(/(\.[^.]+)$/,'_en$1');
+          const matches=files.filter(f=>f.id===id),file=matches[0];
+          if(matches.length!==1||file.path!=='paperwork/generated/'+name||file.name!==name||file.mime!==mime||!Number.isInteger(file.bytes)||file.bytes<1||!Number.isInteger(file.pages)||file.pages<1||!/^[a-f0-9]{64}$/.test(file.sha256))throw new Error('file metadata');
+        }
       }
       if(token!==request||!authorised())return false;
       manifest=data;buttons().forEach(b=>b.disabled=false);status('工作紙已準備好。');return true;
@@ -36,7 +41,8 @@
   }
   async function downloadFile(id){
     if(!authorised()||!manifest||!Object.hasOwn(specs,id))return false;
-    const token=request,file=manifest.files.find(f=>f.id===id);
+    const lang=window.VL1Language?.current==='en'?'en':'zh';
+    const token=request,file=manifest.languages[lang].files.find(f=>f.id===id);
     try{
       const response=await fetch(file.path,{cache:'no-store'});if(!response.ok)throw new Error('file');
       const bytes=await response.arrayBuffer(),head=new Uint8Array(bytes.slice(0,5));

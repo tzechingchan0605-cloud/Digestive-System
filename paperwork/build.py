@@ -8,6 +8,9 @@ from docx.shared import Pt, RGBColor
 import fitz
 from teacher_guide import create as create_guide
 from docx.oxml.ns import qn
+from english import create as create_english
+from teacher_en import create as create_guide_en
+from diagrams_en import create as create_diagrams_en
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'paperwork/generated'
 TEMPLATE = ROOT / 'paperwork/templates/WS1_reviewed.docx'
@@ -16,7 +19,10 @@ SPECS = [('student-pdf', 'WS1_student.pdf', 'application/pdf'),
          ('answers-pdf', 'WS1_answers.pdf', 'application/pdf'),
          ('answers-word', 'WS1_answers.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'),
          ('teacher-guide', 'WS1_D_teacher_guide.pdf', 'application/pdf')]
-INPUTS = ['paperwork/templates/WS1_reviewed.docx', 'paperwork/build.py', 'paperwork/build.cjs', 'paperwork/teacher_guide.py', 'paperwork/rubric.json', 'app.js']
+def specs(language):
+    return [(id, name if language=='zh' else Path(name).stem+'_en'+Path(name).suffix,mime) for id,name,mime in SPECS]
+
+INPUTS = ['paperwork/english.py','paperwork/teacher_en.py','paperwork/diagrams_en.py','paperwork/render_diagrams.cjs','language-dictionary.js','assets/digestive-system.png','paperwork/templates/WS1_reviewed.docx', 'paperwork/build.py', 'paperwork/build.cjs', 'paperwork/teacher_guide.py', 'paperwork/rubric.json', 'app.js']
 sha = lambda b: hashlib.sha256(b).hexdigest()
 def fingerprints():
     return {name: sha((ROOT/name).read_bytes()) for name in INPUTS}
@@ -105,26 +111,29 @@ def prepare():
 
 def check():
     data=json.loads((OUT/'manifest.json').read_text())
-    assert data['format']=='VL1-reviewed-worksheet-v2'
+    assert data['format']=='VL1-reviewed-worksheet-v3' and data['version']==3
     assert data['inputs']==fingerprints(), 'Worksheet sources changed; run npm run paper:build'
-    assert [f['id'] for f in data['files']]==[s[0] for s in SPECS]
-    assert {p.name for p in OUT.iterdir() if p.suffix in ['.pdf','.docx']}=={s[1] for s in SPECS}
-    for f, spec in zip(data['files'],SPECS):
-        assert f['path']=='paperwork/generated/'+spec[1] and f['mime']==spec[2]
-        content=(ROOT/f['path']).read_bytes()
-        assert len(content)==f['bytes'] and sha(content)==f['sha256'],f['path']
-        if f['path'].endswith('.pdf'):
-            assert content.startswith(b'%PDF-')
-            with fitz.open(stream=content,filetype='pdf') as pdf:
-                assert len(pdf)==f['pages']
-                assert len(pdf)==4 if f['id']!='teacher-guide' else len(pdf)>=4
-        else:
-            with zipfile.ZipFile(ROOT/f['path']) as z: assert z.testzip() is None and 'word/document.xml' in z.namelist()
-    # All reviewed student text and images survive layout adjustment exactly.
+    assert set(data['languages'])=={'zh','en'}
+    expected={name for lang in ['zh','en'] for _,name,_ in specs(lang)}
+    assert {p.name for p in OUT.iterdir() if p.suffix in ['.pdf','.docx']}==expected
+    for lang in ['zh','en']:
+        files=data['languages'][lang]['files']
+        assert [f['id'] for f in files]==[s[0] for s in SPECS]
+        for f,spec in zip(files,specs(lang)):
+            assert f['path']=='paperwork/generated/'+spec[1] and f['mime']==spec[2]
+            content=(ROOT/f['path']).read_bytes()
+            assert len(content)==f['bytes'] and sha(content)==f['sha256'],f['path']
+            if f['path'].endswith('.pdf'):
+                assert content.startswith(b'%PDF-')
+                with fitz.open(stream=content,filetype='pdf') as pdf:
+                    assert len(pdf)==f['pages']
+                    assert len(pdf)==4 if f['id']!='teacher-guide' else len(pdf)>=4
+            else:
+                with zipfile.ZipFile(ROOT/f['path']) as z:assert z.testzip() is None and 'word/document.xml' in z.namelist()
     source=Document(TEMPLATE);student=Document(OUT/'WS1_student.docx')
     assert [p.text for p in source.paragraphs]==[p.text for p in student.paragraphs]
     assert [[c.text for row in t.rows for c in row.cells] for t in source.tables]==[[c.text for row in t.rows for c in row.cells] for t in student.tables]
-    print('PASS: four worksheet files plus D guide; dark answer lines; checksums; reviewed text unchanged.')
+    print('PASS: five downloads per language; real English/Chinese files; checksums; reviewed Chinese text preserved.')
 
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--check',action='store_true');args=parser.parse_args()
@@ -134,17 +143,24 @@ def main():
     with TemporaryDirectory(prefix='vl1-word-') as tmp:
         profile=Path(tmp)/'profile'
         guide=Path(tmp)/'WS1_D_teacher_guide.docx';create_guide(guide)
-        subprocess.run(['soffice',f'-env:UserInstallation={profile.as_uri()}','--headless','--convert-to','pdf','--outdir',str(OUT),str(OUT/'WS1_student.docx'),str(OUT/'WS1_answers.docx'),str(guide)],check=True,timeout=120)
-    files=[]
-    for id,name,mime in SPECS:
-        content=(OUT/name).read_bytes()
-        with fitz.open(OUT/name.replace('.docx','.pdf')) as pdf: pages=len(pdf)
-        files.append(dict(id=id,path='paperwork/generated/'+name,name=name,mime=mime,bytes=len(content),sha256=sha(content),pages=pages))
-    data=dict(format='VL1-reviewed-worksheet-v2',version=2,language='zh-Hant',inputs=fingerprints(),files=files)
+        diagrams=Path(tmp)/'diagrams';create_diagrams_en(diagrams)
+        subprocess.run(['node',str(ROOT/'paperwork/render_diagrams.cjs'),str(diagrams)],check=True,timeout=120)
+        create_english(OUT,diagrams)
+        guide_en=Path(tmp)/'WS1_D_teacher_guide_en.docx';create_guide_en(guide_en)
+        subprocess.run(['soffice',f'-env:UserInstallation={profile.as_uri()}','--headless','--convert-to','pdf','--outdir',str(OUT),str(OUT/'WS1_student.docx'),str(OUT/'WS1_answers.docx'),str(guide),str(OUT/'WS1_student_en.docx'),str(OUT/'WS1_answers_en.docx'),str(guide_en)],check=True,timeout=120)
+    languages={}
+    for lang in ['zh','en']:
+        files=[]
+        for id,name,mime in specs(lang):
+            content=(OUT/name).read_bytes()
+            with fitz.open(OUT/name.replace('.docx','.pdf')) as pdf:pages=len(pdf)
+            files.append(dict(id=id,path='paperwork/generated/'+name,name=name,mime=mime,bytes=len(content),sha256=sha(content),pages=pages))
+        languages[lang]=dict(files=files)
+    data=dict(format='VL1-reviewed-worksheet-v3',version=3,inputs=fingerprints(),languages=languages)
     (OUT/'manifest.json').write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
-    # Retire superseded A–D split materials from the current published file set.
+    expected={name for lang in ['zh','en'] for _,name,_ in specs(lang)}
     for old in OUT.iterdir():
-        if old.suffix in ['.pdf','.docx'] and old.name not in {s[1] for s in SPECS}:old.unlink()
+        if old.suffix in ['.pdf','.docx'] and old.name not in expected:old.unlink()
         elif old.name in ['source.json','mapping.md']:old.unlink()
     check()
 if __name__=='__main__':main()

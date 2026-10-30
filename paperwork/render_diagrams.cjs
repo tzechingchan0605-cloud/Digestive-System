@@ -1,0 +1,4 @@
+'use strict';
+const fs=require('node:fs'),path=require('node:path'),{chromium}=require('playwright');
+(async()=>{const folder=process.argv[2];const browser=await chromium.launch({...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:fs.existsSync('/usr/bin/chromium')?{executablePath:'/usr/bin/chromium'}:{}),headless:true,args:['--no-sandbox']});
+try{const page=await browser.newPage({viewport:{width:920,height:400},deviceScaleFactor:3});await page.route('https://**/*',r=>r.abort());for(const file of fs.readdirSync(folder).filter(f=>f.endsWith('.svg'))){await page.setContent('<style>body{margin:0}</style>'+fs.readFileSync(path.join(folder,file),'utf8'));await page.evaluate(()=>document.fonts.ready);await page.locator('svg').screenshot({path:path.join(folder,file.replace('.svg','.png'))});}}finally{await browser.close()}})().catch(e=>{console.error(e);process.exitCode=1});

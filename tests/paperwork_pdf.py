@@ -7,7 +7,7 @@ import fitz
 from docx import Document
 root=Path(__file__).resolve().parents[1];out=root/'paperwork/generated'
 manifest=json.loads((out/'manifest.json').read_text())
-assert len(manifest['files'])==5
+assert all(len(manifest['languages'][lang]['files'])==5 for lang in ['zh','en'])
 student=Document(out/'WS1_student.docx');answers=Document(out/'WS1_answers.docx');template=Document(root/'paperwork/templates/WS1_reviewed.docx')
 assert [p.text for p in student.paragraphs]==[p.text for p in template.paragraphs]
 ns={'a':'http://schemas.openxmlformats.org/drawingml/2006/main'}
@@ -86,3 +86,33 @@ for name in ['WS1_student.pdf','WS1_answers.pdf']:
  lines=[''.join(span['text'] for span in line['spans']) for block in pdf[0].get_text('dict')['blocks'] if 'lines' in block for line in block['lines']]
  assert any(all(label in line for label in ['姓名：','班別：','學號：']) for line in lines), (name,'identity fields wrapped')
 print('PASS: name, class and student number print on the same line in both versions.')
+
+# English material is a genuine translation, including all five figures.
+for stem in ['student','answers']:
+ en=Document(out/f'WS1_{stem}_en.docx')
+ all_paragraphs=list(en.paragraphs)
+ for table in en.tables:
+  for row in table.rows:
+   for cell in row.cells:all_paragraphs.extend(cell.paragraphs)
+ en_text='\n'.join(p.text for p in all_paragraphs)
+ assert not re.search(r'[\u3400-\u9fff]',en_text), 'Untranslated Chinese in English worksheet'
+ assert 'Part 3 | Integrated explanation' in en_text and '8. Using the experimental results and topic notes' in en_text
+ assert len(en.inline_shapes)==5
+ assert images(out/f'WS1_{stem}_en.docx')!=images(out/f'WS1_{stem}.docx')
+ for p in all_paragraphs:
+  for r in p.runs:
+   if r.text.strip():assert (r.font.size or p.style.font.size or en.styles['Normal'].font.size).pt>=11
+ en_pdf=fitz.open(out/f'WS1_{stem}_en.pdf');assert len(en_pdf)==4
+ first_lines=[''.join(s['text'] for s in line['spans']) for b in en_pdf[0].get_text('dict')['blocks'] if 'lines' in b for line in b['lines']]
+ assert any(all(x in t for x in ['Name:','Class:','No.:']) for t in first_lines)
+ for page in en_pdf:
+  assert len(page.get_text().strip())>80 and page.get_images()
+  assert not re.search(r'[\u3400-\u9fff]',page.get_text())
+ for n in range(1,9):assert any(f'{n}.' in page.get_text() for page in en_pdf)
+ en_pdf.close()
+key_en=Document(out/'WS1_answers_en.docx')
+for row in key_en.tables[0].rows[1:]:assert any(r.underline for p in row.cells[1].paragraphs for r in p.runs), 'Missing English answer markings'
+guide_en=fitz.open(out/'WS1_D_teacher_guide_en.pdf');en_guide_text='\n'.join(p.get_text() for p in guide_en)
+assert 'Teacher guide, mapping and marking' in en_guide_text and 'Integrated explanation: 8 marks' in en_guide_text
+assert not re.search(r'[\u3400-\u9fff]',en_guide_text)
+print('PASS: English PDF/Word versions have English text and diagram labels, translated answer markings, 4-page worksheets and one-line identity fields.')

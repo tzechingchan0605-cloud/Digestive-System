@@ -23,24 +23,27 @@ const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
   const excelBefore=await excel('ws-excel-before.xlsx');
   await page.click('#openPaperwork');await page.waitForFunction(()=>!document.querySelector('[data-paper-download]').disabled);
   const manifest=JSON.parse(fs.readFileSync('paperwork/generated/manifest.json','utf8'));
-  assert.deepEqual(await page.locator('[data-paper-download]').evaluateAll(bs=>bs.map(b=>b.dataset.paperDownload)),manifest.files.map(f=>f.id));
+  assert.deepEqual(await page.locator('[data-paper-download]').evaluateAll(bs=>bs.map(b=>b.dataset.paperDownload)),manifest.languages.zh.files.map(f=>f.id));
   assert.equal(await page.locator('#paperPanel .paper-row').count(),5);
   assert.equal(await page.locator('#paperLanguage,[data-paper-preview]').count(),0);
-  for(const file of manifest.files){
+  for(const lang of ['zh','en']){
+   if(await page.evaluate(()=>VL1Language.current)!==lang)await page.click('#teacherLanguageSwitch');
+  for(const file of manifest.languages[lang].files){
    await page.waitForTimeout(1100);
    const wait=page.waitForEvent('download',{timeout:10000});await page.click(`[data-paper-download="${file.id}"]`);const dl=await wait;
    assert.equal(dl.suggestedFilename(),file.name);await dl.saveAs('/tmp/'+file.name);
    const bytes=fs.readFileSync('/tmp/'+file.name);assert.equal(sha(bytes),file.sha256);assert.equal(bytes.length,file.bytes);
    assert(file.name.endsWith('.pdf')?bytes.subarray(0,5).toString()==='%PDF-':bytes[0]===0x50&&bytes[1]===0x4b);
   }
+  }
   assert.deepEqual(await snapshot(),before);
   assert.deepEqual(await excel('ws-excel-after.xlsx'),excelBefore);
-  await page.click('#teacherLanguageSwitch');assert.equal(await page.evaluate(()=>VL1Language.current),'en');
+  assert.equal(await page.evaluate(()=>VL1Language.current),'en');
   assert.equal(await page.locator('#paperPanel h3').innerText(),'Worksheets and answers');
   assert.equal(await page.locator('#paperPanel .paper-row').count(),5);
   assert.equal(await page.locator('[data-paper-download="answers-word"]').innerText(),'Download Word');
   // Invalid manifests must disable every download, not retain an older manifest.
-  for(const data of [{...manifest,version:0},{...manifest,files:manifest.files.slice(0,3)},{...manifest,files:manifest.files.map((f,i)=>i?f:{...f,path:'https://example.com/stolen.docx'})}]){
+  for(const data of [{...manifest,version:0},{...manifest,languages:{...manifest.languages,en:{files:manifest.languages.en.files.slice(0,3)}}},{...manifest,languages:{...manifest.languages,en:{files:manifest.languages.en.files.map((f,i)=>i?f:{...f,path:'https://example.com/stolen.docx'})}}}]){
    await page.route('**/paperwork/generated/manifest.json',r=>r.fulfill({json:data}));
    assert.equal(await page.evaluate(()=>VL1Paperwork.open()),false);
    assert.equal(await page.locator('[data-paper-download]:enabled').count(),0);
@@ -49,7 +52,7 @@ const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
   }
   assert.equal(await page.evaluate(()=>VL1Paperwork.open()),true);
   // Both formats reject corrupt bytes and failed HTTP responses.
-  for(const file of [manifest.files[0],manifest.files[3]]){
+  for(const file of [manifest.languages.en.files[0],manifest.languages.en.files[3]]){
    await page.route('**/'+file.path,r=>r.fulfill({contentType:file.mime,body:'broken file'}));
    assert.equal(await page.evaluate(id=>VL1Paperwork.download(id),file.id),false);
    assert.match(await page.locator('#paperStatus').innerText(),/Download failed/);
@@ -70,6 +73,6 @@ const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
   const wait=page.waitForEvent('download');await page.click('[data-paper-download="answers-word"]');await wait;
   assert.deepEqual(await snapshot(),demoBefore);
   assert.equal(errors.length,0,errors.join('\n'));
-  console.log('PASS: four PDF/Word worksheet downloads plus D PDF, correct bytes/names, bilingual UI, teacher guard, corrupt/missing-file rejection, mobile layout, and unchanged records/demo/Excel.');
+  console.log('PASS: five downloads in each language (10 genuine files), correct bytes/names, bilingual UI, teacher guard, corrupt/missing-file rejection, mobile layout, and unchanged records/demo/Excel.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});
