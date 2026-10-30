@@ -23,9 +23,9 @@ assert answers['I2'].font.color.rgb == 'FF173E34'  # Open observation remains un
 assert len({answers[f'{c}2'].fill.fgColor.rgb for c in ['I', 'N', 'Q', 'T', 'X', 'Y']}) == 6
 assert observations['D3'].font.color.rgb == 'FFC03030'  # First X answer was incorrect.
 assert observations['E3'].font.color.rgb == 'FF00834A'  # Final X answer was correct.
-assert len(scores.data_validations.dataValidation) == 10
+assert len(scores.data_validations.dataValidation) == 31
 assert len(answers.conditional_formatting) == 4 * 6
-assert len(scores.conditional_formatting) == 4 * 25
+assert len(scores.conditional_formatting) == 3 * 22 + 25
 assert w.calculation.fullCalcOnLoad and w.calculation.forceFullCalc
 assert w['評分準則'].max_row >= 19
 assert w['操作事件紀錄'].max_row > 80
@@ -107,19 +107,20 @@ assert ev('K2') == 4
 assert ev('M2') == 0  # Incorrect assumption set.
 assert ev('S2') == 4
 for validation in scores.data_validations.dataValidation:
-    scores[str(validation.sqref).split(':')[0]] = int(validation.formula2)
+    address=str(validation.sqref).split(':')[0]
+    if re.search(r'(?<![0-9])2$',address): scores[address] = int(validation.formula2)
 assert ev('AB2') == 8
 assert ev('W2') == 23  # One point lost on premises.
 assert ev('AC2') == 31
 assert ev('AD2') == '評分完成'
-scores['X2'] = 0
-assert ev('AB2') == 6
-scores['X2'] = None
+scores['AE2'] = 0
+assert ev('AB2') == 0
+scores['AE2'] = None
 assert ev('AB2') == '待評' and ev('AC2') == '待評／未完成'
-for invalid in (3, -1, 1.5, '2', '待評'):
-    scores['X2'] = invalid
+for invalid in (9, -1, 1.5, '8', '待評'):
+    scores['AE2'] = invalid
     assert ev('AB2') == '待評' and ev('AC2') == '待評／未完成'
-scores['X2'] = 2; scores['D2'] = '待提交反思'
+scores['AE2'] = 8; scores['D2'] = '待提交反思'
 assert ev('AC2') == '待評／未完成'
 scores['D2'] = '已完成'
 
@@ -140,16 +141,16 @@ scores['E2'] = None; assert colour_matches('I2') == []
 scores['E2'] = 2; assert colour_matches('I2') == [0]
 scores['E2'] = 0; assert colour_matches('I2') == [1]
 scores['E2'] = 1; assert colour_matches('I2') == [2]
-for c in ['X2', 'Y2', 'Z2', 'AA2']: scores[c] = 0
+scores['AE2'] = 0
 assert colour_matches('Y2') == [1]
-scores['X2'] = None; assert colour_matches('Y2') == []
+scores['AE2'] = None; assert colour_matches('Y2') == []
 # Legacy missing new answers must not manufacture scores or original responses.
 assert answers['J5'].value == '未提供（舊版未保存原始假說）'
 assert scores['J5'].value == '未提供'
 assert scores['M5'].value == '未提供'
 assert scores['S5'].value == '未提供'
 assert ev('AC5') == '待評／未完成'
-print('PASS: seven XLSX sheets, XML integrity, styles, first/final observation colours, images, ten validated manual fields, six SPS totals, pending vs zero, bounds, knowledge, overall gate, legacy missing values and conditional colours.')
+print('PASS: seven XLSX sheets, XML integrity, styles, first/final observation colours, images, version-specific validated manual fields, six SPS totals, pending vs zero, bounds, knowledge, overall gate, legacy missing values and conditional colours.')
 
 # edge_cases.cjs exports a payload larger than one Excel cell, plus formula-like text.
 from pathlib import Path
@@ -171,3 +172,31 @@ if large_path.exists():
     assert large['學生探究答案']['C2'].value == '=1+1'
     assert all(len(str(c.value or '').encode('utf-16-le')) // 2 <= 32767 for sheet in large for row in sheet for c in row)
     print('PASS: large Unicode event/snapshot reconstructed without loss, XML valid, formula-like user text kept as text.')
+
+# Evaluate actual Excel formulas for the new comprehensive question, the interim
+# denaturation-only question, and original historical reflection in one workbook.
+version_path=Path('/tmp/vl1-rubric-versions.xlsx')
+assert version_path.exists(), 'Run tests/scoring_versions.cjs first'
+mixed=load_workbook(version_path);scores=mixed['教師評分']
+assert len(scores.data_validations.dataValidation)==31
+for row,maximum,reflection_max in [(2,32,8),(3,32,8),(4,28,4),(5,32,8)]:
+    assert scores[f'AG{row}'].value==maximum
+    assert ev(f'AC{row}')=='待評／未完成'
+    applicable=[v for v in scores.data_validations.dataValidation if str(v.sqref).endswith(str(row))]
+    assert len(applicable)==(10 if row==5 else 7)
+    for v in applicable:scores[str(v.sqref)]=int(v.formula2)
+    assert ev(f'AB{row}')==reflection_max and ev(f'AC{row}')==maximum
+    assert ev(f'AD{row}')=='評分完成'
+    answer_cell=f'X{row}' if row==5 else f'AE{row}'
+    limit=2 if row==5 else reflection_max
+    scores[answer_cell]=0
+    assert ev(f'AB{row}')==(6 if row==5 else 0)
+    for invalid in [None,limit+1,-1,0.5,'2']:
+        scores[answer_cell]=invalid
+        assert ev(f'AB{row}')=='待評' and ev(f'AC{row}')=='待評／未完成'
+    scores[answer_cell]=limit
+    assert ev(f'AC{row}')==maximum
+    scores[f'D{row}']='待提交反思'
+    assert ev(f'AC{row}')=='待評／未完成'
+    scores[f'D{row}']='已完成'
+print('PASS: actual mixed-version formulas: 32/32/28/32 maxima, 8/8/4/8 reflection, inactive fields, blank/zero/invalid values, submission gates and legacy preservation.')

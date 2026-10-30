@@ -86,7 +86,7 @@ function buildRecord() {
     initialDesign:copy(state.initialDesign),finalAnswers:copy(state.finalAnswers),firstObservations:copy(state.firstObservations),
     phase1:{contextViewed:state.unlocked>1,observation:form.initialObservation},
     phase2:{hypothesis:{liquid:form.hypothesisLiquid,outcome:form.hypothesisOutcome,reason:form.reason},variableChoices:copy(state.variableChoices),assumptions:[...state.assumptions],controlPlan:form.controlPlan,setup:{saved:state.setupSaved,method:state.setupMethod,image:state.setupImage,description:form.setupDescription}},
-    phase3:{trials:copy(state.records)},phase4:{conclusions:Object.fromEntries(Object.keys(conclusionAnswers).map(id=>[id,form[id]])),reflection:form.reflection},telemetry:copy(state.events)};
+    phase3:{trials:copy(state.records)},phase4:{reflectionQuestionId:'integrated-concept-explanation',conclusions:Object.fromEntries(Object.keys(conclusionAnswers).map(id=>[id,form[id]])),reflection:form.reflection},telemetry:copy(state.events)};
 }
 function validRecord(r) { return r && r.moduleId===MODULE_ID && r.profile && typeof r.profile.email==='string'; }
 function legacyId(r) { let h=2166136261;for(const c of JSON.stringify(r)){h=Math.imul(h^c.charCodeAt(0),16777619);}return 'legacy-'+(h>>>0).toString(16); }
@@ -284,7 +284,7 @@ function renderPrint(r) {
   <section class="report-stage page-break"><h2>03 六組觀察</h2><div class="report-card">${table}<p>${LIMIT_REFERENCE}</p></div></section>
   <section class="report-stage"><h2>04 分析與結論</h2><div class="report-card">${Object.keys(conclusionAnswers).map(id=>reportAnswer(questionLabels[id],answerText(id,answers[id]),answerText(id,conclusionAnswers[id]),answers[id]?answers[id]===conclusionAnswers[id]:null)).join('')}</div>
   ${r.submitted||r.schemaVersion!==2?`<div class="concept-summary"><h3>學習重點</h3>${canonicalHTML($('#conceptReveal .learning-points'))}${canonicalHTML($('#conceptReveal .learning-diagrams'))}<p>${LIMIT_REFERENCE}</p></div>`:'<p>此份紀錄尚未遞交探究，學習重點尚未開放。</p>'}
-  <div class="reflection-summary">${open('實際學習反思',r.phase4?.reflection,'判斷原始假說是否獲支持；引用具體組別比較，運用乳化、表面積、脂肪酶及變性概念修訂解釋。')}<p>反思狀態：${reflectionComplete(r)?'已提交':r.schemaVersion===2?'未提交':'未提供（舊版未記錄）'}</p></div></section><footer class="report-footer">探究實驗室 · 原始答案與參考說明 · 答案及回饋 · 請另存此份 PDF</footer>`;
+  <div class="reflection-summary">${open('實際學習反思',r.phase4?.reflection,r.phase4?.reflectionQuestionId==='integrated-concept-explanation'?'膽汁不含消化酶，透過物理消化把大油滴乳化成小油滴，脂質分子沒有改變。小油滴使同量脂質的總表面積增加，讓脂肪酶接觸更多脂質。胰液中的脂肪酶催化脂質的化學消化，按本課完全水解簡化模型，將脂質分解為甘油與脂肪酸。脂肪酶是蛋白質，煮沸使其變性，失去催化功能，冷卻後也不能恢復原來的作用；本模型中的膽汁則在煮沸後仍保留乳化作用。':r.phase4?.reflectionQuestionId==='integrated-explanation-evidence'?'膽汁不含消化酶，透過物理消化把大油滴乳化成小油滴，脂質分子不變；總表面積增加，讓脂肪酶接觸更多脂質。胰液中的脂肪酶催化化學消化，按本課簡化模型產生甘油與脂肪酸。本模型煮沸 X 後仍保留乳化作用；煮沸 Y 則使蛋白質脂肪酶變性失活，冷卻後也不恢復。X 組比水組混濁，符合乳化作用；未煮沸 X＋Y 組清澈，而煮沸 Y 組混濁，支持高溫影響酶作用的解釋。外觀只是線索，不能單獨證明消化產物已形成。':r.phase4?.reflectionQuestionId==='enzyme-denaturation'?'胰液中的脂肪酶是蛋白質；煮沸使其變性，失去催化功能，冷卻後也不恢復原來的作用。':'判斷原始假說是否獲支持；引用具體組別比較，運用乳化、表面積、脂肪酶及變性概念修訂解釋。')}<p>反思狀態：${reflectionComplete(r)?'已提交':r.schemaVersion===2?'未提交':'未提供（舊版未記錄）'}</p></div></section><footer class="report-footer">探究實驗室 · 原始答案與參考說明 · 答案及回饋 · 請另存此份 PDF</footer>`;
   window.VL1Language?.refresh($('#printReport'));
 }
 function reportFilename(r) {const safe=v=>String(v||'未提供').replace(/[\\/:*?"<>|\u0000-\u001f]/g,'_').trim().replace(/[. ]+$/g,'')||'未提供';return `VL1_${safe(r.profile?.classInfo)}_${safe(r.profile?.name)}`;}
@@ -348,39 +348,45 @@ function scoringWorkbook(records) {
     ['setup','實作｜裝置品質（教師 0–2）','conducting',2],['fair','實作｜固定條件與實驗安排（教師 0–2）','conducting',2],['conducting','SPS 進行實驗（0–4）','conducting'],
     ['inference','推論｜結論及界限（自動 0–4）','inferring'],['inferring','SPS 推論（0–4）','inferring'],
     ['communication','溝通｜資料與主張（教師 0–4）','communicating',4],['communicating','SPS 溝通（0–4）','communicating'],['sps','SPS 總分（0–24）','score'],
-    ['emulsion','新知識｜膽汁乳化與表面積（教師 0–2）','knowledge',2],['enzyme','新知識｜脂肪酶與產物（教師 0–2）','knowledge',2],['heat','新知識｜高溫與變性（教師 0–2）','knowledge',2],['revision','新知識｜修訂解釋並連結數據（教師 0–2）','knowledge',2],['knowledge','新知識總分（0–8）','knowledge'],['overall','整體分數（0–32）','score'],['marking','評分狀態','score']
+    ['emulsion','舊反思｜膽汁乳化與表面積（教師 0–2）','knowledge',2],['enzyme','舊反思｜脂肪酶與產物（教師 0–2）','knowledge',2],['heat','舊反思｜高溫與變性（教師 0–2）','knowledge',2],['revision','舊反思｜修訂解釋並連結數據（教師 0–2）','knowledge',2],['knowledge','反思概念解釋（綜合 0–8／前題 0–4）','knowledge'],['overall','整體分數（綜合 0–32／前題 0–28）','score'],['marking','評分狀態','score'],['reflectionScore','綜合解釋／前題酶變性（教師：0–8／0–4）','knowledge',8],['rubricVersion','反思評分版本','reference'],['maximum','活動滿分','reference']
   ];
   const col=Object.fromEntries(columns.map(([id],i)=>[id,colName(i)]));
-  const rows=[columns.map(([,label,group])=>excelCell(label,group))],conditional=[];
+  const rows=[columns.map(([,label,group])=>excelCell(label,group))],conditional=[],validations=[];
   const maxima=Object.fromEntries(columns.filter(c=>c[3]!==undefined).map(c=>[c[0],c[3]]));
   const round=n=>Math.round(n*100)/100;
   records.forEach((r,i)=>{
     const n=i+2,ref=id=>col[id]+n,v=r.phase2?.variableChoices||{},a=r.phase4?.conclusions||{},trials=r.phase3?.trials||[];
+    const concept=r.phase4?.reflectionQuestionId==='integrated-concept-explanation';
+    const integrated=concept||r.phase4?.reflectionQuestionId==='integrated-explanation-evidence';
+    const current=integrated||r.phase4?.reflectionQuestionId==='enzyme-denaturation',reflectionMax=integrated?8:4;
+    const rowMaxima=Object.fromEntries(Object.entries(maxima).filter(([id])=>current?!['emulsion','enzyme','heat','revision'].includes(id):id!=='reflectionScore'));
+    if(current)rowMaxima.reflectionScore=reflectionMax;
+    Object.entries(rowMaxima).forEach(([id,max])=>validations.push({range:ref(id),max}));
     const completeTrialSet=trialKeys.every(key=>trials.some(t=>t.key===key));
     const objective=(g,max)=>Array.isArray(v[g])&&v[g].length?(sameChoices(v[g],expectedVariables[g])?max:0):'未提供';
     const cv=r.schemaVersion===2&&Array.isArray(v.cv)&&v.cv.length?round(expectedVariables.cv.filter(x=>v.cv.includes(x)).length/5*2*(v.cv.some(x=>!expectedVariables.cv.includes(x))?0:1)):'未提供';
     const expectedAnswers=r.uiVersion===3?conclusionAnswers:previousConclusionAnswers;
     const weight=r.uiVersion===3?{q1:1,q3:1,limitations:1,q2:1}:{q1:.5,q2:.5,q3:.5,comparison:.75,heatComparison:.75,limitations:1};
-    const values={id:r.id,name:r.profile?.name,class:r.profile?.classInfo,status:reflectionComplete(r)?'已完成':r.schemaVersion!==2?'舊版／未提供':r.submitted?'待提交反思':'進行中',
+    const values={rubricVersion:concept?'現版：綜合概念解釋（0–8）':integrated?'前版：綜合解釋與證據（0–8）':current?'前版：酶變性（0–4）':'舊版：四項反思（0–8）',maximum:current?24+reflectionMax:32,id:r.id,name:r.profile?.name,class:r.profile?.classInfo,status:reflectionComplete(r)?'已完成':r.schemaVersion!==2?'舊版／未提供':r.submitted?'待提交反思':'進行中',
       trials:completeTrialSet?round(trialKeys.filter(key=>trials.find(t=>t.key===key)?.studentObservation===experiments[key][0]).length/6*2):'未提供',
       iv:objective('iv',1),dv:objective('dv',1),cv,
       assumptions:r.phase2?.assumptions?.length?(sameChoices(r.phase2.assumptions,assumptionsForRecord(r).filter(x=>x[2]).map(x=>x[0]))?1:0):'未提供',
       inference:Object.keys(weight).every(id=>a[id])?Object.entries(weight).reduce((sum,[id,w])=>sum+(a[id]===expectedAnswers[id]?w:0),0):'未提供'};
     // Validate numeric ranges in formulas too: pasted invalid scores cannot create an overall total.
-    const valid=ids=>ids.map(id=>maxima[id]!==undefined?`AND(ISNUMBER(${ref(id)}),${ref(id)}>=0,${ref(id)}<=${maxima[id]},IFERROR(MOD(${ref(id)},1)=0,FALSE))`:`ISNUMBER(${ref(id)})`).join(',');
+    const valid=ids=>ids.map(id=>rowMaxima[id]!==undefined?`AND(ISNUMBER(${ref(id)}),${ref(id)}>=0,${ref(id)}<=${rowMaxima[id]},IFERROR(MOD(${ref(id)},1)=0,FALSE))`:`ISNUMBER(${ref(id)})`).join(',');
     const sum=ids=>`IF(AND(${valid(ids)}),ROUND(SUM(${ids.map(ref).join(',')}),2),"待評")`;
-    const sps=['observing','classifying','designing','conducting','inferring','communicating'],knowledge=['emulsion','enzyme','heat','revision'];
+    const sps=['observing','classifying','designing','conducting','inferring','communicating'],knowledge=current?['reflectionScore']:['emulsion','enzyme','heat','revision'];
     const formulas={observing:sum(['observation','trials']),classifying:sum(['iv','dv','cv']),designing:sum(['hypothesis','assumptions','control']),conducting:sum(['setup','fair']),inferring:sum(['inference']),communicating:sum(['communication']),sps:sum(sps),knowledge:sum(knowledge),
       overall:`IF(AND(ISNUMBER(${ref('sps')}),ISNUMBER(${ref('knowledge')}),${ref('status')}="已完成"),ROUND(SUM(${ref('sps')},${ref('knowledge')}),2),"待評／未完成")`,
-      marking:`IF(AND(${valid(Object.keys(maxima))},ISNUMBER(${ref('sps')}),ISNUMBER(${ref('knowledge')}),${ref('status')}="已完成"),"評分完成","待評／學生未完成／分數不符範圍")`};
-    rows.push(columns.map(([id,,group,max])=>formulas[id]?excelFormula(formulas[id],group):excelCell(max!==undefined?'':values[id],group)));
-    const allMax={...maxima,trials:2,iv:1,dv:1,cv:2,assumptions:1,inference:4,observing:4,classifying:4,designing:4,conducting:4,inferring:4,communicating:4,sps:24,knowledge:8,overall:32};
+      marking:`IF(AND(${valid(Object.keys(rowMaxima))},ISNUMBER(${ref('sps')}),ISNUMBER(${ref('knowledge')}),${ref('status')}="已完成"),"評分完成","待評／學生未完成／分數不符範圍")`};
+    rows.push(columns.map(([id,,group,max])=>formulas[id]?excelFormula(formulas[id],group):excelCell(max!==undefined?(rowMaxima[id]!==undefined?'':'不適用'):values[id],group)));
+    const allMax={...rowMaxima,trials:2,iv:1,dv:1,cv:2,assumptions:1,inference:4,observing:4,classifying:4,designing:4,conducting:4,inferring:4,communicating:4,sps:24,knowledge:current?reflectionMax:8,overall:current?24+reflectionMax:32};
     Object.entries(allMax).forEach(([id,max])=>conditional.push(colourRule(ref(id),ref(id),max)));
   });
-  const validations=records.length?columns.filter(c=>c[3]!==undefined).map(([id,,,max])=>({range:`${col[id]}2:${col[id]}${records.length+1}`,max})):[];
+
   const rubric=[['類別／題目','最高分','評分方式','滿分準則','部分得分準則','零分／缺漏處理']];
   const add=(g,title,max,method,full,partial,zero)=>rubric.push([excelCell(title,g),max,method,full,partial,zero]);
-  add('reference','活動 rubric 初稿：待研究者校準',32,'研究說明','六項 SPS 各 4 分；新知識四項各 2 分。總分 32。','跨 VL 的題目、難度、機會與評分者一致性需校準。','不是已驗證量表；與 SPSAI／CKT 分開。紙本需提供相同問題與靜態資料。');
+  add('reference','活動 rubric 初稿：待研究者校準',32,'研究說明','現版：六項 SPS 共 24，綜合解釋 8，滿分 32。前題酶變性解釋 4，滿分 28；原始假說舊反思四項各 2，滿分 32。按每列題目版本評分。','跨 VL 的題目、難度、機會與評分者一致性需校準。','不是已驗證量表；與 SPSAI／CKT 分開。紙本需提供相同問題與靜態資料。');
   add('observing','初步觀察',2,'人工','2：準確描述可見油水層及圖像細節，區分觀察與猜測。','1：有具體但不完整的描述。','0：無有效觀察；缺少舊版欄位保留待評，不捏造。');
   add('observing','六組外觀',2,'自動','六組均有確認答案；按符合預設外觀的組數／6×2，四捨五入至兩位小數。','部分符合參考外觀按比例得分。','已答但均不符合為 0；缺少組別顯示未提供，不以完成率當能力分數。');
   add('classifying','獨立變量',1,'自動','只選消化液組合。','無部分分數。','有答案但不符為 0；未提供不補 0。');
@@ -392,12 +398,15 @@ function scoringWorkbook(records) {
   add('conducting','裝置品質',2,'人工','2：圖／相片／文字清晰、四組標示、用量合理。','1：方案可操作但標示或用量不完整。','0：無可操作方案；不能因使用文字而扣分。');
   add('conducting','固定條件與實驗安排',2,'人工','2：依設計與操作證據保持公平比較，熱處理冷卻後使用，每次只改變一因素。','1：基本合理但條件或熱處理安排不完整。','0：安排不能有效比較。六組完整性只作證據，不以完成率、點擊或用時直接換分。');
   add('inferring','結論、比較及界限',4,'自動','現版三項推論（外觀、表面積、證據界限）及延伸結論各 1，共 4；歷史版按原六題權重（0.5、0.5、0.5、0.75、0.75、1）。','只按各題明確參考答案得分。','按紀錄版本檢查當時的全部題目；不要求現版回答已刪除題目，歷史缺題不補答案。');
-  add('communicating','資料與主張',4,'人工','4：清楚組織資料，引用至少兩組具體觀察，連結主張並說明界限。','3：完整比較但界限稍弱；2：有效比較但連結不足；1：僅單一相關描述。','0：無有效溝通。現版依假說理由、對照說明、裝置標示、數據表及反思的表達評分；歷史版另可用具體比較說明。評溝通清晰度，不重複評新知識。');
-  add('knowledge','膽汁乳化與表面積',2,'人工：只看學習後反思','2：膽汁不含消化酶，乳化是物理作用，小油滴增加總表面積。','1：概念部分正確但解釋不完整。','0：沒有運用或概念錯誤；未提交反思不能當作零分。');
-  add('knowledge','脂肪酶化學消化及產物',2,'人工：只看學習後反思','2：脂肪酶催化化學消化，形成甘油和脂肪酸。','1：酶作用或產物部分正確。','0：沒有運用或概念錯誤；不是關鍵字計分。');
-  add('knowledge','高溫造成酶變性',2,'人工：只看學習後反思','2：把煮沸 Y 的觀察連結酶蛋白質變性及失去功能。','1：知道高溫影響但欠機理解釋。','0：沒有運用或概念錯誤。');
-  add('knowledge','修訂原始解釋與數據',2,'人工：只看學習後反思','2：回應原始假說是否受支持，引用具體比較，運用概念修訂／完善並注意外觀界限。','1：有比較或修訂但連結不完整。','0：沒有有效修訂或數據連結。');
-  add('score','SPS、新知識及整體分數',32,'公式','六項 SPS=24；四項新知識=8。學生已提交反思且所有必要評分完整才顯示整體。','空白顯示待評；填 0 才是零分。教師欄只接受範圍內整數。','貼上超範圍或非整數也不會得到有效總分；評分欄沒有內容時勿填 0 代替待評。');
+  add('communicating','資料與主張',4,'人工','4：依已問的假說理由、對照／裝置說明及反思，清楚組織已問問題的資料與因果解釋；現版綜合題不另要求組別比較或外觀限制，評表達清晰度而不重複計算概念分。','3：清楚但有輕微連結不足；2：基本可理解但解釋不完整；1：僅單一相關描述。','0：無有效溝通。現版依假說理由、對照說明、裝置標示、數據表及反思的表達評分；歷史版另可用具體比較說明。評溝通清晰度，不重複評新知識。');
+  add('knowledge','舊反思限定｜膽汁乳化與表面積',2,'人工：只看學習後反思','2：膽汁不含消化酶，乳化是物理作用，小油滴增加總表面積。','1：概念部分正確但解釋不完整。','0：沒有運用或概念錯誤；未提交反思不能當作零分。');
+  add('knowledge','舊反思限定｜脂肪酶化學消化及產物',2,'人工：只看學習後反思','2：脂肪酶催化化學消化，形成甘油和脂肪酸。','1：酶作用或產物部分正確。','0：沒有運用或概念錯誤；不是關鍵字計分。');
+  add('knowledge','舊反思限定｜高溫造成酶變性',2,'人工：只看學習後反思','2：把煮沸 Y 的觀察連結酶蛋白質變性及失去功能。','1：知道高溫影響但欠機理解釋。','0：沒有運用或概念錯誤。');
+  add('knowledge','舊反思限定｜修訂原始解釋與數據',2,'人工：只看學習後反思','2：回應原始假說是否受支持，引用具體比較，運用概念修訂／完善並注意外觀界限。','1：有比較或修訂但連結不完整。','0：沒有有效修訂或數據連結。');
+  add('knowledge','前題限定｜酶變性解釋',4,'人工：只看酶變性前題','每項 1 分：脂肪酶是蛋白質；煮沸使酶變性；變性使酶失去催化功能；冷卻未能恢復酶的形狀／功能。合共 4 分。','按正確因果概念逐項給分，接受同義表達；不是數關鍵字。','已作答但無正確概念為 0；未提供保留空白。不得要求膽汁、產物或修訂假說；舊四欄標示不適用。');
+  add('knowledge','前版限定｜綜合解釋與證據',8,'人工：只看綜合證據前題','各 1 分：膽汁物理乳化／分子不變；小滴增加總表面積；胰液脂肪酶催化化學消化；甘油及脂肪酸；蛋白質酶高溫變性失活；本模型煮沸 X 仍有作用而煮沸 Y 失活；具體組別外觀比較支持解釋；外觀不能單獨證明產物。','按正確概念及因果逐項給分；接受同義表達，不數關鍵字。不要求修訂原始假說。','未答保留空白；已答無有效概念為 0。不按新規準重評舊題作答。');
+  add('knowledge','現版反思｜綜合概念解釋',8,'人工：只看現版綜合概念題','各 1 分：膽汁物理乳化大油滴成小油滴；脂質分子不變；小油滴增加總表面積幫助酶作用；胰液脂肪酶催化化學消化；甘油與脂肪酸；脂肪酶是蛋白質；煮沸使酶變性失去催化功能；本模型煮沸膽汁仍保留乳化作用。','按科學概念與因果逐項給分，接受同義表達，不數關鍵字。','未答保留空白；已答無有效概念為 0。不另要求組別比較、外觀限制或修訂假說；第 6 題仍另評外觀限制。');
+  add('score','SPS、反思及整體分數',32,'公式','現版綜合題 24＋8＝32；酶變性前題 24＋4＝28；原始假說舊題 24＋8＝32。每列只驗證適用評分欄，提交反思且評分完整才顯示整體。','空白顯示待評；填 0 才是零分。教師欄只接受範圍內整數。','貼上超範圍或非整數也不會得到有效總分；評分欄沒有內容時勿填 0 代替待評。');
   add('reference','色彩、紀錄及人工分數保存',0,'說明','綠字正確／滿分、紅字錯誤／零分、橙字部分分數；底色區分題目與 SPS 類別。','原始、首次觀察、最後答案與完整事件分表；時間是可見頁面有效秒數。','人工分數只在此 Excel；另存檔保留，重新匯出不會帶入。學生 PDF 無分數。');
   return {sheet:{name:'教師評分',rows,validations,conditional},rubric:{name:'評分準則',rows:rubric},col};
 }
@@ -428,7 +437,7 @@ async function exportExcel() {
     const image=safeImage(r.phase2?.setup?.image);if(image)images.push({row:designs.length-1,data:image,ext:image.startsWith('data:image/png')?'png':'jpeg'});
   });
   const scoring=scoringWorkbook(records),conditional=[];
-  records.forEach((r,i)=>{const n=i+2;[[8,'observation',2],[9,'hypothesis',2],[10,'hypothesis',2],[17,'control',1],[18,'setup',2],[24,'knowledge',8]].forEach(([c,id,max])=>conditional.push(colourRule(colName(c)+n,`INDIRECT("'教師評分'!${scoring.col[id]}${n}")`,max)));});
+  records.forEach((r,i)=>{const n=i+2;[[8,'observation',2],[9,'hypothesis',2],[10,'hypothesis',2],[17,'control',1],[18,'setup',2],[24,'knowledge',r.phase4?.reflectionQuestionId==='enzyme-denaturation'?4:8]].forEach(([c,id,max])=>conditional.push(colourRule(colName(c)+n,`INDIRECT("'教師評分'!${scoring.col[id]}${n}")`,max)));});
   download(workbook([{name:'學生探究答案',rows:answers,conditional},{name:'六組觀察紀錄',rows:observations},scoring.sheet,scoring.rubric,{name:'操作事件紀錄',rows:events},{name:'原始與遞交快照',rows:snapshots},{name:'裝置設計圖',rows:designs}],images),'VL1_未知消化液X與Y_全班學習紀錄.xlsx');
 }
 // Excel limits cell text to 32,767 UTF-16 units; split raw payloads without losing content.

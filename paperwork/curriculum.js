@@ -103,7 +103,7 @@
         {stage:p('B3–B4：獨立應用','B3–B4: independent application'),fraction:0.25},
         {stage:p('C：核對修正','C: check and correct'),fraction:0.10}
       ],
-      modelIdentity:p('核對說明：本教學模型設定 X 為膽汁、Y 為脂肪酶；這是模型設定，不能只靠外觀確證試劑身分。','Check note: this teaching model assigns X to bile (膽汁) and Y to lipase (脂肪酶). These are model settings, not identities proved by appearance alone.'),
+      modelIdentity:p('核對說明：本教學模型設定 X 為膽汁、Y 為含脂肪酶的胰液；這是模型設定，不能只靠外觀確證試劑身分。','Model: X is bile (膽汁); Y is pancreatic juice containing lipase (脂肪酶). Appearance alone cannot prove these identities.'),
       questions,
       corrections:[
         p('在 B 找一項需要修正的答案，寫出題號、正確解釋及錯因。若全部正確，選一題補充證據及限制；不要捏造錯誤。','Choose an answer in B to correct. Write its ID, the sound explanation and why it was wrong. If all are correct, add evidence and a limit to one answer; do not invent a mistake.'),
