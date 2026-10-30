@@ -118,7 +118,7 @@ function assertApprovedChinese(entries,label){
   await page.selectOption('#hypothesisLiquid','X');await page.selectOption('#hypothesisOutcome','cloudy');await page.fill('#reason','開始實驗');
   for(const [group,names]of Object.entries({iv:['消化液組合'],dv:['混合物外觀'],cv:['油和水總體積','反應溫度','反應時間','加液總量','搖勻方式']}))for(const name of names)await page.click(`[data-group="${group}"][data-variable="${name}"]`);
   for(const value of ['time','volume','mixing'])await page.check(`#assumptionChoices input[value="${value}"]`);
-  await page.fill('#controlPlan','探究的對照組');await page.fill('#setupDescription','實驗裝置');
+  await page.fill('#setupDescription','實驗裝置');
   const canvasBox=await page.locator('#setupCanvas').boundingBox();
   await page.mouse.move(canvasBox.x+40,canvasBox.y+40);await page.mouse.down();await page.mouse.move(canvasBox.x+100,canvasBox.y+70,{steps:8});await page.mouse.up();await page.click('#saveSetup');
   await page.click('[data-next="3"]');
@@ -156,9 +156,9 @@ function assertApprovedChinese(entries,label){
    clearTimeout(saveTimer);const at='2026-10-05T04:00:00Z';
    state.records=trialKeys.map(key=>{const [liquid,heat]=key.split('-'),studentObservation=experiments[key][0];return{key,liquid,heat,studentObservation,studentLabel:outcomeLabels[studentObservation],actual:studentObservation,correct:true,at};});
    state.firstObservations=Object.fromEntries(state.records.map(r=>[r.key,structuredClone(r)]));
-   state.unlocked=4;renderTable();renderExtensionTable();updateUnlock();setPhase(4);
+   state.part2Unlocked=state.part3Unlocked=true;renderStaged();state.unlocked=4;renderTable();renderExtensionTable();updateUnlock();setPhase(4);
   });
-  for(const [id,value]of Object.entries({q1:'cloudy',q3:'increase',limitations:'indirect',q2:'Y'}))await page.selectOption('#'+id,value);
+  for(const [id,value]of Object.entries({q1:'cloudy',qY:'thin-oil',q3:'increase',limitations:'indirect',q2:'Y'}))await page.selectOption('#'+id,value);
   await page.click('#revealConcept');assert(await page.locator('#reason').isDisabled());assert.equal(await page.locator('#reflection').isDisabled(),false);assert(await page.locator('#downloadRecord').isDisabled());
   await page.fill('#reflection','學習重點');await page.click('#saveReflection');
   assert(await page.locator('#reflection').isDisabled());assert.equal(await page.locator('#downloadRecord').isDisabled(),false);
@@ -173,7 +173,7 @@ function assertApprovedChinese(entries,label){
   assert.match(await page.locator('#printReport h1').innerText(),/digestive|digestion/i);
   assert.match(await page.locator('#printReport .report-stage h2').first().innerText(),/context|scenario|task|background/i);
   const englishParagraphs=await page.locator('#printReport .report-answer p').allTextContents();
-  for(const answer of ['變得混濁','開始實驗','探究的對照組','實驗裝置','學習重點'])assert(englishParagraphs.includes(answer),`Student answer was translated in English PDF: ${answer}`);
+  for(const answer of ['變得混濁','開始實驗','實驗裝置','學習重點'])assert(englishParagraphs.includes(answer),`Student answer was translated in English PDF: ${answer}`);
   assert.match(await page.locator('#printReport .concept-summary h3').innerText(),/learning/i);
   await assertEnglishSystemText();
   assert.equal(await page.locator('#printReport .physical-diagram picture img').getAttribute('src'),'assets/emulsification-en.svg?v=3');
@@ -186,7 +186,7 @@ function assertApprovedChinese(entries,label){
   assert.equal(await page.locator('#conceptReveal .physical-diagram picture source').getAttribute('srcset'),'assets/emulsification-mobile.svg');
   assert.deepEqual(await page.locator('#conceptReveal .chemical-diagram img').evaluateAll(imgs=>imgs.map(img=>img.getAttribute('src'))),['assets/triglyceride-structure.svg','assets/glycerol-structure.svg?v=2','assets/fatty-acids-structure.svg?v=2']);
   await page.evaluate(()=>renderPrint(window.__languageSubmitted));assert.equal(await page.locator('#printReport h1').innerText(),'未知消化液 X 與 Y');
-  const chineseParagraphs=await page.locator('#printReport .report-answer p').allTextContents();for(const answer of ['變得混濁','開始實驗','探究的對照組','實驗裝置','學習重點'])assert(chineseParagraphs.includes(answer));
+  const chineseParagraphs=await page.locator('#printReport .report-answer p').allTextContents();for(const answer of ['變得混濁','開始實驗','實驗裝置','學習重點'])assert(chineseParagraphs.includes(answer));
   assert.equal(await page.locator('#printReport .physical-diagram picture img').getAttribute('src'),'assets/emulsification.svg');
   await page.waitForFunction(()=>[...document.querySelectorAll('#printReport img')].every(img=>img.complete&&img.naturalWidth>0));
   await page.evaluate(()=>document.body.classList.add('print-record'));await page.pdf({path:'/tmp/vl1-language-zh.pdf',format:'A4',printBackground:true});await page.evaluate(()=>restorePrint());

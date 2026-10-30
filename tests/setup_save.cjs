@@ -35,7 +35,6 @@ const photo = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQ
     for (const [group, value] of [['iv', '消化液組合'], ['dv', '混合物外觀'], ['cv', '反應溫度']])
       await page.click(`[data-group="${group}"][data-variable="${value}"]`);
     await page.check('#assumptionChoices input[value="time"]');
-    await page.fill('#controlPlan', '加水作對照，和 X 組比較，保持時間和溫度相同。');
 
     assert.equal(await page.locator('#saveSetup').count(), 1);
     assert.equal(await page.locator('#saveTextSetup').count(), 0);

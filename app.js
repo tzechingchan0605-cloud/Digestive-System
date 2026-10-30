@@ -21,23 +21,35 @@ const previousAssumptions = [
   ['more','X＋Y 組可加入較多總液量，以便與其他組比較。',false],
   ['hot','煮沸組應趁熱觀察，毋須控制反應溫度。',false]
 ];
-const assumptions = previousAssumptions.filter(([id])=>!['temperature','hot'].includes(id));
-function assumptionsForRecord(r) {return r.uiVersion===3?assumptions:previousAssumptions;}
-function assumptionText(id) {return previousAssumptions.find(a=>a[0]===id)?.[1]||id;}
+const legacyAssumptions = previousAssumptions.filter(([id])=>!['temperature','hot'].includes(id));
+const assumptions = legacyAssumptions.map(a=>a[0]==='more'?[a[0],'X 組可加入較多總液量，以便與 Y 組比較。',false]:a);
+function assumptionsForRecord(r) {return r.uiVersion>=4?assumptions:r.uiVersion===3?legacyAssumptions:previousAssumptions;}
+function assumptionText(id,r) {return (isStaged(r||{})?assumptions:previousAssumptions).find(a=>a[0]===id)?.[1]||id;}
 const CONTROL_REFERENCE = '以油水＋2 mL 水作對照，與油水＋2 mL X、油水＋2 mL Y、油水＋各 1 mL X 和 Y 比較。保持起始油水量、加液總量、反應溫度、反應時間及搖勻方式相同。';
 const DESIGN_REFERENCE = '四個標示清楚的基本裝置，分別是對照、X、Y、X＋Y；熱處理另比較煮沸 X 或 Y 後冷卻至 37°C 的組合，每次只改變一項因素。';
 const LIMIT_REFERENCE = '油層是否存在及混濁程度只提供外觀線索，不能單獨證明產生甘油和脂肪酸；需其他化學檢測。此模擬使用預設教學結果，沒有量度反應速度。';
-const experiments = {
+const legacyExperiments = {
   'none-none':['separated','油水分層（沒有明顯可觀察變化）'],
   'X-none':['cloudy','變得混濁'], 'Y-none':['thin-oil','油水分層（油層變薄）'],
   'XY-none':['clear','油層消失'], 'XY-X':['clear','油層消失'], 'XY-Y':['cloudy','變得混濁']
 };
-const trialKeys = Object.keys(experiments);
-const outcomeLabels = {cloudy:'變得混濁',clear:'油層消失',separated:'油水分層（沒有明顯變化）','thin-oil':'油水分層（油層變薄）'};
-const questionLabels = {q1:'結論 1｜X 組的主要外觀',q3:'結論 2｜小油滴的總表面積',limitations:'結論 3｜本實驗的證據界限',q2:'延伸結論｜煮沸後失去作用的消化液'};
-const conclusionAnswers = {q1:'cloudy',q3:'increase',limitations:'indirect',q2:'Y'};
-const previousConclusionAnswers = {...conclusionAnswers,comparison:'combined',heatComparison:'yaffected'};
-const FIELDS = ['initialObservation','hypothesisLiquid','hypothesisOutcome','reason','controlPlan','setupDescription','q1','q2','q3','limitations','reflection'];
+const experiments = {
+ 'X-none':['cloudy','變得混濁'], 'Y-none':['thin-oil','油水分層（油層變薄）'],
+ 'XthenY-none':['reduced','混濁程度減低，沒有明顯油層'], 'waterThenY-none':['thin-oil','油水分層（油層變薄）'],
+ 'XY-X':['reduced','混濁程度減低，沒有明顯油層'], 'XY-Y':['cloudy','變得混濁']
+};
+const trialKeys=Object.keys(experiments);
+const trialsForRecord=r=>r.uiVersion>=4?trialKeys:Object.keys(legacyExperiments);
+const resultsForRecord=r=>r.uiVersion>=4?experiments:legacyExperiments;
+const isStaged=r=>r.uiVersion>=4;
+const STAGED_DESIGN='主探究只設兩個裝置：相同油水混合物分別加入 2 mL X 或 2 mL Y；標示清楚，保持溫度、搖勻方式及一小時觀察時間相同。';
+const outcomeLabels = {cloudy:'變得混濁',clear:'油層消失',reduced:'混濁程度減低，沒有明顯油層',separated:'油水分層（沒有明顯變化）','thin-oil':'油水分層（油層變薄）'};
+const questionLabels = {q1:'結論 1｜X 組的主要外觀',q3:'結論 2｜小油滴的總表面積',limitations:'結論 3｜本實驗的證據界限',q2:'延伸結論｜煮沸後失去作用的消化液',qY:'主探究結論｜Y 組的外觀'};
+const legacyConclusionAnswers = {q1:'cloudy',q3:'increase',limitations:'indirect',q2:'Y'};
+const conclusionAnswers={...legacyConclusionAnswers,qY:'thin-oil'};
+const answersForRecord=r=>r.uiVersion>=4?conclusionAnswers:r.uiVersion===3?legacyConclusionAnswers:previousConclusionAnswers;
+const previousConclusionAnswers = {...legacyConclusionAnswers,comparison:'combined',heatComparison:'yaffected'};
+const FIELDS = ['initialObservation','hypothesisLiquid','hypothesisOutcome','reason','controlPlan','setupDescription','q1','qY','q2','q3','limitations','reflection'];
 function shuffledChoices(values,random=Math.random) {
   const result=[...values];
   for(let i=result.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[result[i],result[j]]=[result[j],result[i]];}
@@ -54,10 +66,10 @@ function renderAnswerOrder() {
   }
 }
 function freshState(profile=null) {
-  return {schemaVersion:2,uiVersion:3,moduleId:MODULE_ID,id:crypto.randomUUID(),createdAt:new Date().toISOString(),profile,
-    phase:1,unlocked:1,liquid:'XY',heat:'none',records:[],firstObservations:{},initialDesign:null,finalAnswers:null,
+  return {schemaVersion:2,uiVersion:4,experimentVersion:'staged-1',moduleId:MODULE_ID,id:crypto.randomUUID(),createdAt:new Date().toISOString(),profile,
+    phase:1,unlocked:1,liquid:'X',heat:'none',records:[],firstObservations:{},initialDesign:null,finalAnswers:null,
     optionOrder:freshOptionOrder(),variableChoices:{iv:[],dv:[],cv:[]},assumptions:[],setupMade:false,setupSaved:false,setupMethod:'',setupImage:'',
-    selectedObservation:'',experimentHasRun:false,extensionHeat:'',extensionObservation:'',extensionHasRun:false,
+    part2Unlocked:false,part3Unlocked:false,sequence:'',sequenceObservation:'',sequenceHasRun:false,sequenceRunning:false,selectedObservation:'',experimentHasRun:false,extensionHeat:'',extensionObservation:'',extensionHasRun:false,
     submitted:false,submittedAt:null,reflectionSubmittedAt:null,events:[],phaseDurations:{1:0,2:0,3:0,4:0}};
 }
 let state = freshState(), activeSince = Date.now(), timingVisible = !document.hidden;
@@ -80,8 +92,8 @@ function designSnapshot() { return {at:new Date().toISOString(),form:readForms()
 function buildRecord() {
   accountTime(); const form=readForms();
   const attemptCounts=state.events.reduce((out,e)=>{out[e.type]=(out[e.type]||0)+1;return out;},{});
-  return {schemaVersion:2,uiVersion:3,moduleId:MODULE_ID,id:state.id,createdAt:state.createdAt,savedAt:new Date().toISOString(),profile:copy(state.profile),
-    phase:state.phase,optionOrder:copy(state.optionOrder),submitted:state.submitted,submittedAt:state.submittedAt,reflectionSubmittedAt:state.reflectionSubmittedAt,
+  return {schemaVersion:2,uiVersion:4,experimentVersion:'staged-1',moduleId:MODULE_ID,id:state.id,createdAt:state.createdAt,savedAt:new Date().toISOString(),profile:copy(state.profile),
+    phase:state.phase,part2Unlocked:state.part2Unlocked,part3Unlocked:state.part3Unlocked,optionOrder:copy(state.optionOrder),submitted:state.submitted,submittedAt:state.submittedAt,reflectionSubmittedAt:state.reflectionSubmittedAt,
     durationSeconds:Math.round(Object.values(state.phaseDurations).reduce((a,b)=>a+b,0)),phaseDurations:copy(state.phaseDurations),attemptCounts,
     initialDesign:copy(state.initialDesign),finalAnswers:copy(state.finalAnswers),firstObservations:copy(state.firstObservations),
     phase1:{contextViewed:state.unlocked>1,observation:form.initialObservation},
@@ -121,7 +133,7 @@ function archiveCurrent() {
   } catch {toast('舊紀錄備份未能整理；原有儲存內容沒有刪除。');}
 }
 function liquidLabel(v) { return ({none:'對照：加入 2 mL 水',X:'加入 2 mL 消化液 X',Y:'加入 2 mL 消化液 Y',XY:'加入各 1 mL 消化液 X、Y'})[v]||'未提供'; }
-function trialLabel(key) { const [liquid,heat]=key.split('-');return liquidLabel(liquid)+(heat==='none'?'':`（煮沸 ${heat} 後冷卻）`); }
+function trialLabel(key) { if(key==='XthenY-none')return '延伸一：先加 1 mL X，再加 1 mL Y';if(key==='waterThenY-none')return '延伸一：先加 1 mL 水，再加 1 mL Y';const [liquid,heat]=key.split('-');return liquidLabel(liquid)+(heat==='none'?'':`（煮沸 ${heat} 後冷卻）`); }
 function setPhase(p) {
   if(p>state.unlocked)return;accountTime();state.phase=p;
   $$('.phase').forEach(el=>el.classList.toggle('active',el.id===`phase-${p}`));
@@ -140,7 +152,7 @@ function incompleteDesignParts() {
   if(!$('#hypothesisLiquid').value||!$('#hypothesisOutcome').value||!$('#reason').value.trim())missing.push('假說、預測及理由');
   if(!variableGroups.every(([g])=>state.variableChoices[g].length))missing.push('三類變量');
   if(!state.assumptions.length)missing.push('實驗前提');
-  if(!$('#controlPlan').value.trim())missing.push('探究的對照組設計');
+
   if(!state.setupSaved)missing.push('已儲存的文字、繪圖或相片裝置設計');return missing;
 }
 function refreshDesignGate() { $('#variableFeedback').textContent=variableGroups.every(([g])=>state.variableChoices[g].length)?'已記錄你的變量選擇。':'請在三類變量中各選擇至少一項。'; }
@@ -164,7 +176,7 @@ function setupCanvas() {
   $('#clearCanvas').onclick = event => { selectDrawingControl(event.currentTarget); context.clearRect(0, 0, canvas.width, canvas.height); context.fillStyle = '#fff'; context.fillRect(0, 0, canvas.width, canvas.height); state.setupMade = state.setupSaved = false; state.setupImage = ''; $('#setupFeedback').textContent = '繪圖區已清除。'; logEvent('setup_cleared'); refreshDesignGate(); };
   $('#setupPhoto').onchange = event => {
     const file = event.target.files[0]; if (!file || state.submitted) return; const generation=sessionGeneration; if(file.size>8*1024*1024)return toast('請選擇小於 8 MB 的圖片。');
-    selectDrawingControl(event.target.closest('label'));  
+    selectDrawingControl(event.target.closest('label'));
     const reader = new FileReader(); reader.onload = () => { const image = new Image(); image.onload = () => { if(generation!==sessionGeneration||state.submitted)return; context.clearRect(0, 0, canvas.width, canvas.height); context.fillStyle = '#fff'; context.fillRect(0, 0, canvas.width, canvas.height); const scale = Math.min(canvas.width / image.width, canvas.height / image.height); context.drawImage(image, (canvas.width-image.width*scale)/2, (canvas.height-image.height*scale)/2, image.width*scale, image.height*scale); state.setupMade = true; state.setupSaved = false; state.setupMethod = 'photo'; $('#setupFeedback').textContent = '相片已加入；請按「儲存設計」。'; logEvent('setup_photo_uploaded', { filename: file.name }); }; image.src = reader.result; }; reader.readAsDataURL(file);
   };
   $('#saveSetup').onclick = () => {
@@ -179,12 +191,13 @@ function setupCanvas() {
   };
 }
 
-function cancelAnimations() { animationTimers.forEach(clearTimeout);animationTimers.clear();state.running=false;state.extensionRunning=false;$$('.experiment-animation').forEach(el=>el.classList.remove('adding')); }
+function cancelAnimations() { animationTimers.forEach(clearTimeout);animationTimers.clear();state.running=false;state.extensionRunning=false;state.sequenceRunning=false;$$('.experiment-animation').forEach(el=>el.classList.remove('adding')); }
 function later(fn,ms) { const generation=sessionGeneration,id=setTimeout(()=>{animationTimers.delete(id);if(generation===sessionGeneration)fn();},ms);animationTimers.add(id); }
 function resetObservation() {state.selectedObservation='';state.experimentHasRun=false;$('#recordData').disabled=true;$$('#observationChoice button').forEach(b=>{b.disabled=true;b.classList.remove('selected');});}
 function resetExtension() {state.extensionObservation='';state.extensionHasRun=false;$('#recordExtension').disabled=true;$$('[data-extension-observation]').forEach(b=>{b.disabled=true;b.classList.remove('selected');});}
 function animateTrial(extension=false) {
-  if(state.submitted||state.running||state.extensionRunning)return;
+  if(state.submitted||state.running||state.extensionRunning||state.sequenceRunning)return;
+  if(extension&&!state.part3Unlocked)return;
   const trial=extension?`XY-${state.extensionHeat}`:`${state.liquid}-none`;if(!experiments[trial])return;
   const [outcome]=experiments[trial];
   if(extension){resetExtension();state.extensionRunning=true;}else{resetObservation();state.running=true;}
@@ -195,25 +208,44 @@ function animateTrial(extension=false) {
   $$('#liquidButtons button,[data-extension-heat],#runExperiment,#runExtension').forEach(b=>b.disabled=true);
   logEvent(extension?'extension_trial_run':'trial_run',{trial});
   later(()=>{tube.className='test-tube running';title.textContent='正在搖勻試管…';},2100);
-  later(()=>{tube.className=`test-tube ${outcome}`;title.textContent='請自行判讀外觀';
+  later(()=>{tube.className=`test-tube ${outcome}`;title.textContent='模擬一小時後：請判讀外觀';
     if(extension){state.extensionRunning=false;state.extensionHasRun=true;$$('[data-extension-observation]').forEach(b=>b.disabled=false);}else{state.running=false;state.experimentHasRun=true;$$('#observationChoice button').forEach(b=>b.disabled=false);}
     $$('#liquidButtons button,[data-extension-heat],#runExperiment').forEach(b=>b.disabled=false);$('#runExtension').disabled=!state.extensionHeat;
   },3000);
 }
 function recordTrial(extension=false) {
-  if(state.submitted||state.running||state.extensionRunning)return;
+  if(state.submitted||state.running||state.extensionRunning||state.sequenceRunning)return;
   const key=extension?`XY-${state.extensionHeat}`:`${state.liquid}-none`,answer=extension?state.extensionObservation:state.selectedObservation;
   if(!(extension?state.extensionHasRun:state.experimentHasRun)||!answer)return;
-  const record={key,liquid:extension?'XY':state.liquid,heat:extension?state.extensionHeat:'none',studentObservation:answer,studentLabel:outcomeLabels[answer],actual:experiments[key][0],correct:answer===experiments[key][0],at:new Date().toISOString()};
+  const record={simulatedMinutes:60,additionOrder:extension?['X','Y']:[state.liquid],addedMl:extension?{X:1,Y:1}:{[state.liquid]:2},stage:extension?3:1,key,liquid:extension?'XY':state.liquid,heat:extension?state.extensionHeat:'none',studentObservation:answer,studentLabel:outcomeLabels[answer],actual:experiments[key][0],correct:answer===experiments[key][0],at:new Date().toISOString()};
   if(!state.firstObservations[key])state.firstObservations[key]=copy(record);
   const index=state.records.findIndex(r=>r.key===key);if(index<0)state.records.push(record);else state.records[index]=record;
   logEvent('observation_recorded',{...record,first:copy(state.firstObservations[key])});
   if(extension)resetExtension();else resetObservation();renderTable();renderExtensionTable();renderEvidence();updateUnlock();saveRecord();toast('觀察已記錄，保留首次及最後確認的答案。');
   if(!extension)$('#observationTable').scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
 }
-function renderTable() {const rows=state.records.filter(r=>r.heat==='none');$('#dataBody').innerHTML=rows.length?rows.map((r,i)=>`<tr><td>${i+1}</td><td>${liquidLabel(r.liquid)}</td><td>${escapeHtml(r.studentLabel)}</td></tr>`).join(''):'<tr class="empty"><td colspan="3">尚未記錄數據</td></tr>';$('#trialPill').textContent=`${rows.length} / 4 個實驗裝置`;}
+function renderTable() {const rows=state.records.filter(r=>['X-none','Y-none'].includes(r.key));$('#dataBody').innerHTML=rows.length?rows.map((r,i)=>`<tr><td>${i+1}</td><td>${liquidLabel(r.liquid)}</td><td>${escapeHtml(r.studentLabel)}</td></tr>`).join(''):'<tr class="empty"><td colspan="3">尚未記錄數據</td></tr>';$('#trialPill').textContent=`${rows.length} / 2 個實驗裝置`;}
 function renderExtensionTable() {const rows=state.records.filter(r=>r.heat!=='none');$('#extensionDataBody').innerHTML=rows.length?rows.map((r,i)=>`<tr><td>${i+1}</td><td>${trialLabel(r.key)}</td><td>${escapeHtml(r.studentLabel)}</td></tr>`).join(''):'<tr class="empty"><td colspan="3">尚未記錄延伸探究數據</td></tr>';}
-function updateUnlock() {const complete=trialKeys.slice(0,4).every(key=>state.records.some(r=>r.key===key));if(complete)state.unlocked=4;$('#analyseButton').disabled=!complete;$('.step[data-phase="4"]').disabled=!complete;$('#unlockMessage').textContent=complete?'四個裝置已記錄，可以分析數據。':'請完成對照、X、Y、X＋Y 四個裝置的觀察。';}
+function updateUnlock() {const complete=['X-none','Y-none'].every(key=>state.records.some(r=>r.key===key));if(complete)state.unlocked=4;$('#analyseButton').disabled=!complete;$('.step[data-phase="4"]').disabled=!complete;$('#unlockMessage').textContent=complete?'兩個裝置已記錄，可以分析數據。':'請完成 X、Y 兩個裝置的觀察。';}
+function renderStaged() {
+ $('#sequenceInvestigation').hidden=!state.part2Unlocked;$('#extensionInvestigation').hidden=!state.part3Unlocked;
+ $('#sequenceDataBody').innerHTML=state.records.filter(r=>r.stage===2).map(r=>`<tr><td>${trialLabel(r.key)}</td><td>${escapeHtml(r.studentLabel)}</td></tr>`).join('');
+ $('#sequenceBaseline').textContent=state.records.find(r=>r.key==='XthenY-none')?.studentLabel||'尚未記錄延伸一的 X 後加 Y 組';
+}
+function runSequence(){
+ if(state.submitted||state.running||state.extensionRunning||state.sequenceRunning||!state.part2Unlocked||!state.sequence)return;
+ state.sequenceRunning=true;state.sequenceHasRun=false;state.sequenceObservation='';$('#recordSequence').disabled=true;$$('[data-sequence],[data-sequence-observation],#runSequence').forEach(b=>b.disabled=true);
+ const key=state.sequence+'-none';$('#sequenceTube').className='test-tube '+(state.sequence==='XthenY'?'cloudy':'separated');$('#sequenceResultTitle').textContent=state.sequence==='XthenY'?'先加 X 並搖勻，再加入相同量 Y':'先加等量水並搖勻，再加入相同量 Y';
+ logEvent('sequence_trial_run',{trial:key,simulatedMinutes:60});
+ later(()=>{$('#sequenceTube').className='test-tube '+experiments[key][0];$('#sequenceResultTitle').textContent='模擬一小時後：請判讀外觀';state.sequenceRunning=false;state.sequenceHasRun=true;$$('[data-sequence],[data-sequence-observation],#runSequence').forEach(b=>b.disabled=false);},3000);
+}
+function recordSequence(){
+ if(state.submitted||!state.sequenceHasRun||!state.sequenceObservation)return;
+ const key=state.sequence+'-none',answer=state.sequenceObservation;
+ const r={key,stage:2,liquid:state.sequence,heat:'none',simulatedMinutes:60,pretreatment:state.sequence==='XthenY'?'X':'water',pretreatmentMl:1,yMl:1,studentObservation:answer,studentLabel:outcomeLabels[answer],actual:experiments[key][0],correct:answer===experiments[key][0],at:new Date().toISOString()};
+ if(!state.firstObservations[key])state.firstObservations[key]=copy(r);const i=state.records.findIndex(t=>t.key===key);if(i<0)state.records.push(r);else state.records[i]=r;
+ logEvent('observation_recorded',r);state.sequenceHasRun=false;$('#recordSequence').disabled=true;renderStaged();renderEvidence();saveRecord();
+}
 function renderEvidence() {$('#evidenceList').innerHTML=state.records.map(r=>`<div class="evidence"><strong>${trialLabel(r.key)}</strong> → 你記錄：${escapeHtml(r.studentLabel)}</div>`).join('');}
 function reflectionComplete(r) {return !!r.submitted && !!r.reflectionSubmittedAt && !!r.phase4?.reflection?.trim();}
 function currentReflectionComplete() {return state.submitted&&!!state.reflectionSubmittedAt&&!!$('#reflection').value.trim();}
@@ -233,7 +265,7 @@ function applyLock() {
 }
 function submitInvestigation() {
   if(state.submitted)return;
-  if(state.running||state.extensionRunning)return toast('請等待實驗完成。');
+  if(state.running||state.extensionRunning||state.sequenceRunning)return toast('請等待實驗完成。');
   const missing=Object.keys(conclusionAnswers).filter(id=>!$('#'+id).value).map(id=>questionLabels[id]);
   if(!trialKeys.every(key=>state.records.some(r=>r.key===key)))missing.push('六組觀察');
   if(missing.length)return toast('請完成：'+missing.join('、'));
@@ -252,8 +284,8 @@ function resetSession(profile=null) {
   $('#studentName').textContent=isTeacher()?'教師示範':profile?.name||'同學';$('#avatar').textContent=isTeacher()?'師':profile?.name?.[0]||'同';$('#teacherButton').hidden=!isTeacher();
   $('#setupFeedback').textContent='';$('#conclusionFeedback').textContent='';$('#extensionFeedback').textContent='';
   $('#resultTitle').textContent='等待進行實驗';$('#extensionResultTitle').textContent='等待進行延伸測試';$('#testTube').className='test-tube';$('#extensionTube').className='test-tube';
-  $$('#liquidButtons button').forEach(b=>b.classList.toggle('selected',b.dataset.liquid==='XY'));$$('[data-extension-heat]').forEach(b=>b.classList.remove('selected'));
-  renderVariableQuiz();setupCanvas();renderTable();renderExtensionTable();renderEvidence();resetObservation();resetExtension();$('#runExtension').disabled=true;
+  $$('#liquidButtons button').forEach(b=>b.classList.toggle('selected',b.dataset.liquid==='X'));$$('[data-extension-heat]').forEach(b=>b.classList.remove('selected'));
+  $('#sequenceTube').className='test-tube';$('#sequenceResultTitle').textContent='等待進行延伸一';$('#runSequence').disabled=true;$('#recordSequence').disabled=true;renderStaged();renderVariableQuiz();setupCanvas();renderTable();renderExtensionTable();renderEvidence();resetObservation();resetExtension();$('#runExtension').disabled=true;
   $('#revealConcept').textContent='遞交探究，查看學習重點';$('#toast').classList.remove('show');applyLock();setPhase(1);updateUnlock();
   $('main').inert=!profile;
 }
@@ -264,7 +296,7 @@ function returnToLogin() {
 function formatDuration(seconds) {if(!Number.isFinite(seconds))return '未提供';const n=Math.round(seconds);return `${Math.floor(n/60)} 分 ${n%60} 秒`;}
 function formatDate(value) {return value&&Number.isFinite(Date.parse(value))?new Intl.DateTimeFormat('zh-HK',{timeZone:'Asia/Hong_Kong',dateStyle:'medium',timeStyle:'short'}).format(new Date(value)):'未提供';}
 // Excel and persisted answers always use the original Chinese choice labels.
-function answerText(id,value) {return value?(window.VL1Language?.canonicalOption(id,value) ?? $('#'+id).querySelector(`option[value="${CSS.escape(value)}"]`)?.textContent)||'未提供':'未提供';}
+function answerText(id,value) {return value?(window.VL1Language?.canonicalOption(id,value) ?? $('#'+id)?.querySelector(`option[value="${CSS.escape(value)}"]`)?.textContent)||'未提供':'未提供';}
 function variablesForRecord(r,g) {return r.schemaVersion!==2&&g==='cv'?expectedVariables.cv.slice(0,3):expectedVariables[g];}
 function sameChoices(a,b) {return Array.isArray(a)&&a.length===b.length&&b.every(x=>a.includes(x));}
 function answerMark(correct) {return correct===null?'':`<span class="answer-mark ${correct?'correct':'incorrect'}">${correct?'✓':'✕'}</span>`;}
@@ -276,13 +308,13 @@ function renderPrint(r) {
   const variables=variableGroups.map(([g,title])=>reportAnswer(title,vars[g]?.join('、'),variablesForRecord(r,g).join('、'),vars[g]?.length?sameChoices(vars[g],variablesForRecord(r,g)):null)).join('');
   const selected=r.phase2?.assumptions,recordAssumptions=assumptionsForRecord(r);
   const image=safeImage(r.phase2?.setup?.image);
-  const table=`<table class="report-table"><thead><tr><th>裝置／條件</th><th>首次確認</th><th>最後確認</th><th>回饋</th><th>參考外觀</th></tr></thead><tbody>${trialKeys.map(key=>{const t=trials.find(t=>t.key===key),first=r.firstObservations?.[key];return `<tr><td>${trialLabel(key)}</td><td>${escapeHtml(first?.studentLabel||'未提供')}</td><td>${escapeHtml(t?.studentLabel||'未提供')}</td><td>${answerMark(t? t.studentObservation===experiments[key][0]:null)}</td><td>${experiments[key][1]}</td></tr>`;}).join('')}</tbody></table>`;
+  const table=`<table class="report-table"><thead><tr><th>裝置／條件</th><th>首次確認</th><th>最後確認</th><th>回饋</th><th>參考外觀</th></tr></thead><tbody>${trialsForRecord(r).map(key=>{const t=trials.find(t=>t.key===key),first=r.firstObservations?.[key];return `<tr><td>${trialLabel(key)}</td><td>${escapeHtml(first?.studentLabel||'未提供')}</td><td>${escapeHtml(t?.studentLabel||'未提供')}</td><td>${answerMark(t? t.studentObservation===resultsForRecord(r)[key][0]:null)}</td><td>${resultsForRecord(r)[key][1]}</td></tr>`;}).join('')}</tbody></table>`;
   $('#printReport').innerHTML=`<header class="report-cover"><span class="report-logo">✦</span><div><p>IBL 虛擬實驗室 · S4 生物</p><h1>未知消化液 X 與 Y</h1><strong>個人學習紀錄與回饋${isTeacher(r.profile)?'（教師示範）':''}</strong></div></header>
   <section class="report-profile"><div><small>學生</small><b data-language-user>${escapeHtml(r.profile?.name)}</b></div><div><small>班別及學號</small><b data-language-user>${escapeHtml(r.profile?.classInfo)}</b></div><div><small>紀錄時間</small><b>${formatDate(r.savedAt)}</b></div><div><small>有效探究用時${r.schemaVersion===2?'':'（舊版計時）'}</small><b>${formatDuration(r.durationSeconds)}</b></div></section>
   <section class="report-stage"><h2>01 了解情境</h2><div class="report-card context-summary"><img src="assets/oil-water-tube.png" alt="油水試管"><div><h3>研究任務</h3><p>比較 X、Y 及其組合對油水混合物外觀的影響。</p></div></div><div class="report-card">${open('你的初步觀察',r.phase1?.observation,'描述可見的油水層及試管外觀；不要以身分猜測代替觀察。')}</div></section>
-  <section class="report-stage"><h2>02 設計探究</h2><div class="report-card">${open('第一次實驗前固定保存的原始假說',hypothesisText(h),'合理且可測試的原始假說不因預測錯誤而判錯。',false)}${open('原始理由',h?.reason,'說明可測試預測的理由；沒有唯一措辭。')}</div><div class="report-card">${variables}${reportAnswer('實驗前提',selected?.map(assumptionText).join('；'),recordAssumptions.filter(a=>a[2]).map(a=>a[1]).join('；'),selected?.length?sameChoices(selected,recordAssumptions.filter(a=>a[2]).map(a=>a[0])):null)}${open('探究的對照組',r.phase2?.controlPlan,CONTROL_REFERENCE)}${open('裝置文字設計',r.phase2?.setup?.description,DESIGN_REFERENCE)}${image?`<img class="setup-image" src="${image}" alt="學生保存的裝置設計">`:''}<p class="feedback-note">裝置圖及開放題由教師判斷，沒有自動對錯標記。</p></div></section>
+  <section class="report-stage"><h2>02 設計探究</h2><div class="report-card">${open('第一次實驗前固定保存的原始假說',hypothesisText(h),'合理且可測試的原始假說不因預測錯誤而判錯。',false)}${open('原始理由',h?.reason,'說明可測試預測的理由；沒有唯一措辭。')}</div><div class="report-card">${variables}${reportAnswer('實驗前提',selected?.map(id=>assumptionText(id,r)).join('；'),recordAssumptions.filter(a=>a[2]).map(a=>a[1]).join('；'),selected?.length?sameChoices(selected,recordAssumptions.filter(a=>a[2]).map(a=>a[0])):null)}${isStaged(r)?'':open('探究的對照組',r.phase2?.controlPlan,CONTROL_REFERENCE)}${open('裝置文字設計',r.phase2?.setup?.description,isStaged(r)?STAGED_DESIGN:DESIGN_REFERENCE)}${image?`<img class="setup-image" src="${image}" alt="學生保存的裝置設計">`:''}<p class="feedback-note">裝置圖及開放題由教師判斷，沒有自動對錯標記。</p></div></section>
   <section class="report-stage page-break"><h2>03 六組觀察</h2><div class="report-card">${table}<p>${LIMIT_REFERENCE}</p></div></section>
-  <section class="report-stage"><h2>04 分析與結論</h2><div class="report-card">${Object.keys(conclusionAnswers).map(id=>reportAnswer(questionLabels[id],answerText(id,answers[id]),answerText(id,conclusionAnswers[id]),answers[id]?answers[id]===conclusionAnswers[id]:null)).join('')}</div>
+  <section class="report-stage"><h2>04 分析與結論</h2><div class="report-card">${Object.keys(answersForRecord(r)).map(id=>reportAnswer(questionLabels[id],answerText(id,answers[id]),answerText(id,answersForRecord(r)[id]),answers[id]?answers[id]===answersForRecord(r)[id]:null)).join('')}</div>
   ${r.submitted||r.schemaVersion!==2?`<div class="concept-summary"><h3>學習重點</h3>${canonicalHTML($('#conceptReveal .learning-points'))}${canonicalHTML($('#conceptReveal .learning-diagrams'))}<p>${LIMIT_REFERENCE}</p></div>`:'<p>此份紀錄尚未遞交探究，學習重點尚未開放。</p>'}
   <div class="reflection-summary">${open('實際學習反思',r.phase4?.reflection,r.phase4?.reflectionQuestionId==='integrated-concept-explanation'?'膽汁不含消化酶，透過物理消化把大油滴乳化成小油滴，脂質分子沒有改變。小油滴使同量脂質的總表面積增加，讓脂肪酶接觸更多脂質。胰液中的脂肪酶催化脂質的化學消化，按本課完全水解簡化模型，將脂質分解為甘油與脂肪酸。脂肪酶是蛋白質，煮沸使其變性，失去催化功能，冷卻後也不能恢復原來的作用；本模型中的膽汁則在煮沸後仍保留乳化作用。':r.phase4?.reflectionQuestionId==='integrated-explanation-evidence'?'膽汁不含消化酶，透過物理消化把大油滴乳化成小油滴，脂質分子不變；總表面積增加，讓脂肪酶接觸更多脂質。胰液中的脂肪酶催化化學消化，按本課簡化模型產生甘油與脂肪酸。本模型煮沸 X 後仍保留乳化作用；煮沸 Y 則使蛋白質脂肪酶變性失活，冷卻後也不恢復。X 組比水組混濁，符合乳化作用；未煮沸 X＋Y 組油層消失，而煮沸 Y 組混濁，支持高溫影響酶作用的解釋。外觀只是線索，不能單獨證明消化產物已形成。':r.phase4?.reflectionQuestionId==='enzyme-denaturation'?'胰液中的脂肪酶是蛋白質；煮沸使其變性，失去催化功能，冷卻後也不恢復原來的作用。':'判斷原始假說是否獲支持；引用具體組別比較，運用乳化、表面積、脂肪酶及變性概念修訂解釋。')}<p>反思狀態：${reflectionComplete(r)?'已提交':r.schemaVersion===2?'未提交':'未提供（舊版未記錄）'}</p></div></section><footer class="report-footer">探究實驗室 · 原始答案與參考說明 · 答案及回饋 · 請另存此份 PDF</footer>`;
   window.VL1Language?.refresh($('#printReport'));
@@ -335,7 +367,7 @@ async function startTeacherDashboard(password) {
   }
   if(generation!==dashboardGeneration||!isTeacher())return;
   $('#dashboardStatus').textContent=`${cloudSync.enabled?'全班雲端與本機':'這部瀏覽器'}共有 ${rows.length} 份學生探究紀錄；同一電郵的多次探究會分開保存。${cloudSync.enabled?'匯出時會重新讀取雲端最新資料。':'尚未啟用跨裝置同步。'}`;
-  $('#teacherData').innerHTML=rows.length?rows.map((r,i)=>{const trials=r.phase3?.trials||[];return `<tr><td><strong data-language-user>${escapeHtml(r.profile.name)}</strong><small data-language-user>${escapeHtml(r.profile.email)}</small></td><td data-language-user>${escapeHtml(r.profile.classInfo)}</td><td>${reflectionComplete(r)?'已完成':r.submitted?'待提交反思':r.schemaVersion===2?'進行中':'舊版（新欄位未提供）'}</td><td>${trials.filter(t=>t.studentObservation===experiments[t.key]?.[0]).length} / ${trials.length}</td><td>${formatDuration(r.durationSeconds)}</td><td>${formatDate(r.savedAt)}</td><td><button class="secondary" data-view-record="${i}">查看紀錄</button></td></tr>`;}).join(''):'<tr><td colspan="7">暫無學生紀錄</td></tr>';
+  $('#teacherData').innerHTML=rows.length?rows.map((r,i)=>{const trials=r.phase3?.trials||[];return `<tr><td><strong data-language-user>${escapeHtml(r.profile.name)}</strong><small data-language-user>${escapeHtml(r.profile.email)}</small></td><td data-language-user>${escapeHtml(r.profile.classInfo)}</td><td>${reflectionComplete(r)?'已完成':r.submitted?'待提交反思':r.schemaVersion===2?'進行中':'舊版（新欄位未提供）'}</td><td>${trials.filter(t=>t.studentObservation===resultsForRecord(r)[t.key]?.[0]).length} / ${trials.length}</td><td>${formatDuration(r.durationSeconds)}</td><td>${formatDate(r.savedAt)}</td><td><button class="secondary" data-view-record="${i}">查看紀錄</button></td></tr>`;}).join(''):'<tr><td colspan="7">暫無學生紀錄</td></tr>';
   $$('[data-view-record]').forEach(b=>b.onclick=()=>{previewRecord=copy(rows[+b.dataset.viewRecord]);renderPrint(previewRecord);$('#teacherReport').innerHTML=canonicalHTML($('#printReport'),true);$('#teacherDetail').hidden=false;});
 }
 // Activity rubric draft: scores live only in the downloaded teacher workbook.
@@ -344,31 +376,31 @@ function scoringWorkbook(records) {
     ['id','探究識別碼','identity'],['name','姓名','identity'],['class','班別及學號','identity'],['status','完成狀態','identity'],
     ['observation','觀察｜初步觀察（教師 0–2）','observing',2],['trials','觀察｜六組外觀（自動 0–2）','observing'],['observing','SPS 觀察（0–4）','observing'],
     ['iv','分類｜獨立變量（自動 0–1）','classifying'],['dv','分類｜因變量（自動 0–1）','classifying'],['cv','分類｜控制變量（自動 0–2）','classifying'],['classifying','SPS 分類（0–4）','classifying'],
-    ['hypothesis','設計｜原始假說與理由（教師 0–2）','designing',2],['assumptions','設計｜前提選擇（自動 0–1）','designing'],['control','設計｜對照組（教師 0–1）','designing',1],['designing','SPS 設計探究（0–4）','designing'],
+    ['hypothesis','設計｜原始假說與理由（教師 0–2）','designing',2],['assumptions','設計｜前提選擇（自動 0–1）','designing'],['control','設計｜對照組（教師 0–1）','designing',1],['designing','SPS 設計探究（新版 0–3／舊版 0–4）','designing'],
     ['setup','實作｜裝置品質（教師 0–2）','conducting',2],['fair','實作｜固定條件與實驗安排（教師 0–2）','conducting',2],['conducting','SPS 進行實驗（0–4）','conducting'],
     ['inference','推論｜結論及界限（自動 0–4）','inferring'],['inferring','SPS 推論（0–4）','inferring'],
-    ['communication','溝通｜資料與主張（教師 0–4）','communicating',4],['communicating','SPS 溝通（0–4）','communicating'],['sps','SPS 總分（0–24）','score'],
-    ['emulsion','舊反思｜膽汁乳化與表面積（教師 0–2）','knowledge',2],['enzyme','舊反思｜脂肪酶與產物（教師 0–2）','knowledge',2],['heat','舊反思｜高溫與變性（教師 0–2）','knowledge',2],['revision','舊反思｜修訂解釋並連結數據（教師 0–2）','knowledge',2],['knowledge','反思概念解釋（綜合 0–8／前題 0–4）','knowledge'],['overall','整體分數（綜合 0–32／前題 0–28）','score'],['marking','評分狀態','score'],['reflectionScore','綜合解釋／前題酶變性（教師：0–8／0–4）','knowledge',8],['rubricVersion','反思評分版本','reference'],['maximum','活動滿分','reference']
+    ['communication','溝通｜資料與主張（教師 0–4）','communicating',4],['communicating','SPS 溝通（0–4）','communicating'],['sps','SPS 總分（新版 0–23／舊版 0–24）','score'],
+    ['emulsion','舊反思｜膽汁乳化與表面積（教師 0–2）','knowledge',2],['enzyme','舊反思｜脂肪酶與產物（教師 0–2）','knowledge',2],['heat','舊反思｜高溫與變性（教師 0–2）','knowledge',2],['revision','舊反思｜修訂解釋並連結數據（教師 0–2）','knowledge',2],['knowledge','反思概念解釋（綜合 0–8／前題 0–4）','knowledge'],['overall','整體分數（新版 0–31／舊版 0–32 或 28）','score'],['marking','評分狀態','score'],['reflectionScore','綜合解釋／前題酶變性（教師：0–8／0–4）','knowledge',8],['rubricVersion','反思評分版本','reference'],['maximum','活動滿分','reference']
   ];
   const col=Object.fromEntries(columns.map(([id],i)=>[id,colName(i)]));
   const rows=[columns.map(([,label,group])=>excelCell(label,group))],conditional=[],validations=[];
   const maxima=Object.fromEntries(columns.filter(c=>c[3]!==undefined).map(c=>[c[0],c[3]]));
   const round=n=>Math.round(n*100)/100;
   records.forEach((r,i)=>{
-    const n=i+2,ref=id=>col[id]+n,v=r.phase2?.variableChoices||{},a=r.phase4?.conclusions||{},trials=r.phase3?.trials||[];
+    const staged=isStaged(r);const n=i+2,ref=id=>col[id]+n,v=r.phase2?.variableChoices||{},a=r.phase4?.conclusions||{},trials=r.phase3?.trials||[];
     const concept=r.phase4?.reflectionQuestionId==='integrated-concept-explanation';
     const integrated=concept||r.phase4?.reflectionQuestionId==='integrated-explanation-evidence';
     const current=integrated||r.phase4?.reflectionQuestionId==='enzyme-denaturation',reflectionMax=integrated?8:4;
     const rowMaxima=Object.fromEntries(Object.entries(maxima).filter(([id])=>current?!['emulsion','enzyme','heat','revision'].includes(id):id!=='reflectionScore'));
-    if(current)rowMaxima.reflectionScore=reflectionMax;
+    if(current)rowMaxima.reflectionScore=reflectionMax;if(staged)delete rowMaxima.control;
     Object.entries(rowMaxima).forEach(([id,max])=>validations.push({range:ref(id),max}));
-    const completeTrialSet=trialKeys.every(key=>trials.some(t=>t.key===key));
+    const recordKeys=trialsForRecord(r),recordResults=resultsForRecord(r);const completeTrialSet=recordKeys.every(key=>trials.some(t=>t.key===key));
     const objective=(g,max)=>Array.isArray(v[g])&&v[g].length?(sameChoices(v[g],expectedVariables[g])?max:0):'未提供';
     const cv=r.schemaVersion===2&&Array.isArray(v.cv)&&v.cv.length?round(expectedVariables.cv.filter(x=>v.cv.includes(x)).length/5*2*(v.cv.some(x=>!expectedVariables.cv.includes(x))?0:1)):'未提供';
-    const expectedAnswers=r.uiVersion===3?conclusionAnswers:previousConclusionAnswers;
-    const weight=r.uiVersion===3?{q1:1,q3:1,limitations:1,q2:1}:{q1:.5,q2:.5,q3:.5,comparison:.75,heatComparison:.75,limitations:1};
-    const values={rubricVersion:concept?'現版：綜合概念解釋（0–8）':integrated?'前版：綜合解釋與證據（0–8）':current?'前版：酶變性（0–4）':'舊版：四項反思（0–8）',maximum:current?24+reflectionMax:32,id:r.id,name:r.profile?.name,class:r.profile?.classInfo,status:reflectionComplete(r)?'已完成':r.schemaVersion!==2?'舊版／未提供':r.submitted?'待提交反思':'進行中',
-      trials:completeTrialSet?round(trialKeys.filter(key=>trials.find(t=>t.key===key)?.studentObservation===experiments[key][0]).length/6*2):'未提供',
+    const expectedAnswers=answersForRecord(r);
+    const weight=staged?{q1:.8,qY:.8,q3:.8,limitations:.8,q2:.8}:r.uiVersion===3?{q1:1,q3:1,limitations:1,q2:1}:{q1:.5,q2:.5,q3:.5,comparison:.75,heatComparison:.75,limitations:1};
+    const values={rubricVersion:staged?'staged-1：三部分探究；SPS 23＋反思 8':concept?'現版：綜合概念解釋（0–8）':integrated?'前版：綜合解釋與證據（0–8）':current?'前版：酶變性（0–4）':'舊版：四項反思（0–8）',maximum:staged?31:current?24+reflectionMax:32,id:r.id,name:r.profile?.name,class:r.profile?.classInfo,status:reflectionComplete(r)?'已完成':r.schemaVersion!==2?'舊版／未提供':r.submitted?'待提交反思':'進行中',
+      trials:completeTrialSet?round(recordKeys.filter(key=>trials.find(t=>t.key===key)?.studentObservation===recordResults[key][0]).length/recordKeys.length*2):'未提供',
       iv:objective('iv',1),dv:objective('dv',1),cv,
       assumptions:r.phase2?.assumptions?.length?(sameChoices(r.phase2.assumptions,assumptionsForRecord(r).filter(x=>x[2]).map(x=>x[0]))?1:0):'未提供',
       inference:Object.keys(weight).every(id=>a[id])?Object.entries(weight).reduce((sum,[id,w])=>sum+(a[id]===expectedAnswers[id]?w:0),0):'未提供'};
@@ -376,37 +408,44 @@ function scoringWorkbook(records) {
     const valid=ids=>ids.map(id=>rowMaxima[id]!==undefined?`AND(ISNUMBER(${ref(id)}),${ref(id)}>=0,${ref(id)}<=${rowMaxima[id]},IFERROR(MOD(${ref(id)},1)=0,FALSE))`:`ISNUMBER(${ref(id)})`).join(',');
     const sum=ids=>`IF(AND(${valid(ids)}),ROUND(SUM(${ids.map(ref).join(',')}),2),"待評")`;
     const sps=['observing','classifying','designing','conducting','inferring','communicating'],knowledge=current?['reflectionScore']:['emulsion','enzyme','heat','revision'];
-    const formulas={observing:sum(['observation','trials']),classifying:sum(['iv','dv','cv']),designing:sum(['hypothesis','assumptions','control']),conducting:sum(['setup','fair']),inferring:sum(['inference']),communicating:sum(['communication']),sps:sum(sps),knowledge:sum(knowledge),
+    const formulas={observing:sum(['observation','trials']),classifying:sum(['iv','dv','cv']),designing:sum(staged?['hypothesis','assumptions']:['hypothesis','assumptions','control']),conducting:sum(['setup','fair']),inferring:sum(['inference']),communicating:sum(['communication']),sps:sum(sps),knowledge:sum(knowledge),
       overall:`IF(AND(ISNUMBER(${ref('sps')}),ISNUMBER(${ref('knowledge')}),${ref('status')}="已完成"),ROUND(SUM(${ref('sps')},${ref('knowledge')}),2),"待評／未完成")`,
       marking:`IF(AND(${valid(Object.keys(rowMaxima))},ISNUMBER(${ref('sps')}),ISNUMBER(${ref('knowledge')}),${ref('status')}="已完成"),"評分完成","待評／學生未完成／分數不符範圍")`};
     rows.push(columns.map(([id,,group,max])=>formulas[id]?excelFormula(formulas[id],group):excelCell(max!==undefined?(rowMaxima[id]!==undefined?'':'不適用'):values[id],group)));
-    const allMax={...rowMaxima,trials:2,iv:1,dv:1,cv:2,assumptions:1,inference:4,observing:4,classifying:4,designing:4,conducting:4,inferring:4,communicating:4,sps:24,knowledge:current?reflectionMax:8,overall:current?24+reflectionMax:32};
+    const allMax={...rowMaxima,trials:2,iv:1,dv:1,cv:2,assumptions:1,inference:4,observing:4,classifying:4,designing:staged?3:4,conducting:4,inferring:4,communicating:4,sps:staged?23:24,knowledge:current?reflectionMax:8,overall:staged?31:current?24+reflectionMax:32};
     Object.entries(allMax).forEach(([id,max])=>conditional.push(colourRule(ref(id),ref(id),max)));
   });
 
   const rubric=[['類別／題目','最高分','評分方式','滿分準則','部分得分準則','零分／缺漏處理']];
   const add=(g,title,max,method,full,partial,zero)=>rubric.push([excelCell(title,g),max,method,full,partial,zero]);
-  add('reference','活動 rubric 初稿：待研究者校準',32,'研究說明','現版：六項 SPS 共 24，綜合解釋 8，滿分 32。前題酶變性解釋 4，滿分 28；原始假說舊反思四項各 2，滿分 32。按每列題目版本評分。','跨 VL 的題目、難度、機會與評分者一致性需校準。','不是已驗證量表；與 SPSAI／CKT 分開。紙本需提供相同問題與靜態資料。');
+  add('reference','新版 staged-1',31,'版本說明','主探究 X／Y、延伸一 X 後加 Y／水後加 Y、延伸二煮沸 X／Y，均為模擬一小時後。SPS 23＋整合 8＝31；紙本 18。','設計探究只評原始假說理由 2＋前提 1；對照組欄不適用，無需填分。','五項推論各 0.8 共 4；裝置只要求主探究兩組。舊紀錄沿用原規準及滿分。');
+  add('observing','staged-1｜觀察',4,'人工2＋自動2','初步可見描述0–2；六組新序列外觀答齊後，正確組數／6×2。','保留首次及最後觀察，按內容判斷。','缺組未提供；不是按完成率給分。');
+  add('classifying','staged-1｜分類',4,'自動','IV1、DV1、CV2；使用與主探究相同的完整候選。','CV正確項各0.4，選入非CV使CV分為0。','缺答未提供。');
+  add('communicating','staged-1｜溝通',4,'人工','依已問的原始理由、主探究裝置、數據及最後解釋評清晰度與組織。','3稍欠連結、2基本可理解、1單一相關表達。','0無有效溝通；不要求已刪水對照或額外證據比較。');
+  add('designing','staged-1｜設計探究',3,'人工2＋自動1','原始可測試預測與合理理由0–2；公平前提0–1。','裝置只設X與Y，不要求水對照組。','N欄不適用；不用補填才能計總分。');
+  add('conducting','staged-1｜實作',4,'人工','主探究兩個裝置品質0–2；公平條件安排0–2。','部分完整各1。','不以點擊、速度或完成次數當分數。');
+  add('inferring','staged-1｜推論',4,'自動','X外觀、Y外觀、表面積、外觀界限、煮沸結論各0.8。','按正確內容，不按選項位置。','缺答未提供。');
+  add('reference','舊版 ui3／更早：活動 rubric 初稿：待研究者校準',32,'研究說明','舊版 ui3：六項 SPS 共 24，綜合解釋 8，滿分 32。前題酶變性解釋 4，滿分 28；原始假說舊反思四項各 2，滿分 32。按每列題目版本評分。','跨 VL 的題目、難度、機會與評分者一致性需校準。','不是已驗證量表；與 SPSAI／CKT 分開。紙本需提供相同問題與靜態資料。');
   add('observing','初步觀察',2,'人工','2：準確描述可見油水層及圖像細節，區分觀察與猜測。','1：有具體但不完整的描述。','0：無有效觀察；缺少舊版欄位保留待評，不捏造。');
   add('observing','六組外觀',2,'自動','六組均有確認答案；按符合預設外觀的組數／6×2，四捨五入至兩位小數。','部分符合參考外觀按比例得分。','已答但均不符合為 0；缺少組別顯示未提供，不以完成率當能力分數。');
   add('classifying','獨立變量',1,'自動','只選消化液組合。','無部分分數。','有答案但不符為 0；未提供不補 0。');
   add('classifying','因變量',1,'自動','只選混合物外觀。','無部分分數。','有答案但不符為 0；未提供不補 0。');
   add('classifying','控制變量',2,'自動','五項固定條件全選，且無選錯。','選中正確控制變量數／5×2；選錯類別為 0。','舊版只問三項；不能以缺少新選項推斷原能力。跨版比較需另行校準。');
   add('designing','原始可測試假說與理由',2,'人工','2：具可比較條件、可觀察預測及合理理由。','1：可測試但理由或條件不完整。','0：不可測試或沒有合理內容；合理假說不因猜錯而扣分。沒有原始快照時待評。');
-  add('designing','實驗前提',1,'自動','現版只選時間、起始油水及加液總量、搖勻方式三項；不選增加總加液量。','無部分分數。','有答案但不符為 0；舊版沒有此題為未提供。');
+  add('designing','實驗前提',1,'自動','舊版 ui3只選時間、起始油水及加液總量、搖勻方式三項；不選增加總加液量。','無部分分數。','有答案但不符為 0；舊版沒有此題為未提供。');
   add('designing','對照組',1,'人工','1：合理說明需要對照組的比較用途，提出不加消化液的比較裝置並保持條件相同。','此欄只填整數 0 或 1。','0：無有效對照用途說明或理由不合理；沒有此題則待評。');
   add('conducting','裝置品質',2,'人工','2：圖／相片／文字清晰、四組標示、用量合理。','1：方案可操作但標示或用量不完整。','0：無可操作方案；不能因使用文字而扣分。');
   add('conducting','固定條件與實驗安排',2,'人工','2：依設計與操作證據保持公平比較，熱處理冷卻後使用，每次只改變一因素。','1：基本合理但條件或熱處理安排不完整。','0：安排不能有效比較。六組完整性只作證據，不以完成率、點擊或用時直接換分。');
-  add('inferring','結論、比較及界限',4,'自動','現版三項推論（外觀、表面積、證據界限）及延伸結論各 1，共 4；歷史版按原六題權重（0.5、0.5、0.5、0.75、0.75、1）。','只按各題明確參考答案得分。','按紀錄版本檢查當時的全部題目；不要求現版回答已刪除題目，歷史缺題不補答案。');
-  add('communicating','資料與主張',4,'人工','4：依已問的假說理由、對照／裝置說明及反思，清楚組織已問問題的資料與因果解釋；現版綜合題不另要求組別比較或外觀限制，評表達清晰度而不重複計算概念分。','3：清楚但有輕微連結不足；2：基本可理解但解釋不完整；1：僅單一相關描述。','0：無有效溝通。現版依假說理由、對照說明、裝置標示、數據表及反思的表達評分；歷史版另可用具體比較說明。評溝通清晰度，不重複評新知識。');
+  add('inferring','結論、比較及界限',4,'自動','舊版 ui3三項推論（外觀、表面積、證據界限）及延伸結論各 1，共 4；歷史版按原六題權重（0.5、0.5、0.5、0.75、0.75、1）。','只按各題明確參考答案得分。','按紀錄版本檢查當時的全部題目；不要求現版回答已刪除題目，歷史缺題不補答案。');
+  add('communicating','資料與主張',4,'人工','4：依已問的假說理由、對照／裝置說明及反思，清楚組織已問問題的資料與因果解釋；舊版 ui3綜合題不另要求組別比較或外觀限制，評表達清晰度而不重複計算概念分。','3：清楚但有輕微連結不足；2：基本可理解但解釋不完整；1：僅單一相關描述。','0：無有效溝通。舊版 ui3依假說理由、對照說明、裝置標示、數據表及反思的表達評分；歷史版另可用具體比較說明。評溝通清晰度，不重複評新知識。');
   add('knowledge','舊反思限定｜膽汁乳化與表面積',2,'人工：只看學習後反思','2：膽汁不含消化酶，乳化是物理作用，小油滴增加總表面積。','1：概念部分正確但解釋不完整。','0：沒有運用或概念錯誤；未提交反思不能當作零分。');
   add('knowledge','舊反思限定｜脂肪酶化學消化及產物',2,'人工：只看學習後反思','2：脂肪酶催化化學消化，形成甘油和脂肪酸。','1：酶作用或產物部分正確。','0：沒有運用或概念錯誤；不是關鍵字計分。');
   add('knowledge','舊反思限定｜高溫造成酶變性',2,'人工：只看學習後反思','2：把煮沸 Y 的觀察連結酶蛋白質變性及失去功能。','1：知道高溫影響但欠機理解釋。','0：沒有運用或概念錯誤。');
   add('knowledge','舊反思限定｜修訂原始解釋與數據',2,'人工：只看學習後反思','2：回應原始假說是否受支持，引用具體比較，運用概念修訂／完善並注意外觀界限。','1：有比較或修訂但連結不完整。','0：沒有有效修訂或數據連結。');
   add('knowledge','前題限定｜酶變性解釋',4,'人工：只看酶變性前題','每項 1 分：脂肪酶是蛋白質；煮沸使酶變性；變性使酶失去催化功能；冷卻未能恢復酶的形狀／功能。合共 4 分。','按正確因果概念逐項給分，接受同義表達；不是數關鍵字。','已作答但無正確概念為 0；未提供保留空白。不得要求膽汁、產物或修訂假說；舊四欄標示不適用。');
   add('knowledge','前版限定｜綜合解釋與證據',8,'人工：只看綜合證據前題','各 1 分：膽汁物理乳化／分子不變；小滴增加總表面積；胰液脂肪酶催化化學消化；甘油及脂肪酸；蛋白質酶高溫變性失活；本模型煮沸 X 仍有作用而煮沸 Y 失活；具體組別外觀比較支持解釋；外觀不能單獨證明產物。','按正確概念及因果逐項給分；接受同義表達，不數關鍵字。不要求修訂原始假說。','未答保留空白；已答無有效概念為 0。不按新規準重評舊題作答。');
-  add('knowledge','現版反思｜綜合概念解釋',8,'人工：只看現版綜合概念題','各 1 分：膽汁物理乳化大油滴成小油滴；脂質分子不變；小油滴增加總表面積幫助酶作用；胰液脂肪酶催化化學消化；甘油與脂肪酸；脂肪酶是蛋白質；煮沸使酶變性失去催化功能；本模型煮沸膽汁仍保留乳化作用。','按科學概念與因果逐項給分，接受同義表達，不數關鍵字。','未答保留空白；已答無有效概念為 0。不另要求組別比較、外觀限制或修訂假說；第 6 題仍另評外觀限制。');
-  add('score','SPS、反思及整體分數',32,'公式','現版綜合題 24＋8＝32；酶變性前題 24＋4＝28；原始假說舊題 24＋8＝32。每列只驗證適用評分欄，提交反思且評分完整才顯示整體。','空白顯示待評；填 0 才是零分。教師欄只接受範圍內整數。','貼上超範圍或非整數也不會得到有效總分；評分欄沒有內容時勿填 0 代替待評。');
+  add('knowledge','舊版 ui3反思｜綜合概念解釋',8,'人工：只看現版綜合概念題','各 1 分：膽汁物理乳化大油滴成小油滴；脂質分子不變；小油滴增加總表面積幫助酶作用；胰液脂肪酶催化化學消化；甘油與脂肪酸；脂肪酶是蛋白質；煮沸使酶變性失去催化功能；本模型煮沸膽汁仍保留乳化作用。','按科學概念與因果逐項給分，接受同義表達，不數關鍵字。','未答保留空白；已答無有效概念為 0。不另要求組別比較、外觀限制或修訂假說；第 6 題仍另評外觀限制。');
+  add('score','SPS、反思及整體分數',32,'公式','舊版 ui3綜合題 24＋8＝32；酶變性前題 24＋4＝28；原始假說舊題 24＋8＝32。每列只驗證適用評分欄，提交反思且評分完整才顯示整體。','空白顯示待評；填 0 才是零分。教師欄只接受範圍內整數。','貼上超範圍或非整數也不會得到有效總分；評分欄沒有內容時勿填 0 代替待評。');
   add('reference','色彩、紀錄及人工分數保存',0,'說明','綠字正確／滿分、紅字錯誤／零分、橙字部分分數；底色區分題目與 SPS 類別。','原始、首次觀察、最後答案與完整事件分表；時間是可見頁面有效秒數。','人工分數只在此 Excel；另存檔保留，重新匯出不會帶入。學生 PDF 無分數。');
   return {sheet:{name:'教師評分',rows,validations,conditional},rubric:{name:'評分準則',rows:rubric},col};
 }
@@ -418,19 +457,20 @@ async function exportExcel() {
   try {records=await allTeacherRecords();}
   catch(e){toast('未匯出：'+e.message+'。請解鎖雲端並重試，避免下載不完整的全班紀錄。');return;}
   if(!isTeacher())return;
-  const headings=['探究識別碼','姓名','班別及學號','電郵','狀態','建立時間','探究提交時間','反思提交時間','初步觀察','原始假說','原始理由','最後假說','最後理由','獨立變量','因變量','控制變量','實驗前提','對照組設計','裝置文字設計',...Object.values(questionLabels),'歷史具體比較說明（現版不設此題）','實際學習反思','總有效秒數','階段一秒數','階段二秒數','階段三秒數','階段四秒數','基本實驗次數','延伸實驗次數','確認觀察次數','理由修改次數'];
-  const groups=headings.map((_,c)=>c<8?'identity':c===8?'observing':c<13?'designing':c<16?'classifying':c<19?'designing':c<23?'inferring':c===23?'communicating':c===24?'knowledge':'identity');
+  const headings=['探究識別碼','姓名','班別及學號','電郵','狀態','建立時間','探究提交時間','反思提交時間','初步觀察','原始假說','原始理由','最後假說','最後理由','獨立變量','因變量','控制變量','實驗前提','舊版｜對照組設計（新版不適用）','裝置文字設計',...Object.values(questionLabels).slice(0,4),'歷史具體比較說明（現版不設此題）','實際學習反思','總有效秒數','階段一秒數','階段二秒數','階段三秒數','階段四秒數','主探究實驗次數','煮沸實驗次數','確認觀察次數','理由修改次數','主探究結論｜Y 組的外觀','實驗版本','延伸一實驗次數'];
+  const groups=headings.map((heading,c)=>heading===questionLabels.qY?'inferring':c<8?'identity':c===8?'observing':c<13?'designing':c<16?'classifying':c<19?'designing':c<23?'inferring':c===23?'communicating':c===24?'knowledge':'identity');
   const answers=[headings.map((h,c)=>excelCell(h,groups[c]))],observations=[['探究識別碼','姓名','裝置','首次確認外觀','最後確認外觀','參考外觀','最後回饋','首次確認時間','最後確認時間']];
   const events=[['探究識別碼','姓名','事件','時間（香港）','階段','原始時間戳','內容分段','完整事件內容']];
   const snapshots=[['探究識別碼','姓名','快照類別','保存時間','內容分段','原始完整內容（唯讀）']];
   const designs=[['姓名','班別及學號','電郵','文字設計','裝置設計圖']],images=[];
   records.forEach(r=>{
     const h=originalHypothesis(r),last=r.phase2?.hypothesis,v=r.phase2?.variableChoices||{},conclusions=r.phase4?.conclusions||{},selection=r.phase2?.assumptions;
-    const row=[r.id,r.profile.name,r.profile.classInfo,r.profile.email,reflectionComplete(r)?'已完成':r.submitted?'待提交反思':r.schemaVersion===2?'進行中':'舊版／未提供',formatDate(r.createdAt),formatDate(r.submittedAt),formatDate(r.reflectionSubmittedAt),r.phase1?.observation||'未提供',hypothesisText(h),h?.reason||'未提供',last?hypothesisText(last):'未提供',last?.reason||'未提供',v.iv?.join('、')||'未提供',v.dv?.join('、')||'未提供',v.cv?.join('、')||'未提供',selection?.map(assumptionText).join('；')||'未提供',r.phase2?.controlPlan||'未提供',r.phase2?.setup?.description||'未提供',...Object.keys(questionLabels).map(id=>answerText(id,conclusions[id])),r.phase4?.evidenceExplanation||'未提供',r.phase4?.reflection||'未提供',r.durationSeconds??'未提供',...[1,2,3,4].map(p=>r.phaseDurations?.[p]===undefined?'未提供':Math.round(r.phaseDurations[p])),...['trial_run','extension_trial_run','observation_recorded','reason_updated'].map(id=>r.attemptCounts?.[id]??'未提供')];
+    const row=[r.id,r.profile.name,r.profile.classInfo,r.profile.email,reflectionComplete(r)?'已完成':r.submitted?'待提交反思':r.schemaVersion===2?'進行中':'舊版／未提供',formatDate(r.createdAt),formatDate(r.submittedAt),formatDate(r.reflectionSubmittedAt),r.phase1?.observation||'未提供',hypothesisText(h),h?.reason||'未提供',last?hypothesisText(last):'未提供',last?.reason||'未提供',v.iv?.join('、')||'未提供',v.dv?.join('、')||'未提供',v.cv?.join('、')||'未提供',selection?.map(id=>assumptionText(id,r)).join('；')||'未提供',isStaged(r)?'不適用':r.phase2?.controlPlan||'未提供',r.phase2?.setup?.description||'未提供',...Object.keys(questionLabels).slice(0,4).map(id=>answerText(id,conclusions[id])),r.phase4?.evidenceExplanation||'未提供',r.phase4?.reflection||'未提供',r.durationSeconds??'未提供',...[1,2,3,4].map(p=>r.phaseDurations?.[p]===undefined?'未提供':Math.round(r.phaseDurations[p])),...['trial_run','extension_trial_run','observation_recorded','reason_updated'].map(id=>r.attemptCounts?.[id]??'未提供'),isStaged(r)?answerText('qY',conclusions.qY):'不適用',r.experimentVersion||'legacy',r.attemptCounts?.sequence_trial_run??'未提供'];
     const checks={13:v.iv?.length?sameChoices(v.iv,expectedVariables.iv):null,14:v.dv?.length?sameChoices(v.dv,expectedVariables.dv):null,15:v.cv?.length?sameChoices(v.cv,variablesForRecord(r,'cv')):null,16:selection?.length?sameChoices(selection,assumptionsForRecord(r).filter(a=>a[2]).map(a=>a[0])):null};
-    Object.keys(conclusionAnswers).forEach((id,i)=>checks[19+i]=conclusions[id]?conclusions[id]===conclusionAnswers[id]:null);
+    Object.keys(legacyConclusionAnswers).forEach((id,i)=>checks[19+i]=conclusions[id]?conclusions[id]===conclusionAnswers[id]:null);
+    checks[headings.indexOf(questionLabels.qY)]=isStaged(r)&&conclusions.qY?conclusions.qY===conclusionAnswers.qY:null;
     answers.push(row.map((value,c)=>excelCell(value,groups[c],checks[c]??null)));
-    trialKeys.forEach(key=>{const first=r.firstObservations?.[key],last=(r.phase3?.trials||[]).find(t=>t.key===key);observations.push([excelCell(r.id),excelCell(r.profile.name),excelCell(trialLabel(key),'conducting'),excelCell(first?.studentLabel||'未提供','observing',first?first.studentObservation===experiments[key][0]:null),excelCell(last?.studentLabel||'未提供','observing',last?last.studentObservation===experiments[key][0]:null),excelCell(experiments[key][1],'reference'),last?(last.studentObservation===experiments[key][0]?'正確':'錯誤'):'未提供',formatDate(first?.at),formatDate(last?.at)]);});
+    trialsForRecord(r).forEach(key=>{const first=r.firstObservations?.[key],last=(r.phase3?.trials||[]).find(t=>t.key===key);observations.push([excelCell(r.id),excelCell(r.profile.name),excelCell(trialLabel(key),'conducting'),excelCell(first?.studentLabel||'未提供','observing',first?first.studentObservation===resultsForRecord(r)[key][0]:null),excelCell(last?.studentLabel||'未提供','observing',last?last.studentObservation===resultsForRecord(r)[key][0]:null),excelCell(resultsForRecord(r)[key][1],'reference'),last?(last.studentObservation===resultsForRecord(r)[key][0]?'正確':'錯誤'):'未提供',formatDate(first?.at),formatDate(last?.at)]);});
     (r.telemetry||[]).forEach(e=>excelChunks(JSON.stringify(e)).forEach((chunk,i)=>events.push([r.id,r.profile.name,eventLabel(e.type),formatDate(e.at),e.phase??'未提供',e.at,i+1,chunk])));
     [[r.initialDesign,'第一次實驗前固定快照',r.initialDesign?.at],[r.finalAnswers,'遞交時最後答案',r.submittedAt],[r,'本機完整紀錄（含舊版原值）',r.savedAt]].forEach(([snapshot,label,at])=>excelChunks(snapshot?JSON.stringify(snapshot):'未提供').forEach((chunk,i)=>snapshots.push([r.id,r.profile.name,label,formatDate(at),i+1,chunk])));
     designs.push([r.profile.name,r.profile.classInfo,r.profile.email,r.phase2?.setup?.description||'未提供',safeImage(r.phase2?.setup?.image)?'圖像如下':'未提供']);
@@ -446,7 +486,7 @@ function excelChunks(text) {
   for(const character of text){if(chunk.length+character.length>30000){out.push(chunk);chunk='';}chunk+=character;}
   out.push(chunk);return out;
 }
-function eventLabel(type) {return ({phase_opened:'開啟階段',variable_choice:'選擇變量',assumptions_changed:'修改實驗前提',setup_drawing_updated:'修改繪圖',setup_photo_uploaded:'上載相片',setup_saved:'儲存裝置',setup_cleared:'清除裝置',trial_run:'進行基本實驗',extension_trial_run:'進行熱處理實驗',observation_selected:'選擇觀察',observation_recorded:'確認觀察',answer_changed:'修改答案',reason_updated:'修改理由',design_confirmed:'確認設計',lab_started:'開始探究',investigation_submitted:'提交探究',reflection_submitted:'提交反思',pdf_print_requested:'列印 PDF',liquid_selected:'選擇消化液',extension_selected:'選擇熱處理'})[type]||type;}
+function eventLabel(type) {return ({phase_opened:'開啟階段',variable_choice:'選擇變量',assumptions_changed:'修改實驗前提',setup_drawing_updated:'修改繪圖',setup_photo_uploaded:'上載相片',setup_saved:'儲存裝置',setup_cleared:'清除裝置',trial_run:'進行基本實驗',extension_trial_run:'進行熱處理實驗',sequence_trial_run:'進行延伸一實驗',observation_selected:'選擇觀察',observation_recorded:'確認觀察',answer_changed:'修改答案',reason_updated:'修改理由',design_confirmed:'確認設計',lab_started:'開始探究',investigation_submitted:'提交探究',reflection_submitted:'提交反思',pdf_print_requested:'列印 PDF',liquid_selected:'選擇消化液',extension_selected:'選擇熱處理'})[type]||type;}
 
 FIELDS.forEach(id=>{
   $('#'+id).addEventListener('input',()=>{if(id==='setupDescription'){state.setupSaved=false;$('#setupFeedback').textContent='設計已更新，請按「儲存設計」。';}logEvent(id==='reason'?'reason_updated':'answer_changed',{field:id,value:$('#'+id).value});});
@@ -465,9 +505,14 @@ $$('[data-next]').forEach(b=>b.onclick=()=>{
   if(next===3){const missing=incompleteDesignParts();if(missing.length)return toast('請完成：'+missing.join('、'));if(!state.initialDesign)state.initialDesign=designSnapshot();logEvent('design_confirmed',{design:designSnapshot()});}
   state.unlocked=Math.max(state.unlocked,next);setPhase(next);saveRecord();
 });
+$('#completeMain').onclick=()=>{if(!$('#q1').value||!$('#qY').value)return toast('請先完成主探究兩項結論。');state.part2Unlocked=true;renderStaged();saveRecord();$('#sequenceInvestigation').scrollIntoView({block:'start'});};
+$('#completeSequence').onclick=()=>{if(!['XthenY-none','waterThenY-none'].every(k=>state.records.some(r=>r.key===k))||!$('#q3').value||!$('#limitations').value)return toast('請先完成延伸一的兩組觀察及分析。');state.part3Unlocked=true;renderStaged();saveRecord();$('#extensionInvestigation').scrollIntoView({block:'start'});};
+$$('[data-sequence]').forEach(b=>b.onclick=()=>{if(state.submitted||state.sequenceRunning)return;state.sequence=b.dataset.sequence;state.sequenceHasRun=false;state.sequenceObservation='';$('#runSequence').disabled=false;$('#recordSequence').disabled=true;$$('[data-sequence]').forEach(el=>el.classList.toggle('selected',el===b));$$('[data-sequence-observation]').forEach(el=>el.disabled=true);});
+$$('[data-sequence-observation]').forEach(b=>b.onclick=()=>{if(state.submitted||!state.sequenceHasRun)return;state.sequenceObservation=b.dataset.sequenceObservation;$('#recordSequence').disabled=false;$$('[data-sequence-observation]').forEach(el=>el.classList.toggle('selected',el===b));});
+$('#runSequence').onclick=runSequence;$('#recordSequence').onclick=recordSequence;
 $$('[data-back]').forEach(b=>b.onclick=()=>setPhase(+b.dataset.back));$$('.step').forEach(b=>b.onclick=()=>setPhase(+b.dataset.phase));
-$$('#liquidButtons button').forEach(b=>b.onclick=()=>{if(state.submitted||state.running||state.extensionRunning)return;state.liquid=b.dataset.liquid;$$('#liquidButtons button').forEach(el=>el.classList.toggle('selected',el===b));resetObservation();logEvent('liquid_selected',{liquid:state.liquid});});
-$$('[data-extension-heat]').forEach(b=>b.onclick=()=>{if(state.submitted||state.running||state.extensionRunning)return;state.extensionHeat=b.dataset.extensionHeat;$$('[data-extension-heat]').forEach(el=>el.classList.toggle('selected',el===b));resetExtension();$('#runExtension').disabled=false;logEvent('extension_selected',{heat:state.extensionHeat});});
+$$('#liquidButtons button').forEach(b=>b.onclick=()=>{if(state.submitted||state.running||state.extensionRunning||state.sequenceRunning)return;state.liquid=b.dataset.liquid;$$('#liquidButtons button').forEach(el=>el.classList.toggle('selected',el===b));resetObservation();logEvent('liquid_selected',{liquid:state.liquid});});
+$$('[data-extension-heat]').forEach(b=>b.onclick=()=>{if(state.submitted||state.running||state.extensionRunning||state.sequenceRunning)return;state.extensionHeat=b.dataset.extensionHeat;$$('[data-extension-heat]').forEach(el=>el.classList.toggle('selected',el===b));resetExtension();$('#runExtension').disabled=false;logEvent('extension_selected',{heat:state.extensionHeat});});
 $('#runExperiment').onclick=()=>animateTrial();$('#runExtension').onclick=()=>animateTrial(true);
 $$('#observationChoice button').forEach(b=>b.onclick=()=>{if(!state.experimentHasRun||state.submitted)return;state.selectedObservation=b.dataset.observation;$$('#observationChoice button').forEach(el=>el.classList.toggle('selected',el===b));$('#recordData').disabled=false;logEvent('observation_selected',{trial:`${state.liquid}-none`,answer:state.selectedObservation});});
 $$('[data-extension-observation]').forEach(b=>b.onclick=()=>{if(!state.extensionHasRun||state.submitted)return;state.extensionObservation=b.dataset.extensionObservation;$$('[data-extension-observation]').forEach(el=>el.classList.toggle('selected',el===b));$('#recordExtension').disabled=false;logEvent('observation_selected',{trial:`XY-${state.extensionHeat}`,answer:state.extensionObservation});});

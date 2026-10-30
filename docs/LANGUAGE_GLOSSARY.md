@@ -21,3 +21,6 @@
 一般指示使用簡單英文，例如 experiment setup 代替 apparatus；保留正式變量分類名稱，並以「the factor changed on purpose」等簡單句子解釋。簡化用語不改變生物概念或題目意思。
 
 中文版的說明只使用中文，化學式、單位及裝置代號照常保留。英文版的輸入欄提示文字翻譯成英文；學生自行輸入的姓名、理由、設計及反思保留原文。英文介面及 PDF 的文字映射見 [language-dictionary.js](../language-dictionary.js)。
+
+
+新版 staged-1 結果用語：混濁程度減低，沒有明顯油層 = Less cloudy, with no obvious oil layer。X／Y 身分只在最後學習重點揭示；不以 clear 描述結果。

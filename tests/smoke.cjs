@@ -14,10 +14,9 @@ async function design(page,{draw=false,badAssumptions=false}={}) {
   for(const [g,values] of [['iv',['消化液組合']],['dv',['混合物外觀']],['cv',['油和水總體積','反應溫度','反應時間','加液總量','搖勻方式']]])for(const value of values)await page.click(`[data-group="${g}"][data-variable="${value}"]`);
   for(const value of ['time','volume','mixing'])await page.check(`#assumptionChoices input[value="${value}"]`);
   if(badAssumptions)await page.check('#assumptionChoices input[value="more"]');
-  await page.fill('#controlPlan','油水加2 mL水作對照；與X、Y、XY比較，油水量、加液量、37°C、時間及搖勻方式相同。');
   if(draw){await page.locator('#setupCanvas').scrollIntoViewIfNeeded();const box=await page.locator('#setupCanvas').boundingBox();await page.mouse.move(box.x+30,box.y+30);await page.mouse.down();await page.mouse.move(box.x+120,box.y+120,{steps:6});await page.mouse.up();await page.click('#saveSetup');}
-  else {await page.fill('#setupDescription','四個標示裝置：對照加2 mL水、X加2 mL、Y加2 mL、XY各1 mL，保持油水量、溫度、時間及搖勻方式相同；熱處理後冷卻至37°C。');await page.click('#saveSetup');}
-  await page.click('#saveHypothesis');await page.waitForSelector('#phase-3.active');
+  else {await page.fill('#setupDescription','兩個標示裝置：X加2 mL、Y加2 mL，保持油水量、溫度、時間及搖勻方式相同；熱處理後冷卻至37°C。');await page.click('#saveSetup');}
+  await page.click('#saveHypothesis');await page.waitForSelector('#phase-3.active');assert.deepEqual(await page.locator('#liquidButtons button').evaluateAll(bs=>bs.map(b=>b.dataset.liquid)),['X','Y']);assert.equal(await page.locator('#hypothesisLiquid option[value="XY"]').count(),0);
 }
 async function trial(page,liquid,outcome) {
   await page.click(`[data-liquid="${liquid}"]`);await page.click('#runExperiment');
@@ -27,12 +26,15 @@ async function trial(page,liquid,outcome) {
   await page.waitForFunction(()=>window.scrollTargets.at(-1)==='observationTable'&&document.querySelector('#observationTable').getBoundingClientRect().top<innerHeight&&document.querySelector('#observationTable').getBoundingClientRect().bottom>0);
 }
 async function finish(page,{revision=false}={}) {
-  if(revision){await trial(page,'X','clear');await trial(page,'X','cloudy');await page.click('[data-back="2"]');await page.selectOption('#hypothesisLiquid','XY');await page.selectOption('#hypothesisOutcome','clear');await page.fill('#reason','實驗後修改：XY 共同作用。');await page.click('#saveHypothesis');}
-  for(const [liquid,outcome] of [['none','separated'],['X','cloudy'],['Y','thin-oil'],['XY','clear']])await trial(page,liquid,outcome);
+  if(revision){await trial(page,'X','clear');await trial(page,'X','cloudy');await page.click('[data-back="2"]');await page.selectOption('#hypothesisLiquid','Y');await page.selectOption('#hypothesisOutcome','clear');await page.fill('#reason','實驗後修改：XY 共同作用。');await page.click('#saveHypothesis');}
+  for(const [liquid,outcome] of [['X','cloudy'],['Y','thin-oil']])await trial(page,liquid,outcome);
   await page.click('#analyseButton');await page.waitForSelector('#phase-4.active');
-  await page.click('#revealConcept');assert.equal(await page.locator('#conceptReveal').evaluate(el=>el.classList.contains('show')),false);
-  for(const [heat,outcome] of [['X','clear'],['Y','cloudy']]){await page.click(`[data-extension-heat="${heat}"]`);await page.click('#runExtension');assert(await page.locator('#recordExtension').isDisabled());await page.waitForFunction(()=>!document.querySelector('[data-extension-observation="clear"]').disabled);await page.click(`[data-extension-observation="${outcome}"]`);await page.click('#recordExtension');}
-  for(const [id,value] of Object.entries({q1:'cloudy',q2:'Y',q3:'increase',limitations:'indirect'}))await page.selectOption('#'+id,value);
+  assert.equal(await page.locator('#conceptReveal').isVisible(),false);assert.equal(await page.locator('#sequenceInvestigation').isVisible(),false);assert.equal(await page.locator('#extensionInvestigation').isVisible(),false);
+  await page.selectOption('#q1','cloudy');await page.selectOption('#qY','thin-oil');await page.click('#completeMain');
+  for(const [set,outcome]of [['XthenY','reduced'],['waterThenY','thin-oil']]){await page.click(`[data-sequence="${set}"]`);await page.click('#runSequence');await page.waitForFunction(()=>state.sequenceHasRun);await page.click(`[data-sequence-observation="${outcome}"]`);await page.click('#recordSequence');}
+  await page.selectOption('#q3','increase');await page.selectOption('#limitations','indirect');await page.click('#completeSequence');
+  for(const [heat,outcome]of [['X','reduced'],['Y','cloudy']]){await page.click(`[data-extension-heat="${heat}"]`);await page.click('#runExtension');assert(await page.locator('#recordExtension').isDisabled());await page.waitForFunction(()=>state.extensionHasRun);await page.click(`[data-extension-observation="${outcome}"]`);await page.click('#recordExtension');}
+  await page.selectOption('#q2','Y');
   await page.click('#revealConcept');await page.waitForSelector('#conceptReveal.show');
   assert(await page.locator('#q1').isDisabled());assert(await page.locator('#controlPlan').isDisabled());assert(await page.locator('#saveHypothesis').isDisabled());assert(await page.locator('#downloadRecord').isDisabled());assert.equal(await page.locator('#reflection').isDisabled(),false);
   await page.click('#saveReflection');assert.equal(await page.evaluate(()=>state.reflectionSubmittedAt),null);
@@ -55,7 +57,7 @@ async function finish(page,{revision=false}={}) {
  await page.click('#downloadRecord');await page.waitForFunction(()=>window.printCalls?.length===1);
  const printed=await page.evaluate(()=>window.printCalls[0]);assert.equal(printed.title,'VL1_S4_01_陳小明');assert(printed.text.includes('原始X清澈假說不獲支持'));assert(!printed.text.includes('最後保存的假說及理由'));assert(!printed.text.includes('若加入加入'));assert(!printed.text.includes('具體比較與證據說明'));assert(!/SPS|總分|新知識總分|整體分數/.test(printed.text));
  const first=await page.evaluate(k=>JSON.parse(localStorage.getItem(k))[0],RECORDS);
- assert.equal(first.initialDesign.form.hypothesisLiquid,'X');assert.equal(first.phase2.hypothesis.liquid,'XY');assert.equal(first.firstObservations['X-none'].studentObservation,'clear');assert.equal(first.phase3.trials.find(t=>t.key==='X-none').studentObservation,'cloudy');assert(first.finalAnswers&&first.reflectionSubmittedAt);assert(first.optionOrder);assert.equal(await page.locator('#printReport .digestion-diagram').count(),2);assert(first.telemetry.some(e=>e.type==='investigation_submitted'));assert(first.telemetry.some(e=>e.type==='reflection_submitted'));
+ assert.equal(first.initialDesign.form.hypothesisLiquid,'X');assert.equal(first.phase2.hypothesis.liquid,'Y');assert.equal(first.firstObservations['X-none'].studentObservation,'clear');assert.equal(first.phase3.trials.find(t=>t.key==='X-none').studentObservation,'cloudy');assert(first.finalAnswers&&first.reflectionSubmittedAt);assert(first.optionOrder);assert.equal(first.experimentVersion,'staged-1');assert(first.phase3.trials.every(t=>t.simulatedMinutes===60));assert.equal(first.phase3.trials.find(t=>t.key==='waterThenY-none').yMl,1);assert.equal(await page.locator('#printReport .digestion-diagram').count(),2);assert(first.telemetry.some(e=>e.type==='investigation_submitted'));assert(first.telemetry.some(e=>e.type==='reflection_submitted'));
  await page.evaluate(()=>document.body.classList.add('print-record'));await page.pdf({path:'/tmp/vl1-student.pdf',format:'A4',printBackground:true});await page.evaluate(()=>document.body.classList.remove('print-record'));
  await page.click('#changeProfile');await login(page);assert.equal(await page.locator('#reason').inputValue(),'');assert.equal(await page.locator('#reflection').inputValue(),'');assert.equal(await page.evaluate(()=>state.setupImage),'');assert.equal(await page.evaluate(()=>state.records.length),0);assert.notEqual(await page.evaluate(()=>state.id),first.id);
  await page.fill('#initialObservation','第二次探究');await page.evaluate(()=>saveRecord());assert.equal(await page.evaluate(k=>JSON.parse(localStorage.getItem(k)).length,RECORDS),2);

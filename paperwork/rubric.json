@@ -1,11 +1,11 @@
 {
-  "version": "VL1-integrated-concepts-1",
+  "version": "VL1-staged-1",
   "reflectionQuestionId": "integrated-concept-explanation",
   "reflectionMaximum": 8,
-  "spsMaximum": 24,
-  "vlMaximum": 32,
+  "spsMaximum": 23,
+  "vlMaximum": 31,
   "legacyMaximum": 32,
-  "worksheetMaximum": 19,
+  "worksheetMaximum": 18,
   "reflectionPoints": [
     "膽汁透過物理作用，把大油滴乳化成小油滴。",
     "乳化沒有改變脂質分子的結構。",
@@ -23,31 +23,35 @@
       "vl": "設計探究：公平測試設計（IV／DV／CV）",
       "max": 4,
       "answer": "獨立：消化液組合；因：混合物外觀；控制：油和水總體積、反應溫度、反應時間、加液總量、搖勻方式。",
-      "marking": "IV 1；DV 1；CV 2。CV 每個正確因素 0.4 分，若選入非控制因素，CV 該項 0 分。"
+      "marking": "IV 1；DV 1；CV 2。CV 每個正確因素 0.4 分，若選入非控制因素，CV 該項 0 分。",
+      "english": "1. Variables (4): IV = combination of juices; DV = mixture appearance; five CVs worth 0.4 each, wrong-class selection makes CV zero. Same full candidate list as VL."
     },
     {
       "number": 2,
       "title": "公平比較所需前提",
       "vl": "設計探究：實驗前提",
       "max": 1,
-      "answer": "選第 1、3、4 項；不選 X＋Y 可加入較多總液量。",
-      "marking": "三項選齊且無錯選 1 分；其他已作答組合 0 分。"
+      "answer": "選時間、起始油水量與加液總量、搖勻方式；不選 X 組可加較多總液量。",
+      "marking": "三項選齊且無錯選 1 分；其他已作答組合 0 分。",
+      "english": "2. Assumptions (1): time, volumes and shaking; do not select extra volume for X. All correct with no wrong selection earns 1."
     },
     {
       "number": 3,
-      "title": "探究的對照組",
-      "vl": "設計探究：你認為此實驗需要對照組嗎？如需要，你會如何設計比較裝置？",
-      "max": 2,
-      "answer": "需要。油水混合物加入 2 mL 水作對照，與 X、Y 及 X＋Y 組比較，保持其他條件相同。",
-      "marking": "提出合理水對照及比較用途 1；說明維持起始油水量、加液總量、溫度、時間及搖勻方式等公平條件 1。接受其他清楚合理表達。"
-    },
-    {
-      "number": 4,
       "title": "消化液 X 的作用",
       "vl": "數據與推論：q1",
       "max": 1,
       "answer": "混濁乳狀液。",
-      "marking": "正確 1；已答錯誤 0。不另要求物理／化學消化分類或文字比較。"
+      "marking": "正確 1；已答錯誤 0。不另要求物理／化學消化分類或文字比較。",
+      "english": "3. Main q1 (1): cloudy emulsion."
+    },
+    {
+      "number": 4,
+      "title": "Y 組的外觀",
+      "vl": "主探究分析：qY",
+      "max": 1,
+      "answer": "油層變薄，但仍有油水分層。",
+      "marking": "正確1；已答錯誤0。",
+      "english": "4. Main qY (1): thinner oil layer, with two layers remaining."
     },
     {
       "number": 5,
@@ -55,7 +59,8 @@
       "vl": "數據與推論：q3",
       "max": 1,
       "answer": "增加。",
-      "marking": "正確 1；已答錯誤 0。不另要求分子結構解釋。"
+      "marking": "正確 1；已答錯誤 0。不另要求分子結構解釋。",
+      "english": "5. Extension 1 q3 (1): increases."
     },
     {
       "number": 6,
@@ -63,7 +68,8 @@
       "vl": "數據與推論：limitations",
       "max": 1,
       "answer": "A：外觀可提供線索，但不能單獨證明已產生甘油和脂肪酸。",
-      "marking": "選 A 1；已答錯誤 0。"
+      "marking": "選 A 1；已答錯誤 0。",
+      "english": "6. Extension 1 limitations (1): appearance alone cannot prove glycerol and fatty acids formed."
     },
     {
       "number": 7,
@@ -71,15 +77,17 @@
       "vl": "延伸探究：q2",
       "max": 1,
       "answer": "消化液 Y。",
-      "marking": "選 Y 1；已答錯誤 0。不另要求對照組或冷卻程序解釋。"
+      "marking": "選 Y 1；已答錯誤 0。不另要求對照組或冷卻程序解釋。",
+      "english": "7. Extension 2 q2 (1): Y."
     },
     {
       "number": 8,
       "title": "部分 3：綜合概念解釋",
-      "vl": "學習反思：同一概念任務，VL 指「學習重點」，WS 指「課題需知」",
+      "vl": "最後學習重點後的整合解釋；此時才揭示 X、Y 身分。",
       "max": 8,
       "answer": "膽汁不含消化酶，透過物理消化把大油滴乳化成小油滴，脂質分子沒有改變。小油滴使同量脂質的總表面積增加，讓脂肪酶接觸更多脂質。胰液中的脂肪酶催化脂質的化學消化，按本課完全水解簡化模型，將脂質分解為甘油與脂肪酸。脂肪酶是蛋白質，煮沸使其變性，失去催化功能，冷卻後也不能恢復原來的作用；本模型中的膽汁則在煮沸後仍保留乳化作用。",
-      "marking": "按共同八個概念／8 分規準；不另要求引用觀察、外觀限制或修訂假說。"
+      "marking": "按共同八個概念／8 分規準；不另要求引用觀察、外觀限制或修訂假說。",
+      "english": "8. Final integration (8): use the eight concept points below. No extra observation citation, limits or hypothesis revision required."
     }
   ],
   "sps": [
@@ -97,21 +105,21 @@
     },
     {
       "name": "設計探究",
-      "max": 4,
-      "evidence": "原始假說與理由（人工 0–2）＋前提（自動 0–1）＋對照組（人工 0–1）。",
-      "criteria": "假說可測試及理由合理 2、部分完整 1；合理預測不因結果不符扣分。對照有比較用途及合理設計 1。"
+      "max": 3,
+      "evidence": "原始假說與理由0–2＋前提0–1；不設對照組設計題。",
+      "criteria": "主探究比較 X／Y，合理可測試預測不因結果不符扣分。"
     },
     {
       "name": "進行實驗",
       "max": 4,
       "evidence": "裝置品質（人工 0–2）＋固定條件與安排（人工 0–2）。",
-      "criteria": "裝置標示／用量清楚、可操作；公平條件與熱處理安排合理。部分完整各 1，無有效方案各 0。不得以點擊、完成率或用時直接換分。"
+      "criteria": "主探究只要求 X、Y 兩個裝置，標示／用量及公平條件合理；不以操作次數或時間計分。"
     },
     {
       "name": "推論",
       "max": 4,
-      "evidence": "q1、q3、limitations、q2 各 1，自動。",
-      "criteria": "按當時版本參考答案，已答錯誤 0，缺答保留未提供。"
+      "evidence": "q1、qY、q3、limitations、q2 各0.8，共4。",
+      "criteria": "只按當時版本的題目；缺答未提供。"
     },
     {
       "name": "溝通",
@@ -122,5 +130,15 @@
   ],
   "question": "綜合實驗結果與學習重點，解釋膽汁與胰液中的脂肪酶如何共同幫助脂質消化，以及煮沸如何影響它們的作用。",
   "answer": "膽汁不含消化酶，透過物理消化把大油滴乳化成小油滴，脂質分子沒有改變。小油滴使同量脂質的總表面積增加，讓脂肪酶接觸更多脂質。胰液中的脂肪酶催化脂質的化學消化，按本課完全水解簡化模型，將脂質分解為甘油與脂肪酸。脂肪酶是蛋白質，煮沸使其變性，失去催化功能，冷卻後也不能恢復原來的作用；本模型中的膽汁則在煮沸後仍保留乳化作用。",
-  "worksheetQuestion": "綜合實驗結果與課題需知，解釋膽汁與胰液中的脂肪酶如何共同幫助脂質消化，以及煮沸如何影響它們的作用。"
+  "worksheetQuestion": "綜合實驗結果與課題需知，解釋膽汁與胰液中的脂肪酶如何共同幫助脂質消化，以及煮沸如何影響它們的作用。",
+  "reflectionPointsEn": [
+    "Bile physically emulsifies large droplets into smaller droplets.",
+    "Lipid molecules remain unchanged in emulsification.",
+    "Greater total surface area helps lipase contact lipids.",
+    "Lipase in pancreatic juice catalyses chemical digestion.",
+    "Glycerol and fatty acids form in the complete-hydrolysis model.",
+    "Lipase is a protein.",
+    "Boiling denatures lipase and stops catalysis.",
+    "Bile retains emulsifying action after boiling in this model."
+  ]
 }

@@ -13,10 +13,7 @@ const assert=require('node:assert/strict');
  assert.doesNotMatch(identity,/消化液 Y 是脂肪酶/);
  await page.fill('#profileName','圖解測試');await page.fill('#profileClass','S4');await page.fill('#profileEmail','learning@example.com');await page.click('#profileForm button');
  await page.fill('#initialObservation','油水分層。');await page.click('[data-next="2"]');
- const hint=await page.locator('#controlPlan').locator('..').locator('.scaffold-hint').evaluate(el=>({size:parseFloat(getComputedStyle(el).fontSize),colour:getComputedStyle(el).color,emphasis:[...el.querySelectorAll('strong')].map(node=>getComputedStyle(node).color)}));
- assert.equal(hint.size,12);assert.equal(hint.colour,'rgb(101, 128, 135)');hint.emphasis.forEach(colour=>assert.equal(colour,hint.colour));
- assert((await page.locator('#controlPlan').locator('..').innerText()).includes('你認為此實驗需要對照組嗎？如需要，你會如何設計比較裝置？'));
- await page.locator('#controlPlan').locator('..').screenshot({path:'/tmp/vl1-control-hint.png'});
+ assert.equal(await page.locator('#controlPlan').getAttribute('type'),'hidden');
  const order=await page.evaluate(()=>({saved:state.optionOrder,actual:[...document.querySelectorAll('#assumptionChoices input')].map(el=>el.value),all: Object.fromEntries(Object.keys(conclusionAnswers).map(id=>[id,[...document.querySelector('#'+id).options].map(o=>o.value).filter(Boolean)]))}));
  assert.deepEqual(order.actual,order.saved.assumptions);assert.deepEqual(order.all,order.saved.conclusions);assert.deepEqual([...order.actual].sort(),['mixing','more','time','volume']);
  const samples=await page.evaluate(()=>[0,.3,.6,.999].map(value=>shuffledChoices(['time','volume','mixing','more'],()=>value)));
@@ -62,6 +59,6 @@ const assert=require('node:assert/strict');
  await page.evaluate(()=>document.body.classList.add('print-record'));await page.pdf({path:'/tmp/vl1-learning.pdf',format:'A4',printBackground:true});await page.evaluate(()=>document.body.classList.remove('print-record'));
  for(const width of [390,320]){await page.setViewportSize({width,height:844});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));const boxes=await page.locator('#conceptReveal .molecule-card img').evaluateAll(imgs=>imgs.map(img=>img.getBoundingClientRect().width));assert(boxes.every(width=>width>=145));}
  await page.locator('#conceptReveal').screenshot({path:'/tmp/vl1-learning-mobile.png'});
- assert.equal(errors.length,0,errors.join('\n'));console.log('PASS: small grey hints, revised control prompt, varied/stable option positions, saved order, value-based grading, gated diagrams, three separate fatty-acid molecules, centred arrow labels, desktop/mobile legibility and PDF diagrams.');
+ assert.equal(errors.length,0,errors.join('\n'));console.log('PASS: small grey hints, removed control task, varied/stable option positions, saved order, value-based grading, gated diagrams, three separate fatty-acid molecules, centred arrow labels, desktop/mobile legibility and PDF diagrams.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

@@ -149,3 +149,9 @@ html[lang="en-HK"] .reaction-step{word-break:keep-all}
 
 /* Keep the three product molecules separate and readable. */
 .chemical-flow .reaction-products{display:flex;flex-direction:column;align-items:stretch;gap:6px}.chemical-flow .reaction-products .molecule-card{width:100%;max-width:none}.chemical-flow .reaction-products .molecule-card>img{height:115px}.chemical-flow .reaction-products .fatty-acids>img{height:auto}.chemical-flow .product-plus{text-align:center;line-height:1}.reaction-step{justify-items:center}.reaction-step>strong,.reaction-step>span{display:block}
+/* Staged investigations: long bilingual results must wrap on small screens. */
+#sequenceInvestigation[hidden],#extensionInvestigation[hidden]{display:none!important}
+#sequenceInvestigation .report-table{width:100%;table-layout:fixed}
+#sequenceInvestigation td,#sequenceInvestigation th{overflow-wrap:anywhere}
+#sequenceAnalysis select,#qY{width:100%;max-width:100%;font:inherit}
+.extension-layout>*{min-width:0}
