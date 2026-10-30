@@ -123,7 +123,12 @@ def create(out,tmp):
    control_hint=vl.get_element_by_id('controlPlan').getprevious().text_content();p(control_hint if zh else tr(control_hint),small=True)
    if answers:p(t('可另設相同油水混合物加2 mL水作比較基準，與X或Y組比較；保持起始油水量、加液量、溫度、時間及搖勻方式相同。','Use an identical oil–water mixture with 2 mL water as a baseline, compared with X or Y; keep initial amounts, volume, temperature, time and shaking equal.'),answer=True)
    else:
-    for _ in range(2):p('________________________________________________________________').paragraph_format.line_spacing=Pt(26)
+    for _ in range(2):
+     para=p();para.paragraph_format.line_spacing=Pt(26);para.paragraph_format.space_after=Pt(0)
+     border=OxmlElement('w:pBdr')
+     for edge in ['bottom','between']:
+      rule=OxmlElement('w:'+edge);rule.set(qn('w:val'),'single');rule.set(qn('w:color'),'333333');rule.set(qn('w:sz'),'8');border.append(rule)
+     para._p.get_or_add_pPr().append(border)
    p(t('部分 2.1｜分析 X、Y 的個別作用','Part 2.1 | Analyse the individual actions of X and Y'),'Heading 2')
    p(t('以下為搖勻後一小時的模擬結果。','Model results one hour after shaking.'));pic('main',16)
    p(t('4. 消化液 X 有甚麼作用？','4. What does digestive juice X do?'),'Heading 2')

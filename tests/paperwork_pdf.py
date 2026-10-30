@@ -54,7 +54,7 @@ for lang in ['','_en']:
   if stem=='student':
    assert not any(p.text.startswith('☑') for p in doc.paragraphs)
    borders=[b for p in doc.paragraphs for b in p._p.xpath('./w:pPr/w:pBdr/w:bottom')]
-   assert len(borders)==5
+   assert len(borders)==7
    rules=[item for drawing in pdf[-1].get_drawings() for item in drawing['items'] if item[0]=='l' and abs(item[1].y-item[2].y)<1 and abs(item[1].x-item[2].x)>450]
    assert len(rules)>=5, 'Printed response lines must not merge into a single border'
    for b in borders:assert b.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}color')=='333333'
