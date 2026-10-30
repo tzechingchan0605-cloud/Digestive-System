@@ -20,7 +20,7 @@ for lang in ['','_en']:
   assert len([p for p in doc.paragraphs if re.match(r'^\d+\. ',p.text)])==8
   assert '主要外觀' not in text and 'Appearance of X after' not in text
   if not lang:
-   for approved in ['你認為此實驗需要對照組嗎？如需要，你會如何設計比較裝置？','消化液 X 使溶液變得（混濁 ／ 清澈）。','消化液 X 先把大油滴分散成小油滴，令總表面積 （增加 ／ 減少），有助消化液 Y 作用。','我們只觀察油層、混濁或清澈的外觀，沒有檢測消化產物。以下哪個說法最恰當？','A. 外觀可提供消化液作用的線索，但不能單獨證明已產生甘油和脂肪酸。','B. 只要混合物清澈，就已完全證明脂質分解成甘油和脂肪酸。','被煮沸後失去作用的消化液是（消化液 X ／ 消化液 Y）。']:
+   for approved in ['你認為此實驗需要對照組嗎？如需要，你會如何設計比較裝置？','消化液 X 最主要使脂質變成 （混濁乳狀液 ／ 清澈溶液）。','消化液 X 先把大油滴分散成小油滴，令總表面積 （增加 ／ 減少），有助消化液 Y 作用。','我們只觀察油層、混濁或清澈的外觀，沒有檢測消化產物。以下哪個說法最恰當？','A. 外觀可提供消化液作用的線索，但不能單獨證明已產生甘油和脂肪酸。','B. 只要混合物清澈，就已完全證明脂質分解成甘油和脂肪酸。','被煮沸後失去作用的消化液是（消化液 X ／ 消化液 Y）。']:
     assert approved in text, approved
   assert len(doc.inline_shapes)==6
   for row,correct in zip(doc.tables[0].rows[1:],[1,1,5]):

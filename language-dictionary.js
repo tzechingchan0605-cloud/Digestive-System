@@ -524,9 +524,6 @@
     {regex: /^(全班雲端與本機|這部瀏覽器)共有 (\d+) 份學生探究紀錄；同一電郵的多次探究會分開保存。(匯出時會重新讀取雲端最新資料。|尚未啟用跨裝置同步。)$/, replace: (_, source, count, ending) => `${source === '全班雲端與本機' ? 'Class cloud and local storage contain' : 'This browser contains'} ${count} student investigation record(s). Separate investigations using the same email are kept separately. ${ending.startsWith('匯出') ? 'Export reloads the latest cloud data.' : 'Sync across devices is not enabled.'}`}
   );
   Object.assign(texts, {
-"消化液 X 使溶液變得（": "Digestive juice X makes the mixture (",
-"混濁": "cloudy",
-"清澈": "clear",
 "各組在相同反應時間後觀察。；各組起始油量及水量相同，加入液體的總量也相同。；各組使用相同搖勻方式。":"Observe after equal time; use equal initial oil/water amounts and total added volume; shake all setups identically.",
 "可另設相同油水混合物加入2 mL水作比較基準，與X或Y比較，保持起始油水量、加液量、溫度、時間及搖勻方式相同。":"Use an identical oil\u2013water mixture with 2 mL water as a baseline for X or Y; keep initial amounts, added volume, temperature, time and shaking equal.",
 "油層變薄／消失": "Oil layer becomes thinner / disappears",
