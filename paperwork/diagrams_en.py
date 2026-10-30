@@ -32,7 +32,9 @@ def create(out):
  b+=f'<image x="34" y="40" width="64" height="145" xlink:href="{uri}"/>'+text(178,83,'Digestive',23,TEAL,'bold')+text(178,116,'system',23,TEAL,'bold')+arrow(263,107,330)
  b+=rect(360,31,208,65,'#eaf4e5')+text(464,71,'Digestive juice X',22,TEAL,'bold')+rect(360,119,208,65,'#fbecef')+text(464,160,'Digestive juice Y',22,RED,'bold')
  b+=f'<path d="M580 63 L622 107 M580 151 L622 107" stroke="{TEAL}" stroke-width="3" fill="none"/>'+arrow(623,107,668)+text(741,40,'Oil + water',23,TEAL,'bold')
- b+=f'<path d="M710 65 V153 Q710 174 738 174 Q766 174 766 153 V65" fill="#eaf3f3" stroke="{LINE}" stroke-width="3"/><path d="M712 84 H764 V102 H712Z" fill="{OIL}"/>'+text(825,102,'Add')+text(825,133,'and shake')+text(741,200,'Compare appearance',22,TEAL,'bold')
+ b+=f'<path d="M710 65 V153 Q710 174 738 174 Q766 174 766 153 V65" fill="#eaf3f3" stroke="{LINE}" stroke-width="3"/><path d="M712 84 H764 V102 H712Z" fill="{OIL}"/>'
+ b+='<path d="M760 93 H777 V77 H783 M760 136 H777 V119 H783" fill="none" stroke="#20383c" stroke-width="1.8"/>'+text(837,83,'Oil layer')+text(837,125,'Water layer')
+ b+=text(636,45,'Add')+text(637,178,'and shake')+text(741,200,'Compare appearance',22,TEAL,'bold')
  save('03_scenario',216,b)
  def tube(cx,y,appearance):
   x=cx-34;b=f'<path d="M{x} {y+31} H{x+68} V{y+99} Q{x+68} {y+122} {cx} {y+122} Q{x} {y+122} {x} {y+99}Z" fill="'+('#e7e3cd' if appearance=='cloudy' else '#edf5f5')+'"/>'
@@ -43,10 +45,10 @@ def create(out):
     for ix in range(4):b+=f'<circle cx="{x+11+ix*15}" cy="{y+42+iy*14}" r="2.4" fill="#a28d4a"/>'
   b+=f'<path d="M{x} {y+9} V{y+99} Q{x} {y+122} {cx} {y+122} Q{x+68} {y+122} {x+68} {y+99} V{y+9}" fill="none" stroke="{LINE}" stroke-width="4"/><path d="M{x} {y+31} H{x+68}" stroke="{LINE}" stroke-width="1.3"/>';return b
  b=''
- for i,(title,dose,kind,result,detail) in enumerate([('Water control','Add 2 mL water','separated','Two layers','Visible oil layer'),('X','Add 2 mL X','cloudy','Cloudy','An emulsion'),('Y','Add 2 mL Y','thin','Thinner oil layer','Still two layers'),('X + Y','1 mL each','clear','Clear','')]):
+ for i,(title,dose,kind,result,detail) in enumerate([('Water control','Add 2 mL water','separated','Two layers','Visible oil layer'),('X','Add 2 mL X','cloudy','Cloudy','An emulsion'),('Y','Add 2 mL Y','thin','Thinner oil layer','Still two layers'),('X + Y','1 mL each','clear','Oil layer disappears','')]):
   x=i*225;cx=x+112;b+=rect(x+5,5,215,300)+text(cx,40,title,24,TEAL,'bold')+text(cx,75,dose)+tube(cx,91,kind)+text(cx,254,result,22,RED,'bold')+text(cx,285,detail)
  save('04_basic_results',312,b)
  b=''
- for i,(title,sub,kind,result) in enumerate([('Unboiled X + Y','Neither juice boiled','clear','Clear'),('Boiled X + unboiled Y','X cooled to 37°C','clear','Clear'),('Unboiled X + boiled Y','Y cooled to 37°C','cloudy','Cloudy')]):
+ for i,(title,sub,kind,result) in enumerate([('Unboiled X + Y','Neither juice boiled','clear','Oil layer disappears'),('Boiled X + unboiled Y','X cooled to 37°C','clear','Oil layer disappears'),('Unboiled X + boiled Y','Y cooled to 37°C','cloudy','Cloudy')]):
   x=i*300;cx=x+150;b+=rect(x+5,5,290,300)+text(cx,39,title,22,TEAL,'bold')+text(cx,75,'1 mL each of X and Y')+text(cx,109,sub)+tube(cx,123,kind)+text(cx,286,result,24,RED,'bold')
  save('05_heating_results',312,b)

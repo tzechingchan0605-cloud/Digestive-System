@@ -76,7 +76,7 @@ def prepare():
         text = paragraph.text
         if text.startswith('□ ') and not text.startswith('□ X＋Y'):
             replace_text(paragraph, text.replace('□','☑',1), True)
-        elif text.startswith('消化液 X 最主要使脂質變成'):
+        elif text.startswith('加入消化液 X 後，主要觀察到'):
             highlight(paragraph,'混濁乳狀液')
         elif text.startswith('消化液 X 先把大油滴'):
             highlight(paragraph,'增加')

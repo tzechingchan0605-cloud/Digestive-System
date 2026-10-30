@@ -20,6 +20,7 @@ source=text(student);key=text(answers)
 assert '紅色粗體為重點詞彙' not in source+key and '本工作紙毋須操作虛擬實驗室' not in source+key
 questions=[p.text for p in student.paragraphs if re.match(r'^\d+\. ',p.text)]
 assert len(questions)==8
+assert '清澈' not in source+key and '油層消失' in source
 assert all(q in key for q in questions)
 # The actual source and the answer copy use precisely the same choice lists.
 for sr,ar in zip(student.tables[0].rows,answers.tables[0].rows):assert [c.text for c in sr.cells]==[c.text for c in ar.cells]
@@ -97,6 +98,7 @@ for stem in ['student','answers']:
    for cell in row.cells:all_paragraphs.extend(cell.paragraphs)
  en_text='\n'.join(p.text for p in all_paragraphs)
  assert 'Red bold terms' not in en_text and 'You do not need to operate' not in en_text
+ assert 'clear solution' not in en_text and 'oil layer disappears' in en_text
  assert not re.search(r'[\u3400-\u9fff]',en_text), 'Untranslated Chinese in English worksheet'
  assert 'Part 3 | Integrated explanation' in en_text and '8. Using the experimental results and topic notes' in en_text
  assert len(en.inline_shapes)==5
@@ -115,7 +117,7 @@ for stem in ['student','answers']:
  area=next(p for p in en.paragraphs if p.text.startswith('X disperses'))
  assert red(area)==['small droplets','total surface area']
  if stem=='student':
-  for label in ['A. Appearance','B. A clear']:
+  for label in ['A. Appearance','B. Disappearance']:
    assert red(next(p for p in en.paragraphs if p.text.startswith(label)))==['glycerol','fatty acids']
  en_pdf=fitz.open(out/f'WS1_{stem}_en.pdf');assert len(en_pdf)==4
  red_spans=[s for b in en_pdf[0].get_text('dict')['blocks'] if 'lines' in b for l in b['lines'] for s in l['spans'] if s['color']==0xB7312C]
@@ -135,3 +137,7 @@ assert 'Teacher guide, mapping and marking' in en_guide_text and 'Integrated exp
 assert not re.search(r'[\u3400-\u9fff]',en_guide_text)
 print('PASS: English PDF/Word versions have English text and diagram labels, translated answer markings, 4-page worksheets and one-line identity fields.')
 print('PASS: English student and answer PDFs/Word retain red bold conceptual keywords and distinct blue answer marks.')
+
+# The first oil-water figure has readable leader-line layer labels in both languages.
+for file,labels in [("paperwork/figures/03_scenario_zh.svg",["油層","水層"]),("paperwork/diagrams_en.py",["Oil layer","Water layer"])]:
+ assert all(label in (root/file).read_text() for label in labels)

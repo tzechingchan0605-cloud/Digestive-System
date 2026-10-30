@@ -26,14 +26,14 @@ function assumptionsForRecord(r) {return r.uiVersion===3?assumptions:previousAss
 function assumptionText(id) {return previousAssumptions.find(a=>a[0]===id)?.[1]||id;}
 const CONTROL_REFERENCE = '以油水＋2 mL 水作對照，與油水＋2 mL X、油水＋2 mL Y、油水＋各 1 mL X 和 Y 比較。保持起始油水量、加液總量、反應溫度、反應時間及搖勻方式相同。';
 const DESIGN_REFERENCE = '四個標示清楚的基本裝置，分別是對照、X、Y、X＋Y；熱處理另比較煮沸 X 或 Y 後冷卻至 37°C 的組合，每次只改變一項因素。';
-const LIMIT_REFERENCE = '油層、混濁或清澈只提供外觀線索，不能單獨證明產生甘油和脂肪酸；需其他化學檢測。此模擬使用預設教學結果，沒有量度反應速度。';
+const LIMIT_REFERENCE = '油層是否存在及混濁程度只提供外觀線索，不能單獨證明產生甘油和脂肪酸；需其他化學檢測。此模擬使用預設教學結果，沒有量度反應速度。';
 const experiments = {
   'none-none':['separated','油水分層（沒有明顯可觀察變化）'],
   'X-none':['cloudy','變得混濁'], 'Y-none':['thin-oil','油水分層（油層變薄）'],
-  'XY-none':['clear','變得清澈'], 'XY-X':['clear','變得清澈'], 'XY-Y':['cloudy','變得混濁']
+  'XY-none':['clear','油層消失'], 'XY-X':['clear','油層消失'], 'XY-Y':['cloudy','變得混濁']
 };
 const trialKeys = Object.keys(experiments);
-const outcomeLabels = {cloudy:'變得混濁',clear:'變得清澈',separated:'油水分層（沒有明顯變化）','thin-oil':'油水分層（油層變薄）'};
+const outcomeLabels = {cloudy:'變得混濁',clear:'油層消失',separated:'油水分層（沒有明顯變化）','thin-oil':'油水分層（油層變薄）'};
 const questionLabels = {q1:'結論 1｜X 組的主要外觀',q3:'結論 2｜小油滴的總表面積',limitations:'結論 3｜本實驗的證據界限',q2:'延伸結論｜煮沸後失去作用的消化液'};
 const conclusionAnswers = {q1:'cloudy',q3:'increase',limitations:'indirect',q2:'Y'};
 const previousConclusionAnswers = {...conclusionAnswers,comparison:'combined',heatComparison:'yaffected'};
@@ -284,7 +284,7 @@ function renderPrint(r) {
   <section class="report-stage page-break"><h2>03 六組觀察</h2><div class="report-card">${table}<p>${LIMIT_REFERENCE}</p></div></section>
   <section class="report-stage"><h2>04 分析與結論</h2><div class="report-card">${Object.keys(conclusionAnswers).map(id=>reportAnswer(questionLabels[id],answerText(id,answers[id]),answerText(id,conclusionAnswers[id]),answers[id]?answers[id]===conclusionAnswers[id]:null)).join('')}</div>
   ${r.submitted||r.schemaVersion!==2?`<div class="concept-summary"><h3>學習重點</h3>${canonicalHTML($('#conceptReveal .learning-points'))}${canonicalHTML($('#conceptReveal .learning-diagrams'))}<p>${LIMIT_REFERENCE}</p></div>`:'<p>此份紀錄尚未遞交探究，學習重點尚未開放。</p>'}
-  <div class="reflection-summary">${open('實際學習反思',r.phase4?.reflection,r.phase4?.reflectionQuestionId==='integrated-concept-explanation'?'膽汁不含消化酶，透過物理消化把大油滴乳化成小油滴，脂質分子沒有改變。小油滴使同量脂質的總表面積增加，讓脂肪酶接觸更多脂質。胰液中的脂肪酶催化脂質的化學消化，按本課完全水解簡化模型，將脂質分解為甘油與脂肪酸。脂肪酶是蛋白質，煮沸使其變性，失去催化功能，冷卻後也不能恢復原來的作用；本模型中的膽汁則在煮沸後仍保留乳化作用。':r.phase4?.reflectionQuestionId==='integrated-explanation-evidence'?'膽汁不含消化酶，透過物理消化把大油滴乳化成小油滴，脂質分子不變；總表面積增加，讓脂肪酶接觸更多脂質。胰液中的脂肪酶催化化學消化，按本課簡化模型產生甘油與脂肪酸。本模型煮沸 X 後仍保留乳化作用；煮沸 Y 則使蛋白質脂肪酶變性失活，冷卻後也不恢復。X 組比水組混濁，符合乳化作用；未煮沸 X＋Y 組清澈，而煮沸 Y 組混濁，支持高溫影響酶作用的解釋。外觀只是線索，不能單獨證明消化產物已形成。':r.phase4?.reflectionQuestionId==='enzyme-denaturation'?'胰液中的脂肪酶是蛋白質；煮沸使其變性，失去催化功能，冷卻後也不恢復原來的作用。':'判斷原始假說是否獲支持；引用具體組別比較，運用乳化、表面積、脂肪酶及變性概念修訂解釋。')}<p>反思狀態：${reflectionComplete(r)?'已提交':r.schemaVersion===2?'未提交':'未提供（舊版未記錄）'}</p></div></section><footer class="report-footer">探究實驗室 · 原始答案與參考說明 · 答案及回饋 · 請另存此份 PDF</footer>`;
+  <div class="reflection-summary">${open('實際學習反思',r.phase4?.reflection,r.phase4?.reflectionQuestionId==='integrated-concept-explanation'?'膽汁不含消化酶，透過物理消化把大油滴乳化成小油滴，脂質分子沒有改變。小油滴使同量脂質的總表面積增加，讓脂肪酶接觸更多脂質。胰液中的脂肪酶催化脂質的化學消化，按本課完全水解簡化模型，將脂質分解為甘油與脂肪酸。脂肪酶是蛋白質，煮沸使其變性，失去催化功能，冷卻後也不能恢復原來的作用；本模型中的膽汁則在煮沸後仍保留乳化作用。':r.phase4?.reflectionQuestionId==='integrated-explanation-evidence'?'膽汁不含消化酶，透過物理消化把大油滴乳化成小油滴，脂質分子不變；總表面積增加，讓脂肪酶接觸更多脂質。胰液中的脂肪酶催化化學消化，按本課簡化模型產生甘油與脂肪酸。本模型煮沸 X 後仍保留乳化作用；煮沸 Y 則使蛋白質脂肪酶變性失活，冷卻後也不恢復。X 組比水組混濁，符合乳化作用；未煮沸 X＋Y 組油層消失，而煮沸 Y 組混濁，支持高溫影響酶作用的解釋。外觀只是線索，不能單獨證明消化產物已形成。':r.phase4?.reflectionQuestionId==='enzyme-denaturation'?'胰液中的脂肪酶是蛋白質；煮沸使其變性，失去催化功能，冷卻後也不恢復原來的作用。':'判斷原始假說是否獲支持；引用具體組別比較，運用乳化、表面積、脂肪酶及變性概念修訂解釋。')}<p>反思狀態：${reflectionComplete(r)?'已提交':r.schemaVersion===2?'未提交':'未提供（舊版未記錄）'}</p></div></section><footer class="report-footer">探究實驗室 · 原始答案與參考說明 · 答案及回饋 · 請另存此份 PDF</footer>`;
   window.VL1Language?.refresh($('#printReport'));
 }
 function reportFilename(r) {const safe=v=>String(v||'未提供').replace(/[\\/:*?"<>|\u0000-\u001f]/g,'_').trim().replace(/[. ]+$/g,'')||'未提供';return `VL1_${safe(r.profile?.classInfo)}_${safe(r.profile?.name)}`;}
