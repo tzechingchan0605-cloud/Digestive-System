@@ -33,9 +33,7 @@ jobs:
       - name: Verify version-aware Excel formulas
         run: |
           export CHROMIUM_PATH="$(node -e 'process.stdout.write(require("playwright").chromium.executablePath())')"
-          node tests/smoke.cjs http://127.0.0.1:8000
-          node tests/scoring_versions.cjs http://127.0.0.1:8000
-          python tests/excel_scores.py
+          python .github/scripts/check_scores.py
       - name: Regenerate reviewed Word and PDF worksheets
         run: npm run paper:build
       - name: Verify regenerated PDF contents

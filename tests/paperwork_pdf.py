@@ -79,3 +79,10 @@ vl=html.fromstring((root/'index.html').read_text())
 assert vl.xpath('//*[@id="reflectionReveal"]//p')[1].text_content()==rules['question']
 assert '請引用實驗觀察' not in rules['question'] and '一項限制' not in rules['worksheetQuestion']
 assert '不另要求引用組別觀察、外觀限制' in re.sub(r'\s+','',text)
+
+# Identity fields must remain on one printed line in both downloadable versions.
+for name in ['WS1_student.pdf','WS1_answers.pdf']:
+ pdf=fitz.open(out/name)
+ lines=[''.join(span['text'] for span in line['spans']) for block in pdf[0].get_text('dict')['blocks'] if 'lines' in block for line in block['lines']]
+ assert any(all(label in line for label in ['姓名：','班別：','學號：']) for line in lines), (name,'identity fields wrapped')
+print('PASS: name, class and student number print on the same line in both versions.')
