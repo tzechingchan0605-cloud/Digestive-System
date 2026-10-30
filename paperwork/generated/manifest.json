@@ -27,7 +27,7 @@
           "name": "WS1_student.pdf",
           "mime": "application/pdf",
           "bytes": 855921,
-          "sha256": "135647af20072be266d5a86d383231d5d2bcd7eb2ba96d9c32a2fe6313ac5555",
+          "sha256": "d1ef1f963dce94584b1733238d19c6fe041cc4f914a6b9dfafd25a1f4004f073",
           "pages": 4
         },
         {
@@ -36,7 +36,7 @@
           "name": "WS1_student.docx",
           "mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
           "bytes": 709274,
-          "sha256": "7fd09e6aa040c8d2ff4006be3a2250a5643babe06e627c3a058a7a3d92b02927",
+          "sha256": "b68c95999ac20682d1f6ee506180112dd5c02de6285d149f10e9cfafc0634159",
           "pages": 4
         },
         {
@@ -45,7 +45,7 @@
           "name": "WS1_answers.pdf",
           "mime": "application/pdf",
           "bytes": 892521,
-          "sha256": "0de842d6607b8baa330935bad4a76c3da7ec2a5f834830f11f9bf91ee67d0f66",
+          "sha256": "45b94c1545245c269518aed1b6fcd1bbbd95f8b69307c2e9b073c495dd7ba4b3",
           "pages": 4
         },
         {
@@ -54,7 +54,7 @@
           "name": "WS1_answers.docx",
           "mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
           "bytes": 709534,
-          "sha256": "874fb211f66ada50f6c9e25c3320dcb923647566127635fb9c93f3548f8c06e1",
+          "sha256": "229e55931387e3846c0affa99e1ef195e6c30c8fdb91cfb7784d2f3b8f2c9859",
           "pages": 4
         },
         {
@@ -63,7 +63,7 @@
           "name": "WS1_D_teacher_guide.pdf",
           "mime": "application/pdf",
           "bytes": 216611,
-          "sha256": "5a756da982b4b849d669e56d6f30c487083e6639bec2b75ab66106dfda9a3b65",
+          "sha256": "abdf02956d5233b59f946983d58214052616baeacc4caee6bfba6ebf1e3ffb04",
           "pages": 4
         }
       ]
@@ -76,7 +76,7 @@
           "name": "WS1_student_en.pdf",
           "mime": "application/pdf",
           "bytes": 744442,
-          "sha256": "7d604e307c2909257c3637c5a99efaf9761f30dba7bb4afb20c9d20e37460e3f",
+          "sha256": "34809420b77e0786cf7395fc1213b7931604b00b4d959244036c7b735797f1e8",
           "pages": 4
         },
         {
@@ -85,7 +85,7 @@
           "name": "WS1_student_en.docx",
           "mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
           "bytes": 715937,
-          "sha256": "6526cdc05371d51b42d1f8b3bcff83ad9d9853361364e11cfbbd1fb157e81e60",
+          "sha256": "1dbb87a535366419defdf30d839d37c30dc67b3afd042f447a15bfa5c7743d20",
           "pages": 4
         },
         {
@@ -94,7 +94,7 @@
           "name": "WS1_answers_en.pdf",
           "mime": "application/pdf",
           "bytes": 752891,
-          "sha256": "14952cfb3c6c05fe2e0ef2a8ebd2b5faef1d12df6e278c9b52fa3b5e1172af72",
+          "sha256": "811dde55eeb7acc64d54017862a10599e3669f590dcc565e7ae9f8e8d5df7e4f",
           "pages": 4
         },
         {
@@ -103,7 +103,7 @@
           "name": "WS1_answers_en.docx",
           "mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
           "bytes": 716127,
-          "sha256": "cc049d505c81df08b3a0c7868e95beabe5e3fd01bfc50f9cde653165ef943443",
+          "sha256": "798aa8dc298a01af8af0a55f06e3591f5a58341307a03c627407467ef75e902e",
           "pages": 4
         },
         {
@@ -112,7 +112,7 @@
           "name": "WS1_D_teacher_guide_en.pdf",
           "mime": "application/pdf",
           "bytes": 54201,
-          "sha256": "921f75dd660e2f7b052273c97db10ecbbfd273920222f5e7eb79ae4570cfeeb9",
+          "sha256": "89a265759ab9453b44cedfb3f2ed154c9a9d896716954d885000ba9931078020",
           "pages": 3
         }
       ]
