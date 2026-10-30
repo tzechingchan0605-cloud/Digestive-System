@@ -140,5 +140,6 @@
     "Lipase is a protein.",
     "Boiling denatures lipase and stops catalysis.",
     "Bile retains emulsifying action after boiling in this model."
-  ]
+  ],
+  "worksheetDesignVersion": "deductive-1"
 }

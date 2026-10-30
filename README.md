@@ -40,7 +40,7 @@ Excel 包含七張工作表：學生探究答案、六組觀察紀錄、教師�
 
 教師儀表板「下載工作紙與參考答案」提供教師最新核訂的中英文完整工作紙，教材區只設五個下載項目，按目前介面語言選取對應檔案：學生版 PDF、學生版 Word、連參考答案 PDF、連參考答案 Word，以及 D · 教師指引、配對及評分 PDF。兩份 PDF 均為四頁，包含八題及六幅清晰圖示；最後「整合解釋」與 VL 新學習反思使用同一概念任務（題幹分別指「課題需知」及「學習重點」）。答案版保留題目，以藍色標示選項及開放題參考答案。
 
-新版由 `paperwork/staged.py` 產生，中英文均四頁。X／Y身分及概念圖在最後學習重點，題目選項與VL同步；詳見[材料說明](paperwork/README.md)。執行 `npm run paper:build` 及 `npm run paper:check`。原核訂Word保留為歷史參考。
+新版由 `paperwork/staged.py` 產生，中英文均四頁。WS的X／Y身分及概念圖在第1頁課題需知，以演繹式流程先學概念再應用；VL仍在最後學習重點揭示。題目選項與VL同步；詳見[材料說明](paperwork/README.md)。執行 `npm run paper:build` 及 `npm run paper:check`。原核訂Word保留為歷史參考。
 
 ## 重要限制與舊版相容
 

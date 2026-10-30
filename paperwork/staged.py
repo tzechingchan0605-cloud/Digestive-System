@@ -1,5 +1,6 @@
 """Four-page bilingual worksheets and teacher guide for staged-1.
-Question choices and hints are read from the live VL source, not copied by hand.
+Question choices and hints match the VL. The paper condition is deductive:
+concepts first, followed by application to the three experiments.
 """
 from pathlib import Path
 import re,json,subprocess,ast
@@ -89,7 +90,7 @@ def create(out,tmp):
     for opt in select.xpath('./option[@value!=""]'):
      val=opt.get('value');correct=val=={'q1':'cloudy','qY':'thin-oil','q3':'increase','limitations':'indirect','q2':'Y'}[id]
      p(('☑ ' if answers and correct else '□ ')+tr(opt.text_content()),answer=answers and correct)
-   title(t('工作紙一：未知消化液 X 與 Y','Worksheet 1: Unknown Digestive Juices X and Y'),True)
+   title(t('工作紙一：脂質消化的概念與應用','Worksheet 1: Lipid Digestion — Concepts and Applications'),True)
    p(t('姓名：________________　班別：________　學號：________','Name: ________________    Class: ________    No.: ________'))
    p(t('情境：脂質需要消化，才能被吸收。加入消化液 X 或消化液 Y 後會怎樣？','Context: lipids need digestion before absorption. What happens after adding digestive juice X or Y?'))
    pic('scenario',16);p(t('部分 1｜主探究設計：比較 X 與 Y','Part 1 | Main investigation design: compare X and Y'),'Heading 2')
@@ -120,7 +121,7 @@ def create(out,tmp):
    pic('heat',16);choice('q2',7)
    title(t('學習重點｜課題需知','Learning points | Topic notes'))
    for z,e in [
-    ('X 是膽汁，不含消化酶。它透過物理消化把大油滴乳化成小油滴，脂質分子不變；同量脂質的總表面積增加，有助脂肪酶接觸脂質。','X is bile, containing no digestive enzymes. It physically emulsifies large oil droplets into smaller droplets without changing lipid molecules. The greater total surface area helps lipase contact lipids.'),
+    ('X 是膽汁，由肝臟製造並儲存於膽囊，不含消化酶。它透過物理消化把大油滴乳化成小油滴，脂質分子不變；同量脂質的總表面積增加，有助脂肪酶接觸脂質。','X is bile, made in the liver and stored in the gall bladder, containing no digestive enzymes. It physically emulsifies large oil droplets into smaller droplets without changing lipid molecules. The greater total surface area helps lipase contact lipids.'),
     ('Y 是胰液，含有脂肪酶。脂肪酶催化化學消化，按本課完全水解簡化模型，把脂質分解為甘油和脂肪酸。脂肪酶是蛋白質；煮沸使其變性失去功能，冷卻後不恢復。本模型中，煮沸膽汁仍保留乳化作用。','Y is pancreatic juice containing lipase. Lipase catalyses chemical digestion, forming glycerol and fatty acids in this course’s simplified complete-hydrolysis model. Lipase is a protein: boiling denatures it and stops its action, which cooling does not restore. Bile retains emulsifying action after boiling in this model.')]:
     para=p();whole=t(z,e);terms='膽汁|胰液|脂肪酶|乳化|物理消化|總表面積|化學消化|甘油|脂肪酸|蛋白質|變性' if zh else r'\bbile\b|pancreatic juice|lipase|emulsifies|physical|total surface area|chemical digestion|glycerol|fatty acids|protein|denatures'
     for part in re.split('('+terms+')',whole,flags=re.I):
@@ -133,7 +134,27 @@ def create(out,tmp):
    else:
     for _ in range(5):
      para=p();para.paragraph_format.line_spacing=Pt(26);para.paragraph_format.space_after=Pt(0);pr=para._p.get_or_add_pPr();border=OxmlElement('w:pBdr');b=OxmlElement('w:bottom');b.set(qn('w:val'),'single');b.set(qn('w:color'),'333333');b.set(qn('w:sz'),'8');border.append(b);between=OxmlElement('w:between');between.set(qn('w:val'),'single');between.set(qn('w:color'),'333333');between.set(qn('w:sz'),'8');border.append(between);pr.append(border)
-   d.core_properties.title=t('工作紙一：未知消化液','Worksheet 1: Unknown Juices')+(' — Answers' if answers else '')
+   # Paper condition: move the complete concept block before the scenarios.
+   # Keep the same eight tasks and all experimental conditions as the VL.
+   ps=list(d.paragraphs)
+   start=next(i for i,para in enumerate(ps) if para.text==t('學習重點｜課題需知','Learning points | Topic notes'))
+   end=next(i for i in range(start+1,len(ps)) if ps[i].text==t('整合解釋','Integrated explanation'))
+   notes=ps[start:end]
+   notes[0].text=t('課題需知','Topic notes');notes[0].paragraph_format.page_break_before=False
+   anchor=ps[1]._p
+   for para in notes:
+    node=para._p;node.getparent().remove(node);anchor.addnext(node);anchor=node
+   intro=p(t('請先閱讀「課題需知」，再運用概念分析各組結果。','Read the topic notes first, then apply the concepts to analyse the results.'))
+   intro._p.getparent().remove(intro._p);ps[1]._p.addnext(intro._p)
+   context=next(para for para in d.paragraphs if para.text.startswith(t('情境：','Context:')))
+   context.paragraph_format.page_break_before=True
+   for para in d.paragraphs:
+    if para.text==t('部分 1｜主探究結果及分析','Part 1 | Main results and analysis'):
+     para.text=t('部分 1｜運用概念分析 X、Y 的個別作用','Part 1 | Apply concepts to the individual actions of X and Y')
+    elif para.text==t('下一步：X 形成乳狀液，會如何影響其後 Y 的作用？','Next: how might the emulsion formed by X affect the later action of Y?'):
+     para.text=t('運用乳化與表面積概念，分析 X 如何幫助 Y。','Apply emulsification and surface-area concepts to analyse how X helps Y.')
+   d.core_properties.title=t('工作紙一：脂質消化的概念與應用','Worksheet 1: Lipid Digestion — Concepts and Applications')+(' — Answers' if answers else '')
+   d.core_properties.subject='deductive-1 | staged-1 experimental data'
    d.save(out/f'WS1_{"answers" if answers else "student"}{suffix}.docx')
   teacher(out,tmp,lang)
 
@@ -143,7 +164,7 @@ def teacher(out,tmp,lang):
  d.styles['Normal'].font.name='Noto Sans CJK TC' if zh else 'Arial';d.styles['Normal'].font.size=Pt(12);d.styles['Normal'].paragraph_format.line_spacing=1.4
  d.add_heading(t('D · 教師指引、配對及評分','D · Teacher guide, mapping and marking'),0)
  blocks=[
- ('派發與時間','Distribution and timing','三部分探究，X、Y 身分只在最後學習重點揭示。紙本組不操作VL，依同一順序閱讀及自學，不先教答案；保存首次答案後才用答案版核對。動畫的一小時為模擬時間。兩組採相同活動總時間，先以 20–25 分鐘試教，再判斷能否完成於 15–20 分鐘。','Use the same three-part order; reveal X/Y identities only in the final learning points. The paper group learns from supplied materials without operating the VL. Save first responses before checking the answer copy. One hour is simulated, not classroom waiting time. Use equal total time for both groups; pilot 20–25 minutes before claiming 15–20 is sufficient.'),
+ ('派發與時間','Distribution and timing','VL 採三部分探究，最後才揭示 X、Y 身分；紙本組採演繹式自學：先讀課題需知，已知 X 是膽汁、Y 是胰液，再運用乳化、酶作用及變性概念分析相同三部分結果。紙本組不操作VL，不另派預先填好的答案；保存首次答案後才用答案版核對。動畫的一小時為模擬時間。兩組採相同活動總時間，先以 20–25 分鐘試教，再判斷能否完成於 15–20 分鐘。','The VL reveals X/Y identities only after the investigations. The paper group follows a deductive sequence: read the topic notes identifying X as bile and Y as pancreatic juice, then apply emulsification, enzyme and denaturation concepts to the same three experiments without operating the VL. Do not distribute the filled answer key beforehand. Save first responses before checking the answer copy. One hour is simulated, not classroom waiting time. Use equal total time for both groups; pilot 20–25 minutes before claiming 15–20 is sufficient.'),
  ('實驗及科學解釋','Experiments and science','主探究只設 X 2 mL、Y 2 mL 兩組。延伸一重新用兩支油水試管，先加 1 mL X／水並同樣搖勻，再各加 1 mL Y，同樣預處理時間。延伸二沿用未煮沸順序作基準，每次只煮沸一種並冷卻至相同溫度；一小時由加 Y 後起計。','Main: 2 mL X versus 2 mL Y. Extension 1: two fresh tubes; pretreat with 1 mL X/water and identical shaking, then 1 mL Y each. Equal pretreatment times. Extension 2 uses the same unboiled sequence as baseline, boiling only one juice and cooling to the same temperature. Count one hour after Y addition.'),
  ('觀察界限','Evidence limits','X 是膽汁；Y 是含脂肪酶的胰液。乳化不改變脂質分子。混濁減低／油層消失只是預設模型外觀，不單獨證明產物形成或量得速率；機制由最後分子模型解釋。甘油及脂肪酸採完全水解簡化模型。','X is bile; Y is pancreatic juice containing lipase. Emulsification leaves lipid molecules unchanged. Reduced cloudiness / loss of an oil layer are preset appearances, not product tests or measured rates. Explain mechanisms with the final molecular model; glycerol/fatty acids follow the simplified complete-hydrolysis model.'),
  ('新版配分與舊紀錄','Current marks and legacy records','staged-1：SPS 23（觀察4、分類4、設計3、實作4、推論4、溝通4）＋整合8＝31；WS 18。原對照組設計題已移除，欄位不適用；不為維持滿分另加題。新五項推論各0.8。舊 uiVersion 3／更早紀錄仍用當時組別、六題／四題及原總分32／28，不用新規準重評。','staged-1: SPS 23 (4 observation, 4 classification, 3 planning, 4 conducting, 4 inference, 4 communication) + reflection 8 = 31. WS 18. Removed control-design field is not applicable, not mandatory. Five inference items earn 0.8 each. Preserve original trial sets, four/six-item inference and totals 32/28 for legacy records.'),
