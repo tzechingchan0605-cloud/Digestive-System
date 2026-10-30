@@ -15,6 +15,7 @@ const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
   assert.equal(await page.locator('#openPaperwork').isVisible(),false);
   assert.equal(await page.evaluate(()=>VL1Paperwork.open()),false);
   assert.equal(await page.evaluate(()=>VL1Paperwork.download('answers-word')),false);
+  assert.equal(await page.evaluate(()=>VL1Paperwork.preview('student-pdf')),false);
   await page.evaluate(()=>localStorage.setItem('digestiveLab.localRecords.v1',JSON.stringify([{schemaVersion:2,uiVersion:3,moduleId:'VL_BIO_DIGESTION_OPTION_A',id:'saved-student',profile:{name:'保留原文',classInfo:'X1',email:'paper-test@example.com'},phase2:{hypothesis:{liquid:'X',outcome:'clear',reason:'原始理由'},setup:{description:'原始裝置'}},phase3:{trials:[]},phase4:{conclusions:{},reflection:'學生原文'},durationSeconds:30}])));
   await page.fill('#profileName','Teacher');await page.fill('#profileClass','X1');await page.fill('#profileEmail','tzechingchan0605@gmail.com');await page.click('#profileForm button');await page.waitForSelector('#teacherDialog[open]');
   const snapshot=()=>page.evaluate(()=>({storage:{...localStorage},id:state.id,events:state.events,phase:state.phase,phaseDurations:state.phaseDurations,profile:state.profile,form:readForms(),variables:state.variableChoices,records:state.records}));
@@ -25,9 +26,10 @@ const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
   const manifest=JSON.parse(fs.readFileSync('paperwork/generated/manifest.json','utf8'));
   assert.deepEqual(await page.locator('[data-paper-download]').evaluateAll(bs=>bs.map(b=>b.dataset.paperDownload)),manifest.languages.zh.files.map(f=>f.id));
   assert.equal(await page.locator('#paperPanel .paper-row').count(),5);
-  assert.equal(await page.locator('#paperLanguage,[data-paper-preview]').count(),0);
+  assert.equal(await page.locator('#paperLanguage').count(),0);
+  assert.equal(await page.locator('[data-paper-preview]').count(),3);
   for(const lang of ['zh','en']){
-   if(await page.evaluate(()=>VL1Language.current)!==lang)await page.click('#teacherLanguageSwitch');
+   if(await page.evaluate(()=>VL1Language.current)!==lang){await page.click('#teacherLanguageSwitch');assert.equal(await page.locator('#paperPreview').isVisible(),false);}
   for(const file of manifest.languages[lang].files){
    await page.waitForTimeout(1100);
    const wait=page.waitForEvent('download',{timeout:10000});await page.click(`[data-paper-download="${file.id}"]`);const dl=await wait;
@@ -35,6 +37,17 @@ const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
    const bytes=fs.readFileSync('/tmp/'+file.name);assert.equal(sha(bytes),file.sha256);assert.equal(bytes.length,file.bytes);
    assert(file.name.endsWith('.pdf')?bytes.subarray(0,5).toString()==='%PDF-':bytes[0]===0x50&&bytes[1]===0x4b);
   }
+   for(const file of manifest.languages[lang].files.filter(f=>f.mime==='application/pdf')){
+    await page.click(`[data-paper-preview="${file.id}"]`);
+    await page.waitForFunction(()=>document.querySelector('#paperPreview').src.startsWith('blob:'));
+    assert(await page.locator('#paperPreview').isVisible());
+    assert.equal(await page.locator('#paperPreview').getAttribute('data-language'),lang);
+    const actual=await page.evaluate(async()=>{
+     const bytes=await(await fetch(document.querySelector('#paperPreview').src)).arrayBuffer();
+     return [...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(x=>x.toString(16).padStart(2,'0')).join('');
+    });
+    assert.equal(actual,file.sha256,'Preview must show the selected language and material');
+   }
   }
   assert.deepEqual(await snapshot(),before);
   assert.deepEqual(await excel('ws-excel-after.xlsx'),excelBefore);
@@ -56,12 +69,22 @@ const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
    await page.route('**/'+file.path,r=>r.fulfill({contentType:file.mime,body:'broken file'}));
    assert.equal(await page.evaluate(id=>VL1Paperwork.download(id),file.id),false);
    assert.match(await page.locator('#paperStatus').innerText(),/Download failed/);
+   if(file.mime==='application/pdf'){assert.equal(await page.evaluate(id=>VL1Paperwork.preview(id),file.id),false);assert.equal(await page.locator('#paperPreview').isVisible(),false);}
    await page.unroute('**/'+file.path);
    await page.route('**/'+file.path,r=>r.fulfill({status:404,body:'missing'}));
    assert.equal(await page.evaluate(id=>VL1Paperwork.download(id),file.id),false);
    await page.unroute('**/'+file.path);
   }
   assert.equal(await page.evaluate(()=>VL1Paperwork.download('A')),false);
+  assert.equal(await page.evaluate(()=>VL1Paperwork.preview('student-word')),false);
+  // A language switch cancels an in-flight preview rather than showing old-language content.
+  let release,arrived;const gate=new Promise(resolve=>release=resolve),seen=new Promise(resolve=>arrived=resolve);
+  const delayed='**/'+manifest.languages.en.files[0].path;
+  await page.route(delayed,async r=>{arrived();await gate;await r.continue();});
+  const pending=page.evaluate(()=>VL1Paperwork.preview('student-pdf'));
+  await seen;await page.click('#teacherLanguageSwitch');release();
+  assert.equal(await pending,false);assert.equal(await page.locator('#paperPreview').isVisible(),false);
+  await page.unroute(delayed);await page.click('#teacherLanguageSwitch');
   for(const width of [390,320]){
    await page.setViewportSize({width,height:844});
    assert(await page.locator('.teacher-panel').evaluate(el=>el.scrollWidth<=el.clientWidth+1));
@@ -73,6 +96,6 @@ const sha=b=>crypto.createHash('sha256').update(b).digest('hex');
   const wait=page.waitForEvent('download');await page.click('[data-paper-download="answers-word"]');await wait;
   assert.deepEqual(await snapshot(),demoBefore);
   assert.equal(errors.length,0,errors.join('\n'));
-  console.log('PASS: five downloads in each language (10 genuine files), correct bytes/names, bilingual UI, teacher guard, corrupt/missing-file rejection, mobile layout, and unchanged records/demo/Excel.');
+  console.log('PASS: five downloads in each language (10 genuine files), correct bytes/names, six language-correct PDF previews, cancellation on language switch, bilingual UI, teacher guard, corrupt/missing-file rejection, mobile layout, and unchanged records/demo/Excel.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

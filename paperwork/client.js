@@ -8,16 +8,17 @@
     'answers-word':['WS1_answers.docx','application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
     'teacher-guide':['WS1_D_teacher_guide.pdf','application/pdf']
   };
-  let manifest=null,request=0;
+  let manifest=null,request=0,previewURL=null,previewRequest=0;
   const byId=id=>document.getElementById(id);
   const authorised=()=>isTeacher();
-  const buttons=()=>byId('paperPanel').querySelectorAll('[data-paper-download]');
+  const buttons=()=>byId('paperPanel').querySelectorAll('[data-paper-download],[data-paper-preview]');
   const digest=async bytes=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(b=>b.toString(16).padStart(2,'0')).join('');
   const status=text=>{byId('paperStatus').textContent=text;window.VL1Language?.refresh(byId('paperStatus'));};
-  function close(){request++;manifest=null;byId('paperPanel').hidden=true;buttons().forEach(b=>b.disabled=true);}
+  function clearPreview(){previewRequest++;byId('paperPreview').removeAttribute('src');byId('paperPreview').hidden=true;if(previewURL)URL.revokeObjectURL(previewURL);previewURL=null;}
+  function close(){request++;manifest=null;clearPreview();byId('paperPanel').hidden=true;buttons().forEach(b=>b.disabled=true);}
   async function open(){
     if(!authorised())return false;
-    const token=++request;manifest=null;byId('paperPanel').hidden=false;buttons().forEach(b=>b.disabled=true);
+    const token=++request;manifest=null;clearPreview();byId('paperPanel').hidden=false;buttons().forEach(b=>b.disabled=true);
     status('正在準備工作紙……');
     try{
       const response=await fetch('paperwork/generated/manifest.json',{cache:'no-store'});
@@ -39,22 +40,32 @@
       if(token===request&&authorised())status('工作紙未能載入，請重新載入網站後重試。');return false;
     }
   }
-  async function downloadFile(id){
-    if(!authorised()||!manifest||!Object.hasOwn(specs,id))return false;
+  async function fileBlob(id){
+    if(!authorised()||!manifest||!Object.hasOwn(specs,id))return null;
     const lang=window.VL1Language?.current==='en'?'en':'zh';
     const token=request,file=manifest.languages[lang].files.find(f=>f.id===id);
+    const response=await fetch(file.path,{cache:'no-store'});if(!response.ok)throw new Error('file');
+    const bytes=await response.arrayBuffer(),head=new Uint8Array(bytes.slice(0,5));
+    const valid=file.mime==='application/pdf'?new TextDecoder().decode(head)==='%PDF-':head[0]===0x50&&head[1]===0x4b&&head[2]===3&&head[3]===4;
+    if(!valid||bytes.byteLength!==file.bytes||await digest(bytes)!==file.sha256)throw new Error('checksum');
+    if(token!==request||!authorised()||lang!==window.VL1Language.current)return null;
+    return {blob:new Blob([bytes],{type:file.mime}),name:file.name,lang};
+  }
+  async function downloadFile(id){
+    try{const file=await fileBlob(id);if(!file)return false;download(file.blob,file.name);status('檔案已下載。');return true;}
+    catch{if(authorised())status('檔案下載失敗，請重試。');return false;}
+  }
+  async function previewFile(id){
+    if(!authorised()||!manifest||specs[id]?.[1]!=='application/pdf')return false;
+    clearPreview();const token=previewRequest;
     try{
-      const response=await fetch(file.path,{cache:'no-store'});if(!response.ok)throw new Error('file');
-      const bytes=await response.arrayBuffer(),head=new Uint8Array(bytes.slice(0,5));
-      const valid=file.mime==='application/pdf'?new TextDecoder().decode(head)==='%PDF-':head[0]===0x50&&head[1]===0x4b&&head[2]===3&&head[3]===4;
-      if(!valid||bytes.byteLength!==file.bytes||await digest(bytes)!==file.sha256)throw new Error('checksum');
-      if(token!==request||!authorised())return false;
-      download(new Blob([bytes],{type:file.mime}),file.name);status('檔案已下載。');return true;
-    }catch{
-      if(token===request&&authorised())status('檔案下載失敗，請重試。');return false;
-    }
+      const file=await fileBlob(id);if(!file||token!==previewRequest)return false;
+      previewURL=URL.createObjectURL(file.blob);byId('paperPreview').src=previewURL;byId('paperPreview').dataset.language=file.lang;byId('paperPreview').hidden=false;
+      status('預覽已開啟；手機如未能顯示，可直接下載 PDF。');return true;
+    }catch{if(authorised()&&token===previewRequest)status('預覽未能載入，請重試或直接下載 PDF。');return false;}
   }
   byId('openPaperwork').addEventListener('click',open);byId('closePaperwork').addEventListener('click',close);
-  buttons().forEach(button=>button.addEventListener('click',()=>downloadFile(button.dataset.paperDownload)));
-  window.VL1Paperwork={open,close,download:downloadFile};
+  buttons().forEach(button=>button.addEventListener('click',()=>button.dataset.paperPreview?previewFile(button.dataset.paperPreview):downloadFile(button.dataset.paperDownload)));
+  window.addEventListener('vl-language-changed',()=>{request++;clearPreview();if(!byId('paperPanel').hidden){if(!manifest)open();else status('工作紙已準備好。');}});
+  window.VL1Paperwork={open,close,download:downloadFile,preview:previewFile};
 })();

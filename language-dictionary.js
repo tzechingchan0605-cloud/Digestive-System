@@ -426,6 +426,7 @@
     "檔案已下載。": "File downloaded.",
     "檔案下載失敗，請重試。": "Download failed. Please try again.",
     "教材跟隨介面語言，提供完整工作紙、答案版及教師指引。": "Materials follow the interface language: full worksheets, answers and teacher guide.",
+    "預覽未能載入，請重試或直接下載 PDF。": "Preview could not load. Try again or download the PDF directly.",
     // Each label names the language that clicking the button will select.
     '切換至英文': 'Switch to Chinese',
     "下載紙本比較組自學工作紙 PDF": "Download comparison-group self-study worksheets PDF",
