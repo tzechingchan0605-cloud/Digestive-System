@@ -107,7 +107,6 @@ def create(out,tmp):
    pic('scenario',16);p(t('部分 1｜研究情境與公平比較','Part 1 | Context and fair comparisons'),'Heading 2')
    p(t('研究員在相同油水混合物分別加入 2 mL X 或 2 mL Y；在 37°C 同樣搖勻，比較一小時後的外觀。','Researchers added 2 mL X or 2 mL Y to identical oil–water mixtures, shook them identically at 37°C, and compared appearances after one hour.'))
    p(t('1. 辨識實驗變量','1. Identify the variables'),'Heading 2');p(t('在每列剔選適當的因素；每類可選多於一項。','Tick the appropriate factors in each row. You may choose more than one.'))
-   p('；'.join(abbr+tr('（'+definition+'）') for abbr,definition in [('IV','主動改變的因素'),('DV','量度或觀察的結果'),('CV','保持不變的因素')]),small=True)
    table=d.add_table(rows=1,cols=2);table.style='Table Grid';table.autofit=False;table.columns[0].width=Cm(4);table.columns[1].width=Cm(14);table.rows[0].cells[0].text=t('變量類別','Variable type');table.rows[0].cells[1].text=t('可選因素','Factors to choose from')
    for group,correct in [('獨立變量',['消化液組合']),('因變量',['混合物外觀']),('控制變量',variable_names[:5])]:
     cells=table.add_row().cells;cells[0].width=Cm(4);cells[1].width=Cm(14);cells[0].text=tr(group);cells[0].paragraphs[0].runs[0].bold=True;cells[0].paragraphs[0].runs[0].font.color.rgb=RGBColor.from_string('B7312C');definition={'獨立變量':('主動改變的因素','Factor changed'),'因變量':('量度或觀察的結果','Outcome measured'),'控制變量':('保持不變的因素','Kept the same')}[group];cells[0].paragraphs[0].add_run('\n'+t(*definition));para=cells[1].paragraphs[0]
