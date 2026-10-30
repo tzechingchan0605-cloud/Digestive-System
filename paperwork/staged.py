@@ -210,7 +210,7 @@ def create(out,tmp):
      rid,_=d.part.get_or_add_image(BytesIO(blob))
      blip.set(qn('r:embed'),rid)
     anchor.addnext(node);anchor=node
-   intro=p(t('請先閱讀「課題需知」，再運用概念分析各組結果。','Read the topic notes first, then apply the concepts to analyse the results.'))
+   intro=p(t('請先閱讀「課題需知」，再根據提供的情境及模擬結果作答。','Please read the topic notes first, then answer the questions based on the scenario and simulation results provided.'))
    intro._p.getparent().remove(intro._p);ps[1]._p.addnext(intro._p)
    context=next(para for para in d.paragraphs if para.text.startswith(t('情境：','Context:')))
    context.paragraph_format.page_break_before=True

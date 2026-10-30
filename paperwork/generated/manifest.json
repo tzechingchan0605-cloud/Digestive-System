@@ -8,7 +8,7 @@
     "paperwork/figures/03_scenario_reference_en.svg": "8b22e8ee1d989a727e57429e14246ef845abb3b55310c87a2200d2b7598f7320",
     "paperwork/templates/WS1_topic_notes_zh.docx": "d69225830619387c050ec08f79d5fd272f7bc0a6bef71d26d397bfdb630652f3",
     "paperwork/templates/WS1_topic_notes_en.docx": "943669003e62a26b2a2ecd4142dccff2f1516fc693bcbda7de4562b8a958c1d8",
-    "paperwork/staged.py": "9adb763e25ec6866b599e4eacb8cc3f2168212d7b215579689fc632104fd1361",
+    "paperwork/staged.py": "85eabf28609af5dca8e884d37e919f9eb82e2d747a67da4c6370685a71e4be36",
     "paperwork/diagrams_en.py": "16de49582c9c60d83d5f8d81277e32c642166e6be18787403f0a4739c9de714c",
     "paperwork/render_diagrams.cjs": "5535f793731b3b76926fc70b0e6b7d9c99b3ee4335392b5142cdbabf2256f3e9",
     "language-dictionary.js": "3a2a6ea7cf161dabfc5ecad21d987943956efb9f3341dc9966516adc568e813f",
@@ -26,8 +26,8 @@
           "path": "paperwork/generated/WS1_student.pdf",
           "name": "WS1_student.pdf",
           "mime": "application/pdf",
-          "bytes": 857862,
-          "sha256": "57e3a43d6e13a13458e8474e2574d2a43e133e53c836012a634203519fd921c9",
+          "bytes": 857274,
+          "sha256": "e8dbacab41b4bfca52e9becd5647846627137ad69f6c88ba3ee4317c55aef35f",
           "pages": 4
         },
         {
@@ -35,8 +35,8 @@
           "path": "paperwork/generated/WS1_student.docx",
           "name": "WS1_student.docx",
           "mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-          "bytes": 709280,
-          "sha256": "ad601608b6109ffdf84a297dcd620c58ff2ecc7e1140590c0a2d178734bf3f4c",
+          "bytes": 709283,
+          "sha256": "0a1fcd924e4a89a5fe8543b7b98827d6bac856f4bc7255e80ffe7d9b1bdeb569",
           "pages": 4
         },
         {
@@ -44,8 +44,8 @@
           "path": "paperwork/generated/WS1_answers.pdf",
           "name": "WS1_answers.pdf",
           "mime": "application/pdf",
-          "bytes": 894423,
-          "sha256": "587c2eba122cd34993a2f9de776c5c7c92e009c36b31cd62353505cf841f19ac",
+          "bytes": 894513,
+          "sha256": "2629dd32de6c03cea588f70837b73699dbb3cc1fe4a7dc8fdbf4cccb8b8f9d7f",
           "pages": 4
         },
         {
@@ -53,8 +53,8 @@
           "path": "paperwork/generated/WS1_answers.docx",
           "name": "WS1_answers.docx",
           "mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-          "bytes": 709546,
-          "sha256": "c0a9ae2924e8c1b5cc30e83ffa79b5ffc335a2b6f2bef96f45f185c5ea3e2d61",
+          "bytes": 709548,
+          "sha256": "4c391d8d8e826cb1dcd24caf459471f287b289ff0865d1a86e546b34a9ca9dd5",
           "pages": 4
         },
         {
@@ -63,7 +63,7 @@
           "name": "WS1_D_teacher_guide.pdf",
           "mime": "application/pdf",
           "bytes": 216611,
-          "sha256": "17980f621d44a7e2b7af68ce50a7a2dd7516b03d8c435667a8a5a998a09e6b16",
+          "sha256": "4801d81e580eac0871b444735cc6aeac8621a9f058dabf8e7a940c2cb0b7747a",
           "pages": 4
         }
       ]
@@ -75,8 +75,8 @@
           "path": "paperwork/generated/WS1_student_en.pdf",
           "name": "WS1_student_en.pdf",
           "mime": "application/pdf",
-          "bytes": 744478,
-          "sha256": "29e8cc93d2c42823c1412d8cfa6d12f3ddb0ac23858be3e98d8eee11cad80697",
+          "bytes": 744629,
+          "sha256": "bf782b9df50452673d485c9291b6070a03dc5628815d6ee0b02044f700d96cd8",
           "pages": 4
         },
         {
@@ -84,8 +84,8 @@
           "path": "paperwork/generated/WS1_student_en.docx",
           "name": "WS1_student_en.docx",
           "mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-          "bytes": 715948,
-          "sha256": "51c0e14e6876cd40e4118a60d39c09862fbbcc833262fe4159c1f9ddeb36e6a6",
+          "bytes": 715963,
+          "sha256": "b83a73b239d555daa17bfbd1f0be02c7fd55676e9698dca1a3387ea1ca929072",
           "pages": 4
         },
         {
@@ -93,8 +93,8 @@
           "path": "paperwork/generated/WS1_answers_en.pdf",
           "name": "WS1_answers_en.pdf",
           "mime": "application/pdf",
-          "bytes": 752923,
-          "sha256": "c9db670222ea3950c7cf4437d7f92584b765594b00dba7c162586c45c44128b8",
+          "bytes": 753075,
+          "sha256": "b33ea6aab2b2028c5cdf27e23e58f6932f86004101f7dd47a7c5dc18644d3340",
           "pages": 4
         },
         {
@@ -102,8 +102,8 @@
           "path": "paperwork/generated/WS1_answers_en.docx",
           "name": "WS1_answers_en.docx",
           "mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-          "bytes": 716143,
-          "sha256": "f24f55566b0292be6518b33a701b649606ce0ed0cdf77e504ea4c2d85864f4fa",
+          "bytes": 716158,
+          "sha256": "209150ff16fe80116cb035f3bc82fd9fcd3e87414d546e1ccec8fc000ace93ec",
           "pages": 4
         },
         {
@@ -112,7 +112,7 @@
           "name": "WS1_D_teacher_guide_en.pdf",
           "mime": "application/pdf",
           "bytes": 54201,
-          "sha256": "26ed43ba59c236e47434eab40a0d6b1680f07dc5d0823ea6a259a47c4257ff0f",
+          "sha256": "96d201090757e001f4aed33941283f8f85ee2594ebeee5c2148aa7046343a880",
           "pages": 3
         }
       ]
